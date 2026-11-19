@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SSTLI2023Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <Function Name="LoadBranch" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="SSTLI2023ModelStoreContainer" />
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SSTLI2023Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="SSTLI2023Entities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="BranchCustomer" ReturnType="Collection(SSTLI2023Model.BranchCustomer_Result)">
+            <Parameter Name="Brind" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CalcMaden" ReturnType="Collection(SSTLI2023Model.CalcMaden_Result)">
+            <Parameter Name="AcctCode" Mode="In" Type="String" />
+            <Parameter Name="FDate" Mode="In" Type="DateTime" />
+            <Parameter Name="ToDate" Mode="In" Type="DateTime" />
+            <Parameter Name="Brid" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="LoadBranch" ReturnType="Collection(SSTLI2023Model.LoadBranch_Result)" />
+        </EntityContainer>
+        <ComplexType Name="BranchCustomer_Result">
+          <Property Type="String" Name="CUSTNO" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="CUSTNAME" Nullable="true" MaxLength="100" />
+        </ComplexType>
+        <ComplexType Name="CalcMaden_Result">
+          <Property Type="String" Name="DEBITACCT" Nullable="true" MaxLength="50" />
+          <Property Type="Double" Name="DEBIT" Nullable="true" />
+          <Property Type="Boolean" Name="ACTIVATE" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="LoadBranch_Result">
+          <Property Type="Int32" Name="BRNID" Nullable="false" />
+          <Property Type="String" Name="BRNNAME" Nullable="true" MaxLength="100" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SSTLI2023ModelStoreContainer" CdmEntityContainer="SSTLI2023Entities" >
+          <FunctionImportMapping FunctionImportName="LoadBranch" FunctionName="SSTLI2023Model.Store.LoadBranch">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SSTLI2023Model.LoadBranch_Result">
+                <ScalarProperty Name="BRNID" ColumnName="BRNID" />
+                <ScalarProperty Name="BRNNAME" ColumnName="BRNNAME" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram DiagramId="649ca276adee464d96ebaaff9b47e65a" Name="Diagram1" />
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#faf8f4" />
+    <script>
+      // Apply the saved theme before first paint (no white flash in dark mode).
+      (function () {
+        try {
+          // visitor's own choice, else the site default from the dashboard (remembered from the last visit), else light
+          var s = JSON.parse(localStorage.getItem('alsmow-theme') || '{}');
+          var d = JSON.parse(localStorage.getItem('alsmow-theme-defaults') || '{}');
+          var m = s.mode || d.mode || 'light';
+          if (m === 'auto') m = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.mode = m;
+          document.documentElement.dataset.accent = s.accent || d.accent || 'semou';
+          // any colour the visitor picked (also presets): the exact brand colour of the last visit, before first paint
+          var c = localStorage.getItem('alsmow-theme-color');
+          if (c) { document.documentElement.style.setProperty('--brand', c); document.documentElement.style.setProperty('--glow', 'color-mix(in oklab, ' + c + ' 45%, white)'); }
+        } catch (e) {
+          document.documentElement.dataset.mode = 'light';
+        }
+      })();
+    </script>
+    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
+    <link rel="apple-touch-icon" href="/logo.jpeg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet" />
+    <title>معهد السمو للتدريب | دبلومات ودورات معتمدة</title>
+    <meta name="description" content="معهد السمو للتدريب في حفر الباطن: دبلومات ودورات معتمدة من المؤسسة العامة للتدريب التقني والمهني." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:site_name" content="معهد السمو للتدريب" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>يرجى تفعيل JavaScript لعرض موقع معهد السمو للتدريب.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

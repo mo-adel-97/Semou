@@ -1,0 +1,169 @@
+-- Alsmow site: initial schema (MySQL 8 / MariaDB 10.6+, utf8mb4)
+
+CREATE TABLE IF NOT EXISTS users (
+  id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(120) NOT NULL,
+  email         VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role          ENUM('admin','editor') NOT NULL DEFAULT 'editor',
+  is_active     TINYINT(1) NOT NULL DEFAULT 1,
+  token_version INT UNSIGNED NOT NULL DEFAULT 1,
+  last_login_at DATETIME NULL,
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS settings (
+  k          VARCHAR(64) PRIMARY KEY,
+  v          JSON NOT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS programs (
+  id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  type          ENUM('diploma','qualifying','development') NOT NULL,
+  title         VARCHAR(200) NOT NULL,
+  slug          VARCHAR(220) NOT NULL UNIQUE,
+  summary       VARCHAR(600) NULL,
+  body          MEDIUMTEXT NULL,
+  image         VARCHAR(500) NULL,
+  hours         INT UNSIGNED NULL,
+  duration      VARCHAR(80) NULL,
+  mode          ENUM('onsite','online','hybrid') NULL,
+  badge         VARCHAR(40) NULL,
+  features      JSON NULL,
+  accreditation VARCHAR(200) NULL,
+  price         VARCHAR(80) NULL,
+  is_featured   TINYINT(1) NOT NULL DEFAULT 0,
+  is_published  TINYINT(1) NOT NULL DEFAULT 1,
+  sort          INT NOT NULL DEFAULT 0,
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_programs_type (type, is_published, sort)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS posts (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title        VARCHAR(220) NOT NULL,
+  slug         VARCHAR(240) NOT NULL UNIQUE,
+  excerpt      VARCHAR(600) NULL,
+  body         MEDIUMTEXT NULL,
+  cover        VARCHAR(500) NULL,
+  category     VARCHAR(80) NULL,
+  published_at DATE NULL,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_posts_pub (is_published, published_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS pages (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title        VARCHAR(200) NOT NULL,
+  slug         VARCHAR(220) NOT NULL UNIQUE,
+  body         MEDIUMTEXT NULL,
+  in_menu      TINYINT(1) NOT NULL DEFAULT 1,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS accreditations (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name         VARCHAR(200) NOT NULL,
+  logo         VARCHAR(500) NULL,
+  certificate  VARCHAR(500) NULL,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS partners (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name         VARCHAR(200) NOT NULL,
+  logo         VARCHAR(500) NULL,
+  url          VARCHAR(500) NULL,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS testimonials (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name         VARCHAR(120) NOT NULL,
+  role         VARCHAR(160) NULL,
+  text         VARCHAR(1200) NOT NULL,
+  rating       TINYINT UNSIGNED NOT NULL DEFAULT 5,
+  avatar       VARCHAR(500) NULL,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS agreements (
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title        VARCHAR(220) NOT NULL,
+  partner      VARCHAR(200) NULL,
+  summary      VARCHAR(600) NULL,
+  image        VARCHAR(500) NULL,
+  signed_at    DATE NULL,
+  is_published TINYINT(1) NOT NULL DEFAULT 1,
+  sort         INT NOT NULL DEFAULT 0,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS messages (
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  kind       ENUM('contact','register') NOT NULL DEFAULT 'contact',
+  name       VARCHAR(120) NOT NULL,
+  phone      VARCHAR(30) NULL,
+  email      VARCHAR(190) NULL,
+  program    VARCHAR(220) NULL,
+  subject    VARCHAR(200) NULL,
+  body       TEXT NULL,
+  is_read    TINYINT(1) NOT NULL DEFAULT 0,
+  ip         VARCHAR(45) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_messages_read (is_read, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS media (
+  id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  url           VARCHAR(500) NOT NULL,
+  original_name VARCHAR(255) NULL,
+  width         INT UNSIGNED NULL,
+  height        INT UNSIGNED NULL,
+  size          INT UNSIGNED NULL,
+  created_by    INT UNSIGNED NULL,
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id    BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  kind  VARCHAR(20) NOT NULL,
+  ip    VARCHAR(45) NOT NULL,
+  at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_rl (kind, ip, at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS activity_log (
+  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED NULL,
+  action     VARCHAR(20) NOT NULL,
+  resource   VARCHAR(40) NOT NULL,
+  record_id  INT UNSIGNED NULL,
+  label      VARCHAR(255) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_activity_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  name       VARCHAR(190) PRIMARY KEY,
+  applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

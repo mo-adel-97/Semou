@@ -1,0 +1,2953 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3A800104-838A-425F-9D0F-7039592283A8}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>SEMOU.My.MyApplication</StartupObject>
+    <RootNamespace>SEMOU</RootNamespace>
+    <AssemblyName>SEMOU</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>SEMOU.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>SEMOU.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>semou.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bunifu_UI_v1.52">
+      <HintPath>..\..\..\..\My Work\Tools\Bunifu_UI_v1.52.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.CrystalReports.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.ClientDoc, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.ClientDoc.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommLayer, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.CommLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommonControls, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.CommonControls.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommonObjectModel, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.CommonObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.Controllers, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.Controllers.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CubeDefModel, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.CubeDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.DataDefModel, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.DataDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.DataSetConversion, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.DataSetConversion.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.ObjectFactory, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.ObjectFactory.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.Prompting, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.Prompting.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.ReportDefModel, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.ReportDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.XmlSerialize, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>bin\Debug\CrystalDecisions.ReportAppServer.XmlSerialize.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.ReportSource.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.Web, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CrystalDecisions.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="DataGridViewAutoFilter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DataGridViewAutoFilter.1.0.0\lib\DataGridViewAutoFilter.dll</HintPath>
+    </Reference>
+    <Reference Include="DevComponents.DotNetBar2, Version=7.3.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\DevComponents.DotNetBar2.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Data.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.DataAccess.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.DataAccess.v20.1.UI, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Diagram.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Mvvm.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Office.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Pdf.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.PivotGrid.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v20.1.Export, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Sparkline.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Spreadsheet.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Utils.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v20.1.UI, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Xpo.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraCharts.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraCharts.v20.1.Extensions, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraCharts.v20.1.Wizard, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraDiagram.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraGauges.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraGrid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraLayout.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraNavBar.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraPivotGrid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraReports.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraReports.v20.1.Extensions, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraRichEdit.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.XtraScheduler.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraScheduler.v20.1.Core, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraSpreadsheet.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraTreeList.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraVerticalGrid.v20.1, Version=20.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="HijriLibrary, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b1aaae09ceafd697, processorArchitecture=MSIL">
+      <HintPath>..\packages\Salous-Utilities-HijriLibrary.1.0.0\lib\net451\HijriLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Globalization.Calendars, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Globalization.Calendars.4.3.0\lib\net46\System.Globalization.Calendars.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DATASSTLIDataSet.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DATASSTLIDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DATASSTLIDataSet.vb">
+      <DependentUpon>DATASSTLIDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DATASSTLIDataSet1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DATASSTLIDataSet1.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DATASSTLIDataSet1.vb">
+      <DependentUpon>DATASSTLIDataSet1.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Form\About.Designer.vb">
+      <DependentUpon>About.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\About.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\AccountHome.Designer.vb">
+      <DependentUpon>AccountHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\AccountHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\CashBoxHistory.Designer.vb">
+      <DependentUpon>CashBoxHistory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\CashBoxHistory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\ChangeDiscountStaut.Designer.vb">
+      <DependentUpon>ChangeDiscountStaut.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\ChangeDiscountStaut.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\CostCenterHome.Designer.vb">
+      <DependentUpon>CostCenterHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\CostCenterHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\CustomerHome.Designer.vb">
+      <DependentUpon>CustomerHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\CustomerHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\DailyHome.Designer.vb">
+      <DependentUpon>DailyHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\DailyHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\DisCountHome.Designer.vb">
+      <DependentUpon>DisCountHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\DisCountHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodinAccountSetting.Designer.vb">
+      <DependentUpon>EncodinAccountSetting.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodinAccountSetting.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashDayPay.Designer.vb">
+      <DependentUpon>EncodingCashDayPay.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashDayPay.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashDayReceipt.Designer.vb">
+      <DependentUpon>EncodingCashDayReceipt.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashDayReceipt.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingDaily.Designer.vb">
+      <DependentUpon>EncodingDaily.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingDaily.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingDiscountDoc.Designer.vb">
+      <DependentUpon>EncodingDiscountDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingDiscountDoc.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingOpenDaily.Designer.vb">
+      <DependentUpon>EncodingOpenDaily.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingOpenDaily.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingTransMoney.Designer.vb">
+      <DependentUpon>EncodingTransMoney.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingTransMoney.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\ExpenseAnalysisHome.Designer.vb">
+      <DependentUpon>ExpenseAnalysisHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\ExpenseAnalysisHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\GeneralAccountStatment.Designer.vb">
+      <DependentUpon>GeneralAccountStatment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\GeneralAccountStatment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\IncomeStatment.Designer.vb">
+      <DependentUpon>IncomeStatment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\IncomeStatment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchDailyHome.Designer.vb">
+      <DependentUpon>BranchDailyHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchDailyHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchReport\ClassTabelPrint.Designer.vb">
+      <DependentUpon>ClassTabelPrint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchReport\ClassTabelPrint.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchTimeWork.Designer.vb">
+      <DependentUpon>BranchTimeWork.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\BranchTimeWork.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\ChooseData.Designer.vb">
+      <DependentUpon>ChooseData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\ChooseData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\ClassList.Designer.vb">
+      <DependentUpon>ClassList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\ClassList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\ClassTabel.Designer.vb">
+      <DependentUpon>ClassTabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\ClassTabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\ContractHome.Designer.vb">
+      <DependentUpon>ContractHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\ContractHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\ContractReport.Designer.vb">
+      <DependentUpon>ContractReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\ContractReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingClass.Designer.vb">
+      <DependentUpon>EncodingClass.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingClass.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingPaymentOrder.Designer.vb">
+      <DependentUpon>EncodingPaymentOrder.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingPaymentOrder.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingReceiptOrder.Designer.vb">
+      <DependentUpon>EncodingReceiptOrder.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingReceiptOrder.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingTabel.Designer.vb">
+      <DependentUpon>EncodingTabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingTabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\RoomTabel.Designer.vb">
+      <DependentUpon>RoomTabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\RoomTabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\TranierTabel.Designer.vb">
+      <DependentUpon>TranierTabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\TranierTabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingBatchCount.Designer.vb">
+      <DependentUpon>EncodingBatchCount.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingBatchCount.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingCompany.Designer.vb">
+      <DependentUpon>EncodingCompany.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingCompany.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\CrmDailyHome.Designer.vb">
+      <DependentUpon>CrmDailyHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\CrmDailyHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall1.Designer.vb">
+      <DependentUpon>EncodingCall1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall2.Designer.vb">
+      <DependentUpon>EncodingCall2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall2.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall3.Designer.vb">
+      <DependentUpon>EncodingCall3.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\EncodingCall3.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\MainCallHome.Designer.vb">
+      <DependentUpon>MainCallHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\MainCallHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\NewCallType.Designer.vb">
+      <DependentUpon>NewCallType.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\NewCallType.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Customer Services\StudyInfoCrm.Designer.vb">
+      <DependentUpon>StudyInfoCrm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Customer Services\StudyInfoCrm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\AccountOpenBalnceList.Designer.vb">
+      <DependentUpon>AccountOpenBalnceList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\AccountOpenBalnceList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BatchAvailableSeats.Designer.vb">
+      <DependentUpon>BatchAvailableSeats.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BatchAvailableSeats.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BranchCostList.Designer.vb">
+      <DependentUpon>BranchCostList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BranchCostList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\PaymentOrderList.Designer.vb">
+      <DependentUpon>PaymentOrderList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\PaymentOrderList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\ReceiptOrderList.Designer.vb">
+      <DependentUpon>ReceiptOrderList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\ReceiptOrderList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\RoomClassList.Designer.vb">
+      <DependentUpon>RoomClassList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\RoomClassList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\SectorLIst.Designer.vb">
+      <DependentUpon>SectorLIst.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\SectorLIst.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\MssgHome.Designer.vb">
+      <DependentUpon>MssgHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\MssgHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\BatchSeatsHome.Designer.vb">
+      <DependentUpon>BatchSeatsHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\BatchSeatsHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\CustomerBalanceHome.Designer.vb">
+      <DependentUpon>CustomerBalanceHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\CustomerBalanceHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\PaymentOrderDoc.Designer.vb">
+      <DependentUpon>PaymentOrderDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\PaymentOrderDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\ReceiptOrderDoc.Designer.vb">
+      <DependentUpon>ReceiptOrderDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\ReceiptOrderDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\ReTaxReport.Designer.vb">
+      <DependentUpon>ReTaxReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\ReTaxReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\TaxHome.Designer.vb">
+      <DependentUpon>TaxHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\TaxHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\TrailHome.Designer.vb">
+      <DependentUpon>TrailHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\TrailHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\AttachForm.Designer.vb">
+      <DependentUpon>AttachForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\AttachForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\ChangeUserPassword.Designer.vb">
+      <DependentUpon>ChangeUserPassword.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\ChangeUserPassword.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\DocHistory.Designer.vb">
+      <DependentUpon>DocHistory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\DocHistory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingOtherFees.Designer.vb">
+      <DependentUpon>EncodingOtherFees.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingOtherFees.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingPriceList.Designer.vb">
+      <DependentUpon>EncodingPriceList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingPriceList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingPriceSale.Designer.vb">
+      <DependentUpon>EncodingPriceSale.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingPriceSale.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingRegSetting.Designer.vb">
+      <DependentUpon>EncodingRegSetting.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingRegSetting.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingStudyPlan.Designer.vb">
+      <DependentUpon>EncodingStudyPlan.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingStudyPlan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingStudyTabel.Designer.vb">
+      <DependentUpon>EncodingStudyTabel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingStudyTabel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingAccount.Designer.vb">
+      <DependentUpon>EncodingAccount.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingAccount.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingBank.Designer.vb">
+      <DependentUpon>EncodingBank.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingBank.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\EncodingTestSetting.Designer.vb">
+      <DependentUpon>EncodingTestSetting.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\EncodingTestSetting.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Control\UpdateResaon.Designer.vb">
+      <DependentUpon>UpdateResaon.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Control\UpdateResaon.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingBatch.Designer.vb">
+      <DependentUpon>EncodingBatch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingBatch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingBook.Designer.vb">
+      <DependentUpon>EncodingBook.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingBook.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingBranch.Designer.vb">
+      <DependentUpon>EncodingBranch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingBranch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingCalssRoom.Designer.vb">
+      <DependentUpon>EncodingCalssRoom.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingCalssRoom.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashBox.Designer.vb">
+      <DependentUpon>EncodingCashBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCashBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingCompanyInfo.Designer.vb">
+      <DependentUpon>EncodingCompanyInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingCompanyInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCostCenter.Designer.vb">
+      <DependentUpon>EncodingCostCenter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Account\EncodingCostCenter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingDiplom.Designer.vb">
+      <DependentUpon>EncodingDiplom.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingDiplom.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingDiscountType.Designer.vb">
+      <DependentUpon>EncodingDiscountType.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingDiscountType.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingLevel.Designer.vb">
+      <DependentUpon>EncodingLevel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingLevel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingQuestion.Designer.vb">
+      <DependentUpon>EncodingQuestion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingQuestion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingRegCases.Designer.vb">
+      <DependentUpon>EncodingRegCases.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingRegCases.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingSalesMan.Designer.vb">
+      <DependentUpon>EncodingSalesMan.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingSalesMan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingTrainer.Designer.vb">
+      <DependentUpon>EncodingTrainer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\BranchTool\EncodingTrainer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingUser.Designer.vb">
+      <DependentUpon>EncodingUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Encoding\EncodingUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\HomePage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\HomePage.Designer.vb">
+      <DependentUpon>HomePage.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\AccountList.Designer.vb">
+      <DependentUpon>AccountList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\AccountList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BatchList.Designer.vb">
+      <DependentUpon>BatchList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BatchList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BookByLevelList.Designer.vb">
+      <DependentUpon>BookByLevelList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BookByLevelList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BookList.Designer.vb">
+      <DependentUpon>BookList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BookList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ORG\BookTryList.Designer.vb">
+      <DependentUpon>BookTryList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ORG\BookTryList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\BranchList.Designer.vb">
+      <DependentUpon>BranchList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\BranchList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\CashBoxList.Designer.vb">
+      <DependentUpon>CashBoxList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\CashBoxList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\CashDayList.Designer.vb">
+      <DependentUpon>CashDayList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\CashDayList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\CostCenterList.Designer.vb">
+      <DependentUpon>CostCenterList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\CostCenterList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\CourseList.Designer.vb">
+      <DependentUpon>CourseList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\CourseList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\DiplomList.Designer.vb">
+      <DependentUpon>DiplomList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\DiplomList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\DiscountTypeList.Designer.vb">
+      <DependentUpon>DiscountTypeList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\DiscountTypeList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\DocRegSettingList.Designer.vb">
+      <DependentUpon>DocRegSettingList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\DocRegSettingList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\DocTypeList.Designer.vb">
+      <DependentUpon>DocTypeList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\DocTypeList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\ExamList.Designer.vb">
+      <DependentUpon>ExamList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\ExamList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\LevelList.Designer.vb">
+      <DependentUpon>LevelList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\LevelList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\LevelQuestionList.Designer.vb">
+      <DependentUpon>LevelQuestionList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\LevelQuestionList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\ListOpenDaily.Designer.vb">
+      <DependentUpon>ListOpenDaily.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\ListOpenDaily.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\NewBranchList.Designer.vb">
+      <DependentUpon>NewBranchList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\NewBranchList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\OfferPriceList.Designer.vb">
+      <DependentUpon>OfferPriceList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\OfferPriceList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\OtherFeesList.Designer.vb">
+      <DependentUpon>OtherFeesList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\OtherFeesList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\PlanStudyList.Designer.vb">
+      <DependentUpon>PlanStudyList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\PlanStudyList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\PriceList.Designer.vb">
+      <DependentUpon>PriceList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\PriceList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\PriceSaleList.Designer.vb">
+      <DependentUpon>PriceSaleList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\PriceSaleList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\RegSettingList.Designer.vb">
+      <DependentUpon>RegSettingList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\RegSettingList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\SalesManForReg.Designer.vb">
+      <DependentUpon>SalesManForReg.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\SalesManForReg.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\SalesManList.Designer.vb">
+      <DependentUpon>SalesManList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\SalesManList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\SellerList.Designer.vb">
+      <DependentUpon>SellerList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\SellerList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\StautList.Designer.vb">
+      <DependentUpon>StautList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\StautList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\StudentBillList.Designer.vb">
+      <DependentUpon>StudentBillList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\StudentBillList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\StudentDiscountList.Designer.vb">
+      <DependentUpon>StudentDiscountList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\StudentDiscountList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\StudentRegDocList.Designer.vb">
+      <DependentUpon>StudentRegDocList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\StudentRegDocList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\TrainerList.Designer.vb">
+      <DependentUpon>TrainerList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\TrainerList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\TransMoneyList.Designer.vb">
+      <DependentUpon>TransMoneyList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\TransMoneyList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\List\UserList.Designer.vb">
+      <DependentUpon>UserList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\List\UserList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\LogIn.Designer.vb">
+      <DependentUpon>LogIn.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\LogIn.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ORG\ChooseRoom.Designer.vb">
+      <DependentUpon>ChooseRoom.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ORG\ChooseRoom.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ORG\DiplomTryList.Designer.vb">
+      <DependentUpon>DiplomTryList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ORG\DiplomTryList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ORG\StudyTabelList.Designer.vb">
+      <DependentUpon>StudyTabelList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ORG\StudyTabelList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ORG\TrainerForTryList.Designer.vb">
+      <DependentUpon>TrainerForTryList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ORG\TrainerForTryList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\CashBoxHistoryReport.Designer.vb">
+      <DependentUpon>CashBoxHistoryReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\CashBoxHistoryReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\OfferPriceDoc.Designer.vb">
+      <DependentUpon>OfferPriceDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\OfferPriceDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentStatment.Designer.vb">
+      <DependentUpon>StudentStatment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentStatment.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\SalesManReport.Designer.vb">
+      <DependentUpon>SalesManReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\SalesManReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\AddCourseStudentNotes.Designer.vb">
+      <DependentUpon>AddCourseStudentNotes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\AddCourseStudentNotes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\AddServicesOfferPrice.Designer.vb">
+      <DependentUpon>AddServicesOfferPrice.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\AddServicesOfferPrice.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\AddStudentLevelNotes.Designer.vb">
+      <DependentUpon>AddStudentLevelNotes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\AddStudentLevelNotes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\AddStudentOtherFess.Designer.vb">
+      <DependentUpon>AddStudentOtherFess.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\AddStudentOtherFess.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\AttachView.Designer.vb">
+      <DependentUpon>AttachView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\AttachView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\ChangeStudentStaut.Designer.vb">
+      <DependentUpon>ChangeStudentStaut.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\ChangeStudentStaut.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\CourseHome.Designer.vb">
+      <DependentUpon>CourseHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\CourseHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\AcceptDoc.Designer.vb">
+      <DependentUpon>AcceptDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\AcceptDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\CashDayDoc.Designer.vb">
+      <DependentUpon>CashDayDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\CashDayDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\DailyDoc.Designer.vb">
+      <DependentUpon>DailyDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\DailyDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentCourseReport.Designer.vb">
+      <DependentUpon>StudentCourseReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentCourseReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentDiplomLevel.Designer.vb">
+      <DependentUpon>StudentDiplomLevel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentDiplomLevel.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentInvoice.Designer.vb">
+      <DependentUpon>StudentInvoice.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentInvoice.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentRegDoc.Designer.vb">
+      <DependentUpon>StudentRegDoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\Doc\StudentRegDoc.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\Exam\ExamDoc.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExamDoc.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Form\Report\SalesReport.Designer.vb">
+      <DependentUpon>SalesReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\SalesReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingAcceptOrder.Designer.vb">
+      <DependentUpon>EncodingAcceptOrder.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingAcceptOrder.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingOfferPrice.Designer.vb">
+      <DependentUpon>EncodingOfferPrice.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingOfferPrice.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingOrderDis.Designer.vb">
+      <DependentUpon>EncodingOrderDis.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingOrderDis.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\FindOldStudentData.Designer.vb">
+      <DependentUpon>FindOldStudentData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\FindOldStudentData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\FindStudent.Designer.vb">
+      <DependentUpon>FindStudent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\FindStudent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\FinshStudy.Designer.vb">
+      <DependentUpon>FinshStudy.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\FinshStudy.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\IfStudentNotRegister.Designer.vb">
+      <DependentUpon>IfStudentNotRegister.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\IfStudentNotRegister.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\LevelReportForm.Designer.vb">
+      <DependentUpon>LevelReportForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\LevelReportForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\OldSellerReport.Designer.vb">
+      <DependentUpon>OldSellerReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\OldSellerReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\PrintExam.Designer.vb">
+      <DependentUpon>PrintExam.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\PrintExam.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\ReportView.Designer.vb">
+      <DependentUpon>ReportView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\ReportView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Report\ViewReport.Designer.vb">
+      <DependentUpon>ViewReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Report\ViewReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\ChangeStaut.Designer.vb">
+      <DependentUpon>ChangeStaut.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\ChangeStaut.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\CourseStudentInfo.Designer.vb">
+      <DependentUpon>CourseStudentInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\CourseStudentInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingCourse.Designer.vb">
+      <DependentUpon>EncodingCourse.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingCourse.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingNewPayInvoice.Designer.vb">
+      <DependentUpon>EncodingNewPayInvoice.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingNewPayInvoice.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingPayInvoice.Designer.vb">
+      <DependentUpon>EncodingPayInvoice.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingPayInvoice.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\EncodingStudent.Designer.vb">
+      <DependentUpon>EncodingStudent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\EncodingStudent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\MainFindStudent.Designer.vb">
+      <DependentUpon>MainFindStudent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\MainFindStudent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\NewStudentHome.Designer.vb">
+      <DependentUpon>NewStudentHome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\NewStudentHome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\OldStudentStatment.Designer.vb">
+      <DependentUpon>OldStudentStatment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\OldStudentStatment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\PaySelect.Designer.vb">
+      <DependentUpon>PaySelect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\PaySelect.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\RegFessForm.Designer.vb">
+      <DependentUpon>RegFessForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\RegFessForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\RegisterForm.Designer.vb">
+      <DependentUpon>RegisterForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\RegisterForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\RegReview.Designer.vb">
+      <DependentUpon>RegReview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\RegReview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\RePay.Designer.vb">
+      <DependentUpon>RePay.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\RePay.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\Re_Register.Designer.vb">
+      <DependentUpon>Re_Register.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\Re_Register.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\StudentCourseList.Designer.vb">
+      <DependentUpon>StudentCourseList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\StudentCourseList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\StudentDashBoard.Designer.vb">
+      <DependentUpon>StudentDashBoard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\StudentDashBoard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\StudentList.Designer.vb">
+      <DependentUpon>StudentList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\StudentList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\StudyInfo_Student.Designer.vb">
+      <DependentUpon>StudyInfo_Student.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\StudyInfo_Student.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\StusdentStatment.Designer.vb">
+      <DependentUpon>StusdentStatment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\StusdentStatment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\TransAllDiplomStudent.Designer.vb">
+      <DependentUpon>TransAllDiplomStudent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\TransAllDiplomStudent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\TransferStudentCourse.Designer.vb">
+      <DependentUpon>TransferStudentCourse.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\TransferStudentCourse.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\UpdateStudentLevel.Designer.vb">
+      <DependentUpon>UpdateStudentLevel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\UpdateStudentLevel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\WaitForm1.Designer.vb">
+      <DependentUpon>WaitForm1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\WaitForm1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\WaitForm2.Designer.vb">
+      <DependentUpon>WaitForm2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\WaitForm2.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Student\WhatRegTypeNeed.Designer.vb">
+      <DependentUpon>WhatRegTypeNeed.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form\Student\WhatRegTypeNeed.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Moduel\Account.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AccountList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AccountopenBalance.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AccountSetting.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AllCourse_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AllFiles.vb" />
+    <Compile Include="Moduel\ServerConfig.vb" />
+    <Compile Include="Form\Report\Doc\TaxInvoiceReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="My Project\ApplicationEvents.vb" />
+    <Compile Include="Moduel\AllStudentBalance_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AskForDiplomSeat_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AskForLastBill_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AskIfFoundBill_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AttachName.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AutoGetDocType_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\AutoGetInvoiceType_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Batch.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\BatchStudentCount.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\BeforAccountStatmentBalance_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Bill.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\BillForStudent_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Book.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Branch.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\BranchCustomer_Result.vb">
+      <DependentUpon>MainSeting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\BranchDailyWork.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CalcMaden_Result.vb">
+      <DependentUpon>MainSeting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CashBox.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\cashBoxHistory_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CashDay.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CashDayDetail.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ChkDefBranch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ChkIfFoundRegDocNotContract_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Class.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ClassBook.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Classlist_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ClassTimeTabel.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CollectStudentForClass_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CostCenter.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\CostCenterList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Course.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Day.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Day1.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Day2.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Diplom.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\DiplomCountSeat.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\DiscountOrder.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\DisCountType.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\DoUserHavePremision_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Exam.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ExamDetail.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\FindStudebtData_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\FindStudent_CRM_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Form_Name.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\FoundStudentInOld_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\GenralAccountStatment_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\GetDate.vb" />
+    <Compile Include="Moduel\GetDiplomInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\InvoiceSender.vb" />
+    <Compile Include="Moduel\Level.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadAccountOpenBalance_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadBatch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadBookForTabel_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadBook_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadBranchInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadBranch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadCashBox_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadCashday_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadCourse_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadDay_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadDiplomCountSeat_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadDiplom_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadDiscountType_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadDocType_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadExamDetails_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadExam_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadLevel_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadMainForm_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadMainMenu_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadMoneyTrans_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadOldStudentData_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadPaymentOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadPriceList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadPriceSale_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadQuestion_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadReceiptOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadRegSettingForNew_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadRegSttingUser_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadRoomClass_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadStudenrDiscount_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadStudentForAccept_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadStudyPlan_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadTrail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadTrainer_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadTranierForTable_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\LoadUser_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainCall.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainDi.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainFindStudent_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainMenu.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainSeting.Context.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MainSeting.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainSeting.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MainSeting.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MainSeting.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MainSeting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\MoneyTran.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OfferPrice.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OfferPriceDetail.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OfferPriceList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OtherFee.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OtherFeesList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PaymentOrder.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PriceList.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Moduel\PriceListDiplom.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PriceListFee.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PriceSale.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PriceSaleBranch.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PriceSaleDetail.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintBill_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintCashday_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintDailyDoc_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintExamQuestion1_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintExam_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintOfferPrice_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintPaymentOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintQuestion2_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintReceiptOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\PrintRegDoc_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Question.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\QuestionChoose.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ReBill.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ReceiptOrder.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegDoc.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegDocDiplom.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegDocFee.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegDocNote.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegDocPosted.vb" />
+    <Compile Include="Moduel\RegDocReview_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegOtherFess.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegOtherFessDetail.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegSetting.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegSettingList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RegSettingUser.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ReRegDoc.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\RoomClass.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SalesMan.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SalesManBranch.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SalesManList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Sector.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SectorList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SectorOrder.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SemouMainSetting.Context.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SemouMainSetting.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SemouMainSetting.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SemouMainSetting.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SemouMainSetting.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ServicesListOfferPrice_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowAccountOpenBalance_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowAccountSetting_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowAccount_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowActionHistory_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowAllCustBalance_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowAttachName_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBarnchInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBatchInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBatchSeatsDetails_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBatchStudentCount_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBillDetail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBillInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBookByDiplomAndLevel_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBookInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBranchBill_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBranchCostCenter_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowBranchDailyWork_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCashBoxInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCashDayDetail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCashdayInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCenterTree_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowClassBook_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowClassInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowContractInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowContractReport_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCostCenter_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCourseInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowCourseStudentInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDailyCrm_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDaily_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDay1Details_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDay1Info2_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDay1InfoForDoc_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDay1Info_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDiplomInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDiscountOrderForHome_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowDiscountTypeInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowEmptyRoomInDay_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowExamInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowExpenseAnalysis_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowIncomeStatment_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowLevelInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowMainDisInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowOfferPriceDetail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowOfferPriceInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowOpenBalnceStatment_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowOtherFeesInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPaymentOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPreDisOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceListDiplom_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceListFees_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceListInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceSaleBranch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceSaleDetail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceSaleDiplom_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowPriceSaleInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowQuestionChoose_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowReBillStudent_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowReceipt2Info_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowReceiptOrder_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegDocDiplomForRe_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegDocDiplom_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegDocFees_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegDocInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegDocRemainingDays_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegInfoForPay_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegOtherFessDetail_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegOtherFessInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRegSetting_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRePayInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowReRegDocInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowReTaxReport_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowRoomClassInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSalesManBranch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSalesManInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSalesManReport_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSalesReport_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSeatsOnBatch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSectorInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStautInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudentByDiplomAndLevel_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudentCall_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudentCourse_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudentDiscountInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudentInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudyInfo_CRM_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudyInfo_Student_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudyPlanHDInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowStudyPlan_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowSystemInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowTaxReport_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowTimeWork_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowTrainerInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowTransMoneyInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowTreeAccount_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowUserBranch_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowUserInfo_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowUserMenu_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ShowUserPremision_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SmsSender.vb" />
+    <Compile Include="Moduel\Staut.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StautList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Student.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentCourse.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentDiscount.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentLevel.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentRegDocList_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentStatmentAllTime_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudentTransAction.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudyPlan.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\StudyPlanHD.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\SystemInfo.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\TimeWork.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\Trainer.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\UserBranch.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\UserMenu.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\User_Action.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\User_Info.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\User_Premision.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\ViewSalesManForReg_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\WhatDiscountType_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\WhatIsSalesMan_Result.vb">
+      <DependentUpon>SemouMainSetting.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Moduel\OtpSender.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form\About.resx">
+      <DependentUpon>About.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\AccountHome.resx">
+      <DependentUpon>AccountHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\CashBoxHistory.resx">
+      <DependentUpon>CashBoxHistory.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\ChangeDiscountStaut.resx">
+      <DependentUpon>ChangeDiscountStaut.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\CostCenterHome.resx">
+      <DependentUpon>CostCenterHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\CustomerHome.resx">
+      <DependentUpon>CustomerHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\DailyHome.resx">
+      <DependentUpon>DailyHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\DisCountHome.resx">
+      <DependentUpon>DisCountHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodinAccountSetting.resx">
+      <DependentUpon>EncodinAccountSetting.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingCashDayPay.resx">
+      <DependentUpon>EncodingCashDayPay.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingCashDayReceipt.resx">
+      <DependentUpon>EncodingCashDayReceipt.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingDaily.resx">
+      <DependentUpon>EncodingDaily.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingDiscountDoc.resx">
+      <DependentUpon>EncodingDiscountDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingOpenDaily.resx">
+      <DependentUpon>EncodingOpenDaily.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingTransMoney.resx">
+      <DependentUpon>EncodingTransMoney.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\ExpenseAnalysisHome.resx">
+      <DependentUpon>ExpenseAnalysisHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\GeneralAccountStatment.resx">
+      <DependentUpon>GeneralAccountStatment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\IncomeStatment.resx">
+      <DependentUpon>IncomeStatment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\TrailHome.resx">
+      <DependentUpon>TrailHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\BranchDailyHome.resx">
+      <DependentUpon>BranchDailyHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\BranchReport\ClassTabelPrint.resx">
+      <DependentUpon>ClassTabelPrint.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\BranchTimeWork.resx">
+      <DependentUpon>BranchTimeWork.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\ChooseData.resx">
+      <DependentUpon>ChooseData.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\ClassList.resx">
+      <DependentUpon>ClassList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\ClassTabel.resx">
+      <DependentUpon>ClassTabel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\ContractHome.resx">
+      <DependentUpon>ContractHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\ContractReport.resx">
+      <DependentUpon>ContractReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingClass.resx">
+      <DependentUpon>EncodingClass.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingPaymentOrder.resx">
+      <DependentUpon>EncodingPaymentOrder.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingReceiptOrder.resx">
+      <DependentUpon>EncodingReceiptOrder.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingTabel.resx">
+      <DependentUpon>EncodingTabel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\RoomTabel.resx">
+      <DependentUpon>RoomTabel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\TranierTabel.resx">
+      <DependentUpon>TranierTabel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\AttachForm.resx">
+      <DependentUpon>AttachForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\ChangeUserPassword.resx">
+      <DependentUpon>ChangeUserPassword.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\DocHistory.resx">
+      <DependentUpon>DocHistory.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingBatchCount.resx">
+      <DependentUpon>EncodingBatchCount.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingCompany.resx">
+      <DependentUpon>EncodingCompany.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingOtherFees.resx">
+      <DependentUpon>EncodingOtherFees.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingPriceList.resx">
+      <DependentUpon>EncodingPriceList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingPriceSale.resx">
+      <DependentUpon>EncodingPriceSale.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingRegSetting.resx">
+      <DependentUpon>EncodingRegSetting.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingStudyPlan.resx">
+      <DependentUpon>EncodingStudyPlan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingStudyTabel.resx">
+      <DependentUpon>EncodingStudyTabel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingAccount.resx">
+      <DependentUpon>EncodingAccount.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingBank.resx">
+      <DependentUpon>EncodingBank.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\EncodingTestSetting.resx">
+      <DependentUpon>EncodingTestSetting.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Control\UpdateResaon.resx">
+      <DependentUpon>UpdateResaon.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\CrmDailyHome.resx">
+      <DependentUpon>CrmDailyHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\EncodingCall1.resx">
+      <DependentUpon>EncodingCall1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\EncodingCall2.resx">
+      <DependentUpon>EncodingCall2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\EncodingCall3.resx">
+      <DependentUpon>EncodingCall3.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\MainCallHome.resx">
+      <DependentUpon>MainCallHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\NewCallType.resx">
+      <DependentUpon>NewCallType.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Customer Services\StudyInfoCrm.resx">
+      <DependentUpon>StudyInfoCrm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingBatch.resx">
+      <DependentUpon>EncodingBatch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingBook.resx">
+      <DependentUpon>EncodingBook.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingBranch.resx">
+      <DependentUpon>EncodingBranch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingCalssRoom.resx">
+      <DependentUpon>EncodingCalssRoom.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingCashBox.resx">
+      <DependentUpon>EncodingCashBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingCompanyInfo.resx">
+      <DependentUpon>EncodingCompanyInfo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Account\EncodingCostCenter.resx">
+      <DependentUpon>EncodingCostCenter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingDiplom.resx">
+      <DependentUpon>EncodingDiplom.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingDiscountType.resx">
+      <DependentUpon>EncodingDiscountType.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingLevel.resx">
+      <DependentUpon>EncodingLevel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingQuestion.resx">
+      <DependentUpon>EncodingQuestion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingRegCases.resx">
+      <DependentUpon>EncodingRegCases.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingSalesMan.resx">
+      <DependentUpon>EncodingSalesMan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\BranchTool\EncodingTrainer.resx">
+      <DependentUpon>EncodingTrainer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Encoding\EncodingUser.resx">
+      <DependentUpon>EncodingUser.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\HomePage.resx">
+      <DependentUpon>HomePage.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\AccountList.resx">
+      <DependentUpon>AccountList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\AccountOpenBalnceList.resx">
+      <DependentUpon>AccountOpenBalnceList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BatchAvailableSeats.resx">
+      <DependentUpon>BatchAvailableSeats.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BatchList.resx">
+      <DependentUpon>BatchList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BookByLevelList.resx">
+      <DependentUpon>BookByLevelList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BookList.resx">
+      <DependentUpon>BookList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BranchCostList.resx">
+      <DependentUpon>BranchCostList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\PaymentOrderList.resx">
+      <DependentUpon>PaymentOrderList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\ReceiptOrderList.resx">
+      <DependentUpon>ReceiptOrderList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\RoomClassList.resx">
+      <DependentUpon>RoomClassList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\SectorLIst.resx">
+      <DependentUpon>SectorLIst.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\MssgHome.resx">
+      <DependentUpon>MssgHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ORG\BookTryList.resx">
+      <DependentUpon>BookTryList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\BranchList.resx">
+      <DependentUpon>BranchList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\CashBoxList.resx">
+      <DependentUpon>CashBoxList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\CashDayList.resx">
+      <DependentUpon>CashDayList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\CostCenterList.resx">
+      <DependentUpon>CostCenterList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\CourseList.resx">
+      <DependentUpon>CourseList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\DiplomList.resx">
+      <DependentUpon>DiplomList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\DiscountTypeList.resx">
+      <DependentUpon>DiscountTypeList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\DocRegSettingList.resx">
+      <DependentUpon>DocRegSettingList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\DocTypeList.resx">
+      <DependentUpon>DocTypeList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\ExamList.resx">
+      <DependentUpon>ExamList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\LevelList.resx">
+      <DependentUpon>LevelList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\LevelQuestionList.resx">
+      <DependentUpon>LevelQuestionList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\ListOpenDaily.resx">
+      <DependentUpon>ListOpenDaily.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\NewBranchList.resx">
+      <DependentUpon>NewBranchList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\OfferPriceList.resx">
+      <DependentUpon>OfferPriceList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\OtherFeesList.resx">
+      <DependentUpon>OtherFeesList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\PlanStudyList.resx">
+      <DependentUpon>PlanStudyList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\PriceList.resx">
+      <DependentUpon>PriceList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\PriceSaleList.resx">
+      <DependentUpon>PriceSaleList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\RegSettingList.resx">
+      <DependentUpon>RegSettingList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\SalesManForReg.resx">
+      <DependentUpon>SalesManForReg.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\SalesManList.resx">
+      <DependentUpon>SalesManList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\SellerList.resx">
+      <DependentUpon>SellerList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\StautList.resx">
+      <DependentUpon>StautList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\StudentBillList.resx">
+      <DependentUpon>StudentBillList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\StudentDiscountList.resx">
+      <DependentUpon>StudentDiscountList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\StudentRegDocList.resx">
+      <DependentUpon>StudentRegDocList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\TrainerList.resx">
+      <DependentUpon>TrainerList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\TransMoneyList.resx">
+      <DependentUpon>TransMoneyList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\List\UserList.resx">
+      <DependentUpon>UserList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\LogIn.resx">
+      <DependentUpon>LogIn.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ORG\ChooseRoom.resx">
+      <DependentUpon>ChooseRoom.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ORG\DiplomTryList.resx">
+      <DependentUpon>DiplomTryList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ORG\StudyTabelList.resx">
+      <DependentUpon>StudyTabelList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ORG\TrainerForTryList.resx">
+      <DependentUpon>TrainerForTryList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\BatchSeatsHome.resx">
+      <DependentUpon>BatchSeatsHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\CashBoxHistoryReport.resx">
+      <DependentUpon>CashBoxHistoryReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\CustomerBalanceHome.resx">
+      <DependentUpon>CustomerBalanceHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\AcceptDoc.resx">
+      <DependentUpon>AcceptDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\CashDayDoc.resx">
+      <DependentUpon>CashDayDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\DailyDoc.resx">
+      <DependentUpon>DailyDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\OfferPriceDoc.resx">
+      <DependentUpon>OfferPriceDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\PaymentOrderDoc.resx">
+      <DependentUpon>PaymentOrderDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\ReceiptOrderDoc.resx">
+      <DependentUpon>ReceiptOrderDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\StudentCourseReport.resx">
+      <DependentUpon>StudentCourseReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\StudentDiplomLevel.resx">
+      <DependentUpon>StudentDiplomLevel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\StudentInvoice.resx">
+      <DependentUpon>StudentInvoice.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\StudentRegDoc.resx">
+      <DependentUpon>StudentRegDoc.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Doc\StudentStatment.resx">
+      <DependentUpon>StudentStatment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\Exam\ExamDoc.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ExamDoc.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\ReTaxReport.resx">
+      <DependentUpon>ReTaxReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\SalesManReport.resx">
+      <DependentUpon>SalesManReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\SalesReport.resx">
+      <DependentUpon>SalesReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\TaxHome.resx">
+      <DependentUpon>TaxHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\AddCourseStudentNotes.resx">
+      <DependentUpon>AddCourseStudentNotes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\AddServicesOfferPrice.resx">
+      <DependentUpon>AddServicesOfferPrice.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\AddStudentLevelNotes.resx">
+      <DependentUpon>AddStudentLevelNotes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\AddStudentOtherFess.resx">
+      <DependentUpon>AddStudentOtherFess.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\AttachView.resx">
+      <DependentUpon>AttachView.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\ChangeStudentStaut.resx">
+      <DependentUpon>ChangeStudentStaut.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\CourseHome.resx">
+      <DependentUpon>CourseHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingAcceptOrder.resx">
+      <DependentUpon>EncodingAcceptOrder.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingOfferPrice.resx">
+      <DependentUpon>EncodingOfferPrice.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingOrderDis.resx">
+      <DependentUpon>EncodingOrderDis.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\FindOldStudentData.resx">
+      <DependentUpon>FindOldStudentData.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\FindStudent.resx">
+      <DependentUpon>FindStudent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\FinshStudy.resx">
+      <DependentUpon>FinshStudy.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\IfStudentNotRegister.resx">
+      <DependentUpon>IfStudentNotRegister.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\LevelReportForm.resx">
+      <DependentUpon>LevelReportForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\OldSellerReport.resx">
+      <DependentUpon>OldSellerReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\PrintExam.resx">
+      <DependentUpon>PrintExam.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\ReportView.resx">
+      <DependentUpon>ReportView.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Report\ViewReport.resx">
+      <DependentUpon>ViewReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\ChangeStaut.resx">
+      <DependentUpon>ChangeStaut.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\CourseStudentInfo.resx">
+      <DependentUpon>CourseStudentInfo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingCourse.resx">
+      <DependentUpon>EncodingCourse.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingNewPayInvoice.resx">
+      <DependentUpon>EncodingNewPayInvoice.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingPayInvoice.resx">
+      <DependentUpon>EncodingPayInvoice.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\EncodingStudent.resx">
+      <DependentUpon>EncodingStudent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\MainFindStudent.resx">
+      <DependentUpon>MainFindStudent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\NewStudentHome.resx">
+      <DependentUpon>NewStudentHome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\OldStudentStatment.resx">
+      <DependentUpon>OldStudentStatment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\PaySelect.resx">
+      <DependentUpon>PaySelect.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\RegFessForm.resx">
+      <DependentUpon>RegFessForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\RegisterForm.resx">
+      <DependentUpon>RegisterForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\RegReview.resx">
+      <DependentUpon>RegReview.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\RePay.resx">
+      <DependentUpon>RePay.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\Re_Register.resx">
+      <DependentUpon>Re_Register.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\StudentCourseList.resx">
+      <DependentUpon>StudentCourseList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\StudentDashBoard.resx">
+      <DependentUpon>StudentDashBoard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\StudentList.resx">
+      <DependentUpon>StudentList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\StudyInfo_Student.resx">
+      <DependentUpon>StudyInfo_Student.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\StusdentStatment.resx">
+      <DependentUpon>StusdentStatment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\TransAllDiplomStudent.resx">
+      <DependentUpon>TransAllDiplomStudent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\TransferStudentCourse.resx">
+      <DependentUpon>TransferStudentCourse.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\UpdateStudentLevel.resx">
+      <DependentUpon>UpdateStudentLevel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\WaitForm1.resx">
+      <DependentUpon>WaitForm1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\WaitForm2.resx">
+      <DependentUpon>WaitForm2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\Student\WhatRegTypeNeed.resx">
+      <DependentUpon>WhatRegTypeNeed.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DATASSTLIDataSet.xsc">
+      <DependentUpon>DATASSTLIDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="DATASSTLIDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DATASSTLIDataSet.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DATASSTLIDataSet.xss">
+      <DependentUpon>DATASSTLIDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="DATASSTLIDataSet1.xsc">
+      <DependentUpon>DATASSTLIDataSet1.xsd</DependentUpon>
+    </None>
+    <None Include="DATASSTLIDataSet1.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DATASSTLIDataSet1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DATASSTLIDataSet1.xss">
+      <DependentUpon>DATASSTLIDataSet1.xsd</DependentUpon>
+    </None>
+    <EntityDeploy Include="Moduel\MainSeting.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>MainSeting.Designer.vb</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="Moduel\SemouMainSetting.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SemouMainSetting.Designer.vb</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Moduel\SemouMainSetting.edmx.diagram">
+      <DependentUpon>SemouMainSetting.edmx</DependentUpon>
+    </None>
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Moduel\MainSeting.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MainSeting.Context.vb</LastGenOutput>
+      <DependentUpon>MainSeting.edmx</DependentUpon>
+    </Content>
+    <Content Include="Moduel\MainSeting.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MainSeting.vb</LastGenOutput>
+      <DependentUpon>MainSeting.edmx</DependentUpon>
+    </Content>
+    <None Include="Resources\semouback.jpg" />
+    <Content Include="Moduel\SemouMainSetting.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SemouMainSetting.edmx</DependentUpon>
+      <LastGenOutput>SemouMainSetting.Context.vb</LastGenOutput>
+    </Content>
+    <Content Include="Moduel\SemouMainSetting.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SemouMainSetting.edmx</DependentUpon>
+      <LastGenOutput>SemouMainSetting.vb</LastGenOutput>
+    </Content>
+    <None Include="Resources\semou.jfif" />
+    <None Include="Resources\Image10.bmp" />
+    <Content Include="semou.ico" />
+    <None Include="Resources\Image1.bmp" />
+    <None Include="Resources\reyal ico.jpg" />
+    <None Include="Resources\BACK2024.jpg" />
+    <None Include="Resources\cashboxs.png" />
+    <None Include="Resources\sstliback.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+</Project>

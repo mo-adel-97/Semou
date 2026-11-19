@@ -1,0 +1,26 @@
+# Build output / IDE / dependencies
+bin/
+obj/
+.vs/
+*.user
+*.suo
+packages/
+node_modules/
+dist/
+vendor/
+.deploy/
+*.log
+_gitbackup/
+SemouWeb/api/wwwroot/
+AlsmowSite/uploads/
+
+# Secrets - never publish
+.env*
+appsettings.*.local.json
+*.exe.config
+**/ServerConfig.vb
+**/ServerConfig.vb.bak*
+AlsmowSite/api/config.php
+*.pfx
+*.pem
+*.key

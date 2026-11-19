@@ -1,0 +1,10 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Server-only code and secrets are never reachable from the web.
+RewriteRule ^(lib|migrations|tools)(/|$) - [F,L]
+RewriteRule ^config(\.sample)?\.php$ - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
