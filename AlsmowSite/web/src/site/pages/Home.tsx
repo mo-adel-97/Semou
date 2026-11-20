@@ -339,7 +339,8 @@ function Ticker({ data }: { data: HomeData }) {
   const row = [...words, ...words]
   return (
     <div className="relative -mx-4 -rotate-1 overflow-hidden border-y border-deep-700 bg-deep-900 py-4 text-white">
-      <div className="flex w-max animate-marquee gap-10 whitespace-nowrap">
+      {/* a calm pace: easy to read while it glides */}
+      <div className="flex w-max animate-marquee gap-10 whitespace-nowrap [animation-duration:95s]">
         {[...row, ...row].map((w, i) => (
           <span key={i} className="flex items-center gap-10 font-display text-xl font-bold md:text-2xl">
             {w}

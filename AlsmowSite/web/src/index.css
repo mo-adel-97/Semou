@@ -647,12 +647,11 @@ html.fx-on .fx-img:not(.fx-in) { clip-path: inset(0 0 100% 0); }
   66% { border-radius: 64% 36% 46% 54% / 60% 44% 56% 40%; }
 }
 .hero-photo-soft {
-  /* the photo melts into the page on every side: a soft oval vignette (sharp in the middle, no hard edge anywhere) */
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 47%, #000 52%, rgb(0 0 0 / .75) 68%, rgb(0 0 0 / .3) 84%, transparent 100%);
-          mask-image: radial-gradient(ellipse 50% 50% at 50% 47%, #000 52%, rgb(0 0 0 / .75) 68%, rgb(0 0 0 / .3) 84%, transparent 100%);
+  /* the hero image is a cut-out (transparent background) that carries its own soft edges; only a light fade at
+     the very bottom, so its lower edge always melts into the page */
+  -webkit-mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
 }
-/* dark mode: a bright photo is toned down a little so it sits in the night stage instead of glowing like a hole */
-[data-mode="dark"] .hero-photo-soft { filter: brightness(.8) contrast(1.06) saturate(1.05); }
 @media (max-width: 640px) {
   .s3d-hide-sm { display: none; }
 }
