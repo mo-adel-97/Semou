@@ -54,7 +54,7 @@ export interface Settings {
   intro?: Partial<{ mode: 'off' | 'first' | 'session' | 'always'; kicker: string | null; title: string | null; message: string | null; quote: string | null; skip: string | null }>
   about: Partial<{ title: string; summary: string; body: string; image: string; vision: string; mission: string; values: string[] }>
   stats: Partial<{ items: StatItem[] }>
-  contact: Partial<{ phone: string; whatsapp: string; email: string; address: string; hours: string; map_url: string }>
+  contact: Partial<{ phone: string; whatsapp: string; email: string; address: string; hours: string; map_url: string; branches: string[] }>
   social: Partial<Record<'x' | 'instagram' | 'snapchat' | 'tiktok' | 'facebook' | 'linkedin' | 'youtube', string>>
   seo: Partial<{ title: string; description: string; og_image: string }>
   /** lib/layout.tsx: the order of each page's sections and which are hidden. */

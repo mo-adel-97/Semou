@@ -134,6 +134,8 @@ function settings_schema(): array
                 'email' => ['type' => 'string', 'label' => 'البريد الإلكتروني', 'max' => 190],
                 'address' => ['type' => 'string', 'label' => 'العنوان', 'max' => 250],
                 'hours' => ['type' => 'string', 'label' => 'أوقات العمل', 'max' => 120],
+                'branches' => ['type' => 'list', 'label' => 'الفروع وطرق الدراسة', 'max' => 160, 'maxItems' => 8,
+                    'placeholder' => 'مثال: حضوري: حفر الباطن', 'help' => 'تظهر في صفحة «تواصل معنا» ويرد بها المساعد الذكي على «أين يقع المعهد؟»'],
                 'map_url' => ['type' => 'url', 'label' => 'رابط خرائط جوجل', 'max' => 1000, 'help' => 'من خرائط جوجل: مشاركة ← تضمين خريطة ← انسخ الرابط من src'],
                 'notify_email' => ['type' => 'string', 'label' => 'بريد استلام إشعارات الرسائل', 'max' => 190, 'help' => 'يصلك بريد عند كل رسالة أو طلب تسجيل جديد'],
             ],

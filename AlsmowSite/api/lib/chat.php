@@ -39,6 +39,7 @@ function chat_knowledge(): string
     foreach (['phone' => 'الهاتف', 'whatsapp' => 'واتساب', 'email' => 'البريد', 'address' => 'العنوان', 'hours' => 'أوقات العمل'] as $k => $label) {
         if (!empty($c[$k])) $lines[] = "- $label: {$c[$k]}";
     }
+    foreach ((array) ($c['branches'] ?? []) as $b) if (trim((string) $b) !== '') $lines[] = '- ' . trim((string) $b);
     $site = rtrim((string) config('site_url'), '/');
     $lines[] = "- رابط التسجيل في الموقع: $site/register";
     $lines[] = "- صفحة التواصل: $site/contact";

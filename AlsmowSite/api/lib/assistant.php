@@ -287,6 +287,7 @@ function as_contact_lines(bool $short = false): array
     if (!empty($c['phone'])) $l[] = "- **الهاتف:** {$c['phone']}";
     if (!empty($c['whatsapp'])) $l[] = "- **واتساب:** https://wa.me/" . preg_replace('/\D+/', '', (string) $c['whatsapp']);
     if (!$short && !empty($c['email'])) $l[] = "- **البريد:** {$c['email']}";
+    if (!$short && !empty($c['branches'])) foreach ((array) $c['branches'] as $b) if (trim((string) $b) !== '') $l[] = '- ' . trim((string) $b);
     if (!$short && !empty($c['address'])) $l[] = "- **العنوان:** {$c['address']}";
     if (!$short && !empty($c['hours'])) $l[] = "- **أوقات العمل:** {$c['hours']}";
     $l[] = "- صفحة التواصل: $site/contact";

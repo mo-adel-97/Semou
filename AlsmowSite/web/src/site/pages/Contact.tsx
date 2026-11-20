@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { CheckCircle2, Clock, Loader2, Mail, MapPin, Phone, Send } from 'lucide-react'
+import { CheckCircle2, Clock, Loader2, Mail, MapPin, Phone, Send, Building2 } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { ComponentType } from 'react'
 import { useForm } from 'react-hook-form'
@@ -178,8 +178,9 @@ function ContactCards() {
   const wa = waNumber(c?.whatsapp || c?.phone)
   const items = [
     c?.phone && { icon: Phone, label: 'اتصل بنا', value: c.phone, href: `tel:${c.phone}`, ltr: true },
-    wa && { icon: WhatsAppIcon, label: 'واتساب', value: 'راسلينا مباشرة', href: `https://wa.me/${wa}` },
+    wa && { icon: WhatsAppIcon, label: 'واتساب', value: 'راسلنا مباشرة', href: `https://wa.me/${wa}` },
     c?.email && { icon: Mail, label: 'البريد الإلكتروني', value: c.email, href: `mailto:${c.email}` },
+    Array.isArray(c?.branches) && c.branches.some((b) => b.trim()) && { icon: Building2, label: 'الفروع وطرق الدراسة', value: c.branches.filter((b) => b.trim()).join(String.fromCharCode(10)) },
     c?.address && { icon: MapPin, label: 'العنوان', value: c.address },
     c?.hours && { icon: Clock, label: 'أوقات العمل', value: c.hours },
   ].filter(Boolean) as { icon: ComponentType<{ className?: string }>; label: string; value: string; href?: string; ltr?: boolean }[]
@@ -193,7 +194,7 @@ function ContactCards() {
             </span>
             <div className="min-w-0">
               <div className="text-sm text-muted">{it.label}</div>
-              <div className="font-display font-bold break-words text-ink" dir={it.ltr ? 'ltr' : undefined}>{it.value}</div>
+              <div className="font-display font-bold break-words whitespace-pre-line text-ink" dir={it.ltr ? 'ltr' : undefined}>{it.value}</div>
             </div>
           </>
         )
