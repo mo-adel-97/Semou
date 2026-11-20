@@ -187,7 +187,7 @@ function Hero({ data }: { data: HomeData }) {
             {h.image && <div className="hd-sheen" aria-hidden />}
           </div>
 
-          <FloatCard className="top-[24%] -right-1 sm:top-[30%] sm:-right-4 xl:-right-8" delay={LITE ? 0.6 : 0.9}>
+          <FloatCard className="top-[62%] -right-1 sm:-right-4 xl:-right-10" delay={LITE ? 0.6 : 0.9}>
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-gold-400/15 text-gold-600"><ShieldCheck className="h-6 w-6" /></span>
             <div>
               <div className="font-display text-sm font-extrabold text-ink">شهادات معتمدة</div>
@@ -358,17 +358,35 @@ function Accreditations({ items }: { items: Accreditation[] }) {
   const [open, setOpen] = useState<Accreditation | null>(null)
   if (!items.length) return null
   return (
-    <section className="py-14">
+    <section className="py-16 md:py-24">
       <div className="container-x">
-        <Reveal><p className="mb-8 text-center font-display text-sm font-bold tracking-wide text-muted">معتمدون من جهات موثوقة · اضغط على الشعار لعرض الشهادة</p></Reveal>
-        <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true }} className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
-          {items.map((a) => (
-            <motion.button key={a.id} variants={stagger.item} onClick={() => a.certificate && setOpen(a)} className={cx('group flex flex-col items-center gap-2', !a.certificate && 'cursor-default')} title={a.name}>
-              <img src={a.logo ?? ''} alt={a.name} className="h-14 w-auto max-w-[9rem] object-contain opacity-70 grayscale transition duration-500 group-hover:scale-110 group-hover:opacity-100 group-hover:grayscale-0 md:h-16 dark:invert-[.1]" loading="lazy" />
-              {a.certificate && <span className="text-xs font-semibold text-brand-600 opacity-0 transition group-hover:opacity-100">عرض الشهادة</span>}
-            </motion.button>
-          ))}
-        </motion.div>
+        <Reveal>
+          {/* a deep band in the theme colour; every logo is painted in one light tone through its own shape,
+              so the row always matches the site's colour, in light and dark mode */}
+          <div className="grain relative overflow-hidden rounded-[2.5rem] bg-deep-900 px-5 py-12 text-white sm:px-10 md:py-14">
+            <div className="pattern-light absolute inset-0" />
+            <div className="absolute -top-24 left-1/2 h-64 w-[70%] -translate-x-1/2 rounded-full bg-brand-500/30 blur-3xl" />
+            <div className="relative mb-10 text-center">
+              <span className="eyebrow !border-white/15 !bg-white/10 !text-white"><BadgeCheck className="h-4 w-4" /> اعتماداتنا</span>
+              <h2 className="mt-4 text-[clamp(1.6rem,1.1rem+1.8vw,2.4rem)] leading-tight font-black">معتمدون من جهات رسمية موثوقة</h2>
+            </div>
+            <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true }} className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+              {items.map((a) => (
+                <motion.button
+                  key={a.id}
+                  variants={stagger.item}
+                  onClick={() => a.certificate && setOpen(a)}
+                  className={cx('acc-item group', !a.certificate && 'cursor-default')}
+                  title={a.name}
+                >
+                  {/* the logo already carries the body's name: shown once, the name stays for screen readers / tooltip */}
+                  <span className="acc-logo" style={{ WebkitMaskImage: `url(${a.logo})`, maskImage: `url(${a.logo})` }} role="img" aria-label={a.name} />
+                  {a.certificate && <span className="acc-cert">عرض الشهادة</span>}
+                </motion.button>
+              ))}
+            </motion.div>
+          </div>
+        </Reveal>
       </div>
       <AnimatePresence>
         {open && (
