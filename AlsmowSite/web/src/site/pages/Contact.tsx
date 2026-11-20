@@ -10,6 +10,7 @@ import { SocialLinks, WhatsAppIcon } from '../../components/BrandIcons'
 import { PageHero, Reveal, Seo } from '../../components/ui'
 import { ApiError, api } from '../../lib/api'
 import { cx, waNumber } from '../../lib/format'
+import { Sections } from '../../lib/layout'
 import { usePrograms, useSite } from '../../lib/queries'
 import { track } from '../../lib/track'
 import { PROGRAM_TYPES } from '../../lib/types'
@@ -220,6 +221,7 @@ export function Contact() {
     <>
       <Seo title="تواصل معنا" description="تواصل مع معهد السمو للتدريب" />
       <PageHero title="تواصل معنا" text="فريقنا جاهز للإجابة عن استفساراتك ومساعدتك في اختيار البرنامج المناسب." crumbs={<><Link to="/" className="transition hover:text-brand-700">الرئيسية</Link> / تواصل معنا</>} />
+      <Sections settings={data?.settings} page="contact" sections={{ form: (
       <section className="container-x grid gap-8 py-14 md:py-20 lg:grid-cols-[360px_1fr]">
         <ContactCards />
         <Reveal className="card overflow-hidden">
@@ -229,11 +231,11 @@ export function Contact() {
           <MessageForm kind="contact" />
         </Reveal>
       </section>
-      {map && (
+      ), map: map ? (
         <section className="container-x pb-20">
           <iframe src={map} title="موقع المعهد على الخريطة" loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="h-96 w-full rounded-[2rem] border-0 shadow-soft" />
         </section>
-      )}
+      ) : null }} />
     </>
   )
 }

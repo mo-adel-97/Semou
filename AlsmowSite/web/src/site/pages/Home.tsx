@@ -12,6 +12,7 @@ import { Capsule, Cube, Sphere } from '../../components/Shapes3D'
 import { ButterflyOrbit, ButterflySky } from '../../components/Butterflies'
 import BrandLogo from '../../components/BrandLogo'
 import { cx, fmtDate } from '../../lib/format'
+import { Sections } from '../../lib/layout'
 import { useHome } from '../../lib/queries'
 import { PROGRAM_TYPES, type Accreditation, type HomeData, type ProgramType } from '../../lib/types'
 import ProgramCard from '../ProgramCard'
@@ -31,18 +32,21 @@ export default function Home() {
       {seo.title && <title>{seo.title}</title>}
       {/* desktop keeps the original composition; phones/tablets get the full-screen stage */}
       {wide ? <Hero data={data} /> : <HeroMobile data={data} />}
-      <Ticker data={data} />
-      <Accreditations items={data.accreditations} />
-      <Paths data={data} />
-      <Programs data={data} />
-      <About data={data} />
-      <Stats data={data} />
-      <Journey />
-      <Testimonials data={data} />
-      <PortalPromo />
-      <LatestPosts data={data} />
-      <Agreements data={data} />
-      <Partners data={data} />
+      {/* every other section in the order (and visibility) set in the dashboard › ترتيب الصفحات */}
+      <Sections settings={data.settings} page="home" sections={{
+        ticker: <Ticker data={data} />,
+        accreditations: <Accreditations items={data.accreditations} />,
+        paths: <Paths data={data} />,
+        programs: <Programs data={data} />,
+        about: <About data={data} />,
+        stats: <Stats data={data} />,
+        journey: <Journey />,
+        testimonials: <Testimonials data={data} />,
+        portal: <PortalPromo />,
+        posts: <LatestPosts data={data} />,
+        agreements: <Agreements data={data} />,
+        partners: <Partners data={data} />,
+      }} />
     </>
   )
 }

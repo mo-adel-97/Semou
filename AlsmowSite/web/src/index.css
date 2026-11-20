@@ -878,6 +878,47 @@ html.menu-open .site-shell main *, html.menu-open .bf-orbit-host *, html.menu-op
 @media (max-width: 639px) { .acc-item { flex-basis: calc(50% - .4rem); height: 7rem; padding: .9rem; } .acc-logo { height: 3.4rem; } }
 
 /* =====================================================================
+   Living sections (lib/layout.tsx · SectionLife): every section breathes.
+   Soft theme lights drift behind the content, motes of light rise; transform/opacity only.
+   ===================================================================== */
+.sec-live { position: relative; isolation: isolate; overflow: clip; }
+.sec-orb {
+  position: absolute; z-index: 0; width: min(46rem, 90vw); aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklab, var(--glow) 22%, transparent) 0%, color-mix(in oklab, var(--brand) 10%, transparent) 38%, transparent 68%);
+  will-change: transform; animation: sec-drift 22s ease-in-out infinite alternate;
+}
+.sec-orb.a { top: -18%; inset-inline-start: -14%; }
+.sec-orb.b { bottom: -22%; inset-inline-end: -16%; width: min(38rem, 80vw); animation-duration: 28s; animation-delay: -9s;
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-gold-300) 16%, transparent) 0%, transparent 62%); }
+.sec-live.alt .sec-orb.a { inset-inline-start: auto; inset-inline-end: -14%; }
+.sec-live.alt .sec-orb.b { inset-inline-end: auto; inset-inline-start: -16%; }
+@keyframes sec-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(6%, 8%, 0) scale(1.12); }
+  100% { transform: translate3d(-5%, 3%, 0) scale(.94); }
+}
+[data-mode="dark"] .sec-orb.a { background: radial-gradient(circle, color-mix(in oklab, var(--brand) 26%, transparent) 0%, transparent 66%); }
+[data-mode="dark"] .sec-orb.b { background: radial-gradient(circle, color-mix(in oklab, var(--glow) 12%, transparent) 0%, transparent 62%); }
+.sec-motes { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.sec-motes i {
+  position: absolute; bottom: -10px; width: 7px; height: 7px; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, color-mix(in oklab, var(--glow) 90%, white), transparent 70%);
+  animation: sec-mote 16s linear infinite; will-change: transform, opacity;
+}
+.sec-motes i:nth-child(1) { left: 8%; animation-delay: -2s; }
+.sec-motes i:nth-child(2) { left: 27%; animation-delay: -9s; animation-duration: 19s; width: 5px; height: 5px; }
+.sec-motes i:nth-child(3) { left: 52%; animation-delay: -5s; animation-duration: 14s; }
+.sec-motes i:nth-child(4) { left: 73%; animation-delay: -12s; animation-duration: 21s; width: 9px; height: 9px; }
+.sec-motes i:nth-child(5) { left: 91%; animation-delay: -7s; }
+@keyframes sec-mote { 0% { opacity: 0; transform: translate3d(0, 0, 0); } 15% { opacity: .8; } 85% { opacity: .5; } 100% { opacity: 0; transform: translate3d(30px, -110vh, 0); } }
+/* the content sits above the lights; its own backgrounds turn see-through a touch so the life shows through */
+.sec-live > section, .sec-live > div:not(.bf-sky) { position: relative; z-index: 1; }
+.sec-live > section[class*="bg-sand"] { background-color: color-mix(in oklab, var(--bg-2) 72%, transparent); }
+.sec-live .sec-bf { z-index: 2; }
+html.menu-open .sec-live * { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) { .sec-orb, .sec-motes { animation: none !important; display: none; } }
+
+/* =====================================================================
    Phones / tablets / touch (same query as LITE in components/ui.tsx).
    Same look, minus the effects that make mobile GPUs drop frames while scrolling.
    ===================================================================== */

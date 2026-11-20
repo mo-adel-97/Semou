@@ -57,6 +57,8 @@ export interface Settings {
   contact: Partial<{ phone: string; whatsapp: string; email: string; address: string; hours: string; map_url: string }>
   social: Partial<Record<'x' | 'instagram' | 'snapchat' | 'tiktok' | 'facebook' | 'linkedin' | 'youtube', string>>
   seo: Partial<{ title: string; description: string; og_image: string }>
+  /** lib/layout.tsx: the order of each page's sections and which are hidden. */
+  layout?: Partial<Record<'home' | 'about' | 'program' | 'contact', SectionPick[]>>
   /** components/Butterflies.tsx: every word they show comes from here. */
   butterflies?: Partial<{
     hide: boolean; letters_hide: boolean; letters: TextPair[]; chat_hide: boolean; chat: TextPair[]
@@ -68,6 +70,8 @@ export interface Settings {
 
 /** A row of a 'pairs' field: a text and a second text (a link, or an answer). */
 export interface TextPair { a: string; b: string | null }
+/** One section of a page layout (settings › layout). */
+export interface SectionPick { key: string; hidden: boolean }
 
 export type ProgramCounts = Record<ProgramType, number>
 
@@ -90,7 +94,7 @@ export interface HomeData {
 
 /* ---------- Admin ---------- */
 
-export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb' | 'pairs' | 'color'
+export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb' | 'pairs' | 'color' | 'sections'
 
 export interface FieldSpec {
   key: string

@@ -94,6 +94,20 @@ function settings_schema(): array
                 ]],
             ],
         ],
+        // Page layouts: the order of each page's sections and which are hidden (web/src/lib/layout.tsx)
+        'layout' => [
+            'label' => 'ترتيب الصفحات', 'icon' => 'layout-dashboard',
+            'fields' => [
+                'home' => ['type' => 'sections', 'label' => 'الصفحة الرئيسية', 'help' => 'اسحب الأقسام لتغيير ترتيبها، وأخفِ ما لا تريد ظهوره. الواجهة الرئيسية تبقى دائمًا في الأعلى', 'options' => [
+                    'ticker' => 'الشريط المتحرك', 'accreditations' => 'اعتماداتنا', 'paths' => 'المسارات التدريبية', 'programs' => 'البرامج',
+                    'about' => 'عن المعهد', 'stats' => 'الأرقام والإحصائيات', 'journey' => 'خطوات التسجيل', 'testimonials' => 'آراء المتدربين',
+                    'portal' => 'بوابة المتدربين', 'posts' => 'أحدث المقالات', 'agreements' => 'الاتفاقيات', 'partners' => 'الشركاء',
+                ]],
+                'about' => ['type' => 'sections', 'label' => 'صفحة «عن المعهد»', 'options' => ['content' => 'النبذة والصورة', 'values' => 'الرؤية والرسالة والقيم']],
+                'program' => ['type' => 'sections', 'label' => 'صفحة البرنامج', 'options' => ['details' => 'تفاصيل البرنامج والتسجيل', 'related' => 'برامج قد تهمك']],
+                'contact' => ['type' => 'sections', 'label' => 'صفحة «تواصل معنا»', 'options' => ['form' => 'بيانات التواصل والنموذج', 'map' => 'الخريطة']],
+            ],
+        ],
         'about' => [
             'label' => 'عن المعهد', 'icon' => 'building-2',
             'fields' => [
@@ -248,6 +262,17 @@ function save_settings_group(string $group, array $input): array
                     $items[] = ['value' => max(0, $value), 'label' => $label, 'suffix' => plain_text($item['suffix'] ?? '+', 4) ?? ''];
                 }
                 $clean[$key] = array_slice($items, 0, $f['maxItems'] ?? 6);
+                break;
+            case 'sections': // a page layout: [{key, hidden}], known keys only, each once
+                $items = [];
+                $seen = [];
+                foreach (is_array($v) ? $v : [] as $item) {
+                    $k = is_array($item) ? (string) ($item['key'] ?? '') : '';
+                    if (!isset($f['options'][$k]) || isset($seen[$k])) continue;
+                    $seen[$k] = true;
+                    $items[] = ['key' => $k, 'hidden' => filter_var($item['hidden'] ?? false, FILTER_VALIDATE_BOOL)];
+                }
+                $clean[$key] = $items;
                 break;
             case 'color': // a hex colour code (#abc or #aabbcc)
                 $c = strtolower(trim((string) $v));

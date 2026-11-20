@@ -42,6 +42,7 @@ export const ICONS: Record<string, LucideIcon> = {
   search: Search,
   type: Type,
   bird: Bird,
+  'layout-dashboard': LayoutDashboard,
   bot: Bot,
 }
 

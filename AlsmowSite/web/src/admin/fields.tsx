@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { GripVertical, ImagePlus, Images, Loader2, Plus, Trash2, Upload, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, Eye, EyeOff, GripVertical, ImagePlus, Images, Loader2, Plus, Trash2, Upload, X } from 'lucide-react'
 import { AnimatePresence, motion, Reorder } from 'motion/react'
 import { lazy, Suspense, useRef, useState, type ReactNode } from 'react'
 import { Controller, type Control, type FieldValues } from 'react-hook-form'
 import { toast } from '../lib/alerts'
 import { api } from '../lib/api'
 import { cx } from '../lib/format'
-import type { FieldSpec, KbEntry, StatItem, TextPair } from '../lib/types'
+import type { FieldSpec, KbEntry, SectionPick, StatItem, TextPair } from '../lib/types'
 
 const RichEditor = lazy(() => import('./RichEditor'))
 const KbField = lazy(() => import('./KbField'))
@@ -78,6 +78,9 @@ export function Field({ f, control, error }: { f: FieldSpec; control: Control<Fi
             break
           case 'stats':
             input = <StatsField value={(field.value as StatItem[]) ?? []} onChange={field.onChange} max={f.maxItems ?? 6} />
+            break
+          case 'sections':
+            input = <SectionsField f={f} value={(field.value as SectionPick[]) ?? []} onChange={field.onChange} />
             break
           case 'color':
             input = <ColorField value={(field.value as string) ?? ''} onChange={field.onChange} placeholder={f.placeholder} />
@@ -271,6 +274,38 @@ function ListField({ value, onChange, max }: { value: string[]; onChange: (v: st
         </div>
       )}
     </div>
+  )
+}
+
+/** A page layout: drag (or the arrows) to reorder the sections, the eye to hide / show one. */
+function SectionsField({ f, value, onChange }: { f: FieldSpec; value: SectionPick[]; onChange: (v: SectionPick[]) => void }) {
+  const opts = f.options ?? []
+  const label = (k: string) => opts.find((o) => o.value === k)?.label ?? k
+  // saved order first, then any section not saved yet, in its default place
+  const saved = value.filter((s) => opts.some((o) => o.value === s.key))
+  const list: SectionPick[] = [...saved, ...opts.filter((o) => !saved.some((s) => s.key === o.value)).map((o) => ({ key: o.value, hidden: false }))]
+  const move = (i: number, d: number) => {
+    const j = i + d
+    if (j < 0 || j >= list.length) return
+    const next = [...list]
+    ;[next[i], next[j]] = [next[j], next[i]]
+    onChange(next)
+  }
+  return (
+    <Reorder.Group axis="y" values={list} onReorder={onChange} className="space-y-2">
+      {list.map((s, i) => (
+        <Reorder.Item key={s.key} value={s} className={cx('flex cursor-grab items-center gap-2 rounded-2xl border border-line bg-surface p-2.5 select-none active:cursor-grabbing', s.hidden && 'opacity-55')}>
+          <GripVertical className="h-4 w-4 shrink-0 text-muted" />
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-50 font-display text-xs font-bold text-brand-700">{i + 1}</span>
+          <span className={cx('flex-1 text-sm font-semibold', s.hidden ? 'text-muted line-through' : 'text-ink')}>{label(s.key)}</span>
+          <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="rounded-lg p-1.5 text-muted hover:bg-sand hover:text-ink disabled:opacity-30" aria-label="لأعلى"><ChevronUp className="h-4 w-4" /></button>
+          <button type="button" onClick={() => move(i, 1)} disabled={i === list.length - 1} className="rounded-lg p-1.5 text-muted hover:bg-sand hover:text-ink disabled:opacity-30" aria-label="لأسفل"><ChevronDown className="h-4 w-4" /></button>
+          <button type="button" onClick={() => onChange(list.map((x) => (x.key === s.key ? { ...x, hidden: !x.hidden } : x)))} className={cx('rounded-lg p-1.5', s.hidden ? 'text-muted hover:bg-sand' : 'text-brand-600 hover:bg-brand-50')} aria-label={s.hidden ? 'إظهار' : 'إخفاء'} title={s.hidden ? 'مخفي، اضغط للإظهار' : 'ظاهر، اضغط للإخفاء'}>
+            {s.hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </Reorder.Item>
+      ))}
+    </Reorder.Group>
   )
 }
 

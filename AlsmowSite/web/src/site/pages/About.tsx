@@ -1,6 +1,7 @@
 import { Eye, Gem, Target } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Img, PageHero, Reveal, Seo, Skeleton } from '../../components/ui'
+import { Sections } from '../../lib/layout'
 import { useSite } from '../../lib/queries'
 
 export default function About() {
@@ -13,7 +14,8 @@ export default function About() {
       {isLoading || !a ? (
         <div className="container-x py-20"><Skeleton className="h-96" /></div>
       ) : (
-        <>
+        <Sections settings={data?.settings} page="about" sections={{
+          content: (
           <section className="container-x grid items-start gap-12 py-14 md:py-20 lg:grid-cols-2">
             <Reveal className="lg:sticky lg:top-28">
               <Img src={a.image} alt={a.title || ''} className="aspect-[4/3] w-full rounded-[2rem] shadow-lift" />
@@ -26,6 +28,8 @@ export default function About() {
               )}
             </Reveal>
           </section>
+          ),
+          values: (
           <section className="bg-sand/60 py-16 md:py-20">
             <div className="container-x grid gap-6 md:grid-cols-3">
               {[
@@ -51,7 +55,8 @@ export default function About() {
                 })}
             </div>
           </section>
-        </>
+          ),
+        }} />
       )}
     </>
   )

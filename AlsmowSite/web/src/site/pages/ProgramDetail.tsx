@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { WhatsAppIcon } from '../../components/BrandIcons'
 import { Img, PageHero, Reveal, Seo, Skeleton } from '../../components/ui'
 import { waNumber } from '../../lib/format'
+import { Sections } from '../../lib/layout'
 import { useProgram, useSite } from '../../lib/queries'
 import { PROGRAM_MODES, PROGRAM_TYPES } from '../../lib/types'
 import ProgramCard from '../ProgramCard'
@@ -49,6 +50,7 @@ export default function ProgramDetail() {
         </div>
       </PageHero>
 
+      <Sections settings={site.data?.settings} page="program" sections={{ details: (
       <section className="container-x grid gap-10 py-14 md:py-20 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0">
           <Reveal>
@@ -119,8 +121,7 @@ export default function ProgramDetail() {
           </div>
         </aside>
       </section>
-
-      {data.related.length > 0 && (
+      ), related: data.related.length > 0 ? (
         <section className="bg-sand/60 py-16 md:py-20">
           <div className="container-x">
             <h2 className="mb-8 text-3xl font-extrabold">برامج قد تهمك</h2>
@@ -129,7 +130,7 @@ export default function ProgramDetail() {
             </div>
           </div>
         </section>
-      )}
+      ) : null }} />
     </>
   )
 }
