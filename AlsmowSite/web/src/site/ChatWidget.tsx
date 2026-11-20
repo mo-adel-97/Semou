@@ -2,6 +2,7 @@ import { ArrowUp, RotateCcw, Sparkles, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { LITE } from '../components/ui'
 import { cx } from '../lib/format'
 import { useSite } from '../lib/queries'
 import { track } from '../lib/track'
@@ -96,8 +97,9 @@ export default function ChatWidget() {
   // introduce itself once (label visible for a few seconds), then stay a compact icon
   const [peek, setPeek] = useState(false)
   useEffect(() => {
-    const a = setTimeout(() => setPeek(true), 1800)
-    const b = setTimeout(() => setPeek(false), 7000)
+    // phones: a shorter hello, so the label doesn't sit over the hero photo
+    const a = setTimeout(() => setPeek(true), LITE ? 2200 : 1800)
+    const b = setTimeout(() => setPeek(false), LITE ? 4800 : 7000)
     return () => { clearTimeout(a); clearTimeout(b) }
   }, [])
 
@@ -112,6 +114,12 @@ export default function ChatWidget() {
     return () => { clearInterval(t); clearTimeout(stop) }
   }, [msgs, typingAt, open])
   useEffect(() => () => abort.current?.abort(), [])
+  useEffect(() => {
+    if (!open) return
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [open])
 
   if (cfg.disabled === true) return null
 
@@ -184,6 +192,22 @@ export default function ChatWidget() {
               <span className="block ps-3 pe-4 text-[11px] text-white/60">مساعدتك في المعهد · متاحة الآن</span>
             </motion.span>
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Backdrop: a tap / click anywhere outside the panel closes it (dimmed on phones, invisible on desktop) */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="chat-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-[64] bg-deep-950/45 sm:bg-transparent"
+            aria-hidden
+          />
         )}
       </AnimatePresence>
 

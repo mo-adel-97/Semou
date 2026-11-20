@@ -4,6 +4,7 @@ import { useEffect } from 'react'
  * Site-wide micro-interactions, all transform/opacity (compositor) and off for "reduce motion":
  * - desktop: a soft brand halo trails the cursor, and cards light up where the cursor is (spotlight);
  * - touch: a ripple of light blooms from the exact tap point, with a tiny haptic tick on Android.
+ * Depth parallax follows the mouse on desktop only.
  */
 export default function Fx() {
   useEffect(() => {
@@ -97,18 +98,9 @@ export default function Fx() {
       const mm = (e: PointerEvent) => aim((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1)
       document.addEventListener('pointermove', mm, { passive: true })
       cleanups.push(() => document.removeEventListener('pointermove', mm))
-    } else {
-      let base: { b: number; g: number } | null = null
-      const ori = (e: DeviceOrientationEvent) => {
-        if (e.beta == null || e.gamma == null) return
-        base ??= { b: e.beta, g: e.gamma } // relative to how she holds the phone
-        aim((e.gamma - base.g) / 18, (e.beta - base.b) / 22)
-      }
-      const reset = () => { base = null }
-      window.addEventListener('deviceorientation', ori, { passive: true })
-      document.addEventListener('visibilitychange', reset)
-      cleanups.push(() => { window.removeEventListener('deviceorientation', ori); document.removeEventListener('visibilitychange', reset) })
     }
+    // phones: no tilt-driven parallax. The gyroscope never rests (hand tremor), so it kept a style
+    // recalculation running on every frame while scrolling, which was a main source of jank.
     cleanups.push(() => cancelAnimationFrame(draf))
 
     if (fine) {

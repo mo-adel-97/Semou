@@ -6,7 +6,7 @@ import { Controller, type Control, type FieldValues } from 'react-hook-form'
 import { toast } from '../lib/alerts'
 import { api } from '../lib/api'
 import { cx } from '../lib/format'
-import type { FieldSpec, KbEntry, StatItem } from '../lib/types'
+import type { FieldSpec, KbEntry, StatItem, TextPair } from '../lib/types'
 
 const RichEditor = lazy(() => import('./RichEditor'))
 const KbField = lazy(() => import('./KbField'))
@@ -78,6 +78,9 @@ export function Field({ f, control, error }: { f: FieldSpec; control: Control<Fi
             break
           case 'stats':
             input = <StatsField value={(field.value as StatItem[]) ?? []} onChange={field.onChange} max={f.maxItems ?? 6} />
+            break
+          case 'pairs':
+            input = <PairsField f={f} value={(field.value as TextPair[]) ?? []} onChange={field.onChange} />
             break
           case 'kb':
             input = (
@@ -263,6 +266,33 @@ function ListField({ value, onChange, max }: { value: string[]; onChange: (v: st
           />
           <button type="button" onClick={add} className="btn-ghost shrink-0 !rounded-xl !px-4" aria-label="إضافة"><Plus className="h-4 w-4" /></button>
         </div>
+      )}
+    </div>
+  )
+}
+
+function PairsField({ f, value, onChange }: { f: FieldSpec; value: TextPair[]; onChange: (v: TextPair[]) => void }) {
+  const set = (i: number, patch: Partial<TextPair>) => onChange(value.map((x, j) => (j === i ? { ...x, ...patch } : x)))
+  const max = f.maxItems ?? 20
+  return (
+    <div className="space-y-3">
+      {value.map((p, i) => (
+        <div key={i} className="grid gap-2 rounded-2xl border border-line bg-surface p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-muted">{f.labelA}</span>
+            <textarea className="input min-h-[2.75rem] resize-y" rows={1} value={p.a} onChange={(e) => set(i, { a: e.target.value })} placeholder={f.placeholderA} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-semibold text-muted">{f.labelB}</span>
+            <textarea className="input min-h-[2.75rem] resize-y" rows={1} value={p.b ?? ''} onChange={(e) => set(i, { b: e.target.value })} placeholder={f.placeholderB} dir="auto" />
+          </label>
+          <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="self-end rounded-lg p-2 text-muted hover:bg-red-500/10 hover:text-red-600 sm:mt-6" aria-label="حذف"><Trash2 className="h-4 w-4" /></button>
+        </div>
+      ))}
+      {value.length < max && (
+        <button type="button" onClick={() => onChange([...value, { a: '', b: '' }])} className="btn-ghost !rounded-xl !px-4 !py-2 text-sm">
+          <Plus className="h-4 w-4" /> إضافة
+        </button>
       )}
     </div>
   )

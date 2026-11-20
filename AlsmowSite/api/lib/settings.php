@@ -65,6 +65,33 @@ function settings_schema(): array
                 'skip' => ['type' => 'string', 'label' => 'نص زر التخطي', 'max' => 20, 'placeholder' => 'تخطّي'],
             ],
         ],
+        // The butterflies (web/src/components/Butterflies.tsx): decoration, the one carrying a banner, the two that talk.
+        // Every word they show comes from here; the code holds none.
+        'butterflies' => [
+            'label' => 'الفراشات', 'icon' => 'sparkles',
+            'fields' => [
+                // "hide" (not "show") so a never-saved / unticked box can never switch them off by accident
+                'hide' => ['type' => 'bool', 'label' => 'إخفاء كل الفراشات في الموقع', 'default' => false, 'help' => 'يشمل الفراشات حول الشعار وفي الخلفية، والفراشة حاملة اللافتة، وحوار الفراشتين'],
+                'letters_hide' => ['type' => 'bool', 'label' => 'إيقاف الفراشة حاملة اللافتة', 'default' => false],
+                'letters' => ['type' => 'pairs', 'label' => 'لافتات الفراشة', 'maxItems' => 12,
+                    'labelA' => 'نص اللافتة', 'labelB' => 'الرابط عند الضغط (اختياري)', 'maxA' => 120, 'bLink' => true,
+                    'placeholderA' => 'مثال: التسجيل مفتوح الآن', 'placeholderB' => '/register',
+                    'help' => 'تطير الفراشة حاملة لافتة واحدة في كل مرة، بالتناوب'],
+                'chat_hide' => ['type' => 'bool', 'label' => 'إيقاف حوار الفراشتين', 'default' => false],
+                'chat' => ['type' => 'pairs', 'label' => 'حوار الفراشتين', 'maxItems' => 20,
+                    'labelA' => 'سؤال المتدربة', 'labelB' => 'رد المعهد', 'maxA' => 140, 'maxB' => 220,
+                    'placeholderA' => 'مثال: هل الشهادات معتمدة؟', 'placeholderB' => 'مثال: نعم، معتمدة من المؤسسة العامة للتدريب التقني والمهني',
+                    'help' => 'تظهر فراشتان، تسأل الأولى وترد الثانية؛ حوار واحد في كل مرة بالتناوب'],
+                'chat_asker' => ['type' => 'string', 'label' => 'اسم الفراشة السائلة', 'max' => 30, 'placeholder' => 'مثال: متدربة', 'help' => 'يظهر صغيرًا فوق السؤال، اتركه فارغًا لإخفائه'],
+                'chat_answerer' => ['type' => 'string', 'label' => 'اسم فراشة المعهد', 'max' => 30, 'placeholder' => 'مثال: معهد السمو', 'help' => 'يظهر صغيرًا فوق الرد، اتركه فارغًا لإخفائه'],
+                'first' => ['type' => 'enum', 'label' => 'أول ظهور بعد فتح الموقع', 'default' => '10', 'options' => [
+                    '5' => 'بعد 5 ثوانٍ', '10' => 'بعد 10 ثوانٍ', '20' => 'بعد 20 ثانية', '30' => 'بعد 30 ثانية',
+                ]],
+                'every' => ['type' => 'enum', 'label' => 'الفاصل بين كل ظهور والذي يليه', 'default' => '35', 'options' => [
+                    '20' => 'كل 20 ثانية', '35' => 'كل 35 ثانية', '50' => 'كل 50 ثانية', '90' => 'كل دقيقة ونصف', '180' => 'كل 3 دقائق',
+                ]],
+            ],
+        ],
         'about' => [
             'label' => 'عن المعهد', 'icon' => 'building-2',
             'fields' => [
@@ -219,6 +246,22 @@ function save_settings_group(string $group, array $input): array
                     $items[] = ['value' => max(0, $value), 'label' => $label, 'suffix' => plain_text($item['suffix'] ?? '+', 4) ?? ''];
                 }
                 $clean[$key] = array_slice($items, 0, $f['maxItems'] ?? 6);
+                break;
+            case 'pairs': // a list of two short texts per row; with bLink the second one is a link
+                $items = [];
+                foreach (is_array($v) ? $v : [] as $item) {
+                    if (!is_array($item)) continue;
+                    $a = plain_text($item['a'] ?? null, $f['maxA'] ?? 300);
+                    $b = plain_text($item['b'] ?? null, $f['maxB'] ?? 500);
+                    if ($a === null) continue;
+                    if (!empty($f['bLink'])) {
+                        if ($b !== null && !str_starts_with($b, '/') && safe_url($b) === null) $b = null;
+                    } elseif ($b === null) {
+                        continue;
+                    }
+                    $items[] = ['a' => $a, 'b' => $b];
+                }
+                $clean[$key] = array_slice($items, 0, $f['maxItems'] ?? 20);
                 break;
             case 'kb':
                 $items = [];

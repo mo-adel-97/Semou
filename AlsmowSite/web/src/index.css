@@ -339,6 +339,21 @@
 .pl-msg { margin: 0; font-weight: 600; font-size: clamp(13px, 3.9vw, 17px); color: rgb(255 255 255 / .92); }
 .pl-quote { margin: clamp(8px, 2.4vw, 12px) 0 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(13px, 3.7vw, 16.5px); color: #f3dc9c; }
 
+/* phones: one emblem only (the medallion), the name centred and balanced, more air between the lines */
+@media (max-width: 640px) {
+  .intro-flight { --w: min(90vw, 400px); }
+  .pl-brand .brand-logo { display: none; }
+  .pl-brand { margin-top: 4px; }
+  .pl-brand h1 { font-size: clamp(24px, 7.4vw, 30px); line-height: 1.35; text-wrap: balance; }
+  .pl-frame { padding: 40px 18px 22px; }
+  .pl-kicker { font-size: 13px; opacity: .9; }
+  .pl-rule { margin: 12px 0 10px; }
+  .pl-rule span { width: 46px; }
+  .pl-msg { font-size: 15px; line-height: 1.7; }
+  .pl-quote { margin-top: 10px; font-size: 14px; opacity: .92; }
+  .pl-emblem { width: 62px; }
+}
+
 .intro-skip {
   position: absolute; left: 50%; translate: -50% 0; bottom: max(22px, calc(env(safe-area-inset-bottom) + 14px));
   padding: 8px 22px; border-radius: 999px; font-weight: 700; font-size: 14px; color: var(--ink-2);
@@ -632,8 +647,11 @@ html.fx-on .fx-img:not(.fx-in) { clip-path: inset(0 0 100% 0); }
   66% { border-radius: 64% 36% 46% 54% / 60% 44% 56% 40%; }
 }
 .hero-photo-soft {
-  -webkit-mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%);
-          mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%);
+  /* soft round edge + the bottom melts away (no hard cut line under the person) */
+  -webkit-mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%), linear-gradient(to bottom, #000 80%, transparent 99%);
+          mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%), linear-gradient(to bottom, #000 80%, transparent 99%);
+  -webkit-mask-composite: source-in;
+          mask-composite: intersect;
 }
 @media (max-width: 640px) {
   .s3d-hide-sm { display: none; }
@@ -641,6 +659,208 @@ html.fx-on .fx-img:not(.fx-in) { clip-path: inset(0 0 100% 0); }
 @media (prefers-reduced-motion: reduce) {
   .s3d, .s3d *, .hero-blob { animation: none !important; }
 }
+
+/* =====================================================================
+   Home hero on phones & tablets (HeroMobile in site/pages/Home.tsx).
+   Every colour is derived from the theme (--brand / --glow), light and dark.
+   ===================================================================== */
+.hm {
+  --stage: color-mix(in oklab, var(--brand) 6%, var(--bg));
+  background:
+    radial-gradient(110% 60% at 50% 18%, color-mix(in oklab, var(--glow) 30%, transparent), transparent 62%),
+    var(--stage);
+}
+[data-mode="dark"] .hm {
+  --stage: color-mix(in oklab, var(--brand) 14%, #050807);
+  background:
+    radial-gradient(110% 60% at 50% 18%, color-mix(in oklab, var(--brand) 38%, transparent), transparent 62%),
+    var(--stage);
+}
+.hm-glow {
+  position: absolute; left: 50%; top: 6%; width: 130vw; aspect-ratio: 1; translate: -50% 0; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, color-mix(in oklab, var(--glow) 45%, transparent) 0%, transparent 46%);
+}
+.hm-figure { position: absolute; left: 50%; top: max(5.5rem, 9svh); width: min(118vw, 640px); translate: -50% 0; animation: hm-rise 1.5s cubic-bezier(.22, 1, .36, 1) .05s both; }
+@keyframes hm-rise { from { opacity: 0; transform: translate3d(0, 36px, 0) scale(1.04); } to { opacity: 1; transform: none; } }
+/* the genius touch: one sweep of theme-coloured light passes over her as the page opens */
+.hm-figure::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--glow) 85%, white) 50%, transparent 65%);
+  background-size: 250% 100%; background-position: 130% 0; opacity: 0;
+  -webkit-mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%); mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%);
+  animation: hm-sheen 1.8s cubic-bezier(.45, 0, .2, 1) 1.1s both;
+}
+@keyframes hm-sheen { 0% { opacity: 0; background-position: 130% 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; background-position: -30% 0; } }
+/* slow light rays and an orbit of light behind her, in the theme's glow colour */
+.hm-rays {
+  position: absolute; left: 50%; top: 42%; width: 175%; aspect-ratio: 1; translate: -50% -50%; z-index: -1; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--glow) 34%, transparent) 0deg 3deg, transparent 3deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 8%, transparent 58%); mask-image: radial-gradient(circle, #000 8%, transparent 58%);
+  opacity: .55; animation: hm-spin 90s linear infinite;
+}
+.hm-orbit {
+  position: absolute; left: 50%; top: 40%; width: 74%; aspect-ratio: 1; translate: -50% -50%; z-index: -1; border-radius: 50%; pointer-events: none;
+  border: 1px solid color-mix(in oklab, var(--brand) 30%, transparent); animation: hm-spin 22s linear infinite;
+}
+.hm-orbit i {
+  position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%;
+  background: color-mix(in oklab, var(--glow) 60%, white);
+  box-shadow: 0 0 12px 4px color-mix(in oklab, var(--glow) 80%, transparent), 0 0 30px 8px color-mix(in oklab, var(--brand) 45%, transparent);
+}
+@keyframes hm-spin { to { rotate: 360deg; } }
+/* the words always start right under her face (never over it), whatever the phone's height */
+.hm-words { padding-top: calc(max(5.5rem, 9svh) + min(118vw, 640px) / 1.2 * .54); }
+.hm-veil { background: linear-gradient(to top, var(--stage) 0%, var(--stage) 54%, color-mix(in oklab, var(--stage) 88%, transparent) 61%, transparent 74%); }
+[data-mode="dark"] .hm-veil { background: linear-gradient(to top, var(--stage) 0%, var(--stage) 34%, color-mix(in oklab, var(--stage) 72%, transparent) 46%, transparent 62%); }
+.hm-rule { display: block; margin-top: 1.1rem; width: 6.5rem; height: 3px; border-radius: 3px; transform-origin: right; background: linear-gradient(to left, var(--brand), var(--glow) 60%, transparent); }
+.hm-facts { border-top: 1px solid var(--line); padding-top: 1.1rem; }
+.hm-facts > div { padding-inline: .9rem; border-inline-start: 1px solid var(--line); }
+.hm-facts > div:first-child { padding-inline-start: 0; border-inline-start: 0; }
+.hm-facts dd { margin-top: .45rem; font-size: .75rem; line-height: 1.4; color: var(--muted); }
+@media (min-width: 640px) { .hm-facts > div { padding-inline: 1.5rem; } .hm-facts dd { font-size: .875rem; } }
+@media (prefers-reduced-motion: reduce) { .hm-figure, .hm-figure::after, .hm-rays, .hm-orbit { animation: none !important; } }
+
+/* =====================================================================
+   Butterflies (components/Butterflies.tsx): theme-coloured, transform-only.
+   Wings turn in real 3D around the body, the body rises a little on each beat.
+   ===================================================================== */
+.bf { position: absolute; display: block; width: var(--s, 22px); height: calc(var(--s, 22px) * .8); pointer-events: none; perspective: calc(var(--s, 22px) * 3.5); }
+.bf-body-wrap { position: absolute; inset: 0; transform-style: preserve-3d; animation: bf-body var(--flap, .25s) cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+@keyframes bf-body { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, -9%, 0); } }
+.bf-w { position: absolute; top: 0; width: 50%; height: 100%; animation: bf-wing var(--flap, .25s) cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.bf-wl { left: 0; transform-origin: 100% 50%; }
+.bf-wr { right: 0; transform-origin: 0% 50%; animation-name: bf-wing-r; }
+@keyframes bf-wing { from { transform: rotateY(-6deg); } to { transform: rotateY(74deg); } }
+@keyframes bf-wing-r { from { transform: rotateY(6deg); } to { transform: rotateY(-74deg); } }
+.bf-w svg, .bf-torso { display: block; width: 100%; height: 100%; overflow: visible; }
+.bf-w svg { filter: drop-shadow(0 3px 3px rgb(0 0 0 / .14)); }
+.bf-torso { position: absolute; inset: 0; }
+.bf-up { fill: color-mix(in oklab, var(--brand) 82%, var(--glow)); }
+.bf-lo { fill: color-mix(in oklab, var(--glow) 70%, white); }
+.bf-up, .bf-lo { stroke: rgb(255 255 255 / .6); stroke-width: .6; }
+.bf-body { stroke: color-mix(in oklab, var(--brand) 55%, black); stroke-width: 1.8; stroke-linecap: round; fill: none; }
+.bf-ant { stroke: color-mix(in oklab, var(--brand) 55%, black); stroke-width: .7; fill: none; stroke-linecap: round; }
+.bf-upright, .bf-bob { display: block; }
+.bf-upright > .bf, .bf-bob > .bf { position: relative; }
+
+/* orbits around a logo (each butterfly counter-turns so it always stays upright) */
+.bf-orbit-host { position: relative; display: inline-grid; place-items: center; }
+.bf-ring { position: absolute; left: 50%; top: 50%; width: var(--r); aspect-ratio: 1; translate: -50% -50%; pointer-events: none; animation: bf-spin var(--t, 9s) linear infinite; }
+.bf-ring.rev { animation-direction: reverse; }
+.bf-ring > .bf-upright { position: absolute; left: 50%; top: 0; translate: -50% -50%; animation: bf-spin var(--t, 9s) linear infinite reverse; }
+.bf-ring.rev > .bf-upright { animation-direction: normal; }
+@keyframes bf-spin { to { rotate: 360deg; } }
+/* drifting across a section: a steady glide right → left, and on top of it a soft rise-and-fall */
+.bf-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.bf-fly { position: absolute; top: var(--y); right: -64px; animation: bf-fly var(--d, 26s) linear infinite; animation-delay: var(--delay, 0s); opacity: .92; }
+@keyframes bf-fly { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-125vw, 0, 0); } }
+.bf-bob { animation: bf-bob var(--bob, 3s) ease-in-out infinite alternate; }
+@keyframes bf-bob { from { transform: translate3d(0, 0, 0) rotate(-12deg); } to { transform: translate3d(0, calc(var(--amp, 24px) * -1), 0) rotate(9deg); } }
+@media (prefers-reduced-motion: reduce) { .bf-sky { display: none; } .bf-ring, .bf-ring > .bf-upright, .bf-w, .bf-body-wrap { animation: none !important; } }
+
+/* the messenger: a butterfly carrying a little letter on a thread across the screen (Butterflies.tsx) */
+.bf-messenger { position: fixed; left: 0; top: 0; translate: -50% 0; /* x/y from JS = her centre */ z-index: 58; display: flex; flex-direction: column; align-items: center; pointer-events: none; will-change: transform; }
+.bf-messenger > .bf { position: relative; }
+.bf-thread { width: 1px; height: 22px; margin-top: -4px; background: linear-gradient(color-mix(in oklab, var(--brand) 60%, black), color-mix(in oklab, var(--brand) 30%, transparent)); }
+.bf-letter-swing { transform-origin: 50% 0; animation: bf-swing 2.2s ease-in-out infinite alternate; margin-top: -1px; }
+@keyframes bf-swing { from { rotate: -7deg; } to { rotate: 7deg; } }
+.bf-letter {
+  pointer-events: auto; display: flex; align-items: center; gap: .5rem; max-width: min(72vw, 280px);
+  padding: .55rem .85rem .55rem .7rem; border-radius: .9rem; font-family: var(--font-display); font-weight: 700; font-size: .85rem; line-height: 1.45;
+  background: var(--surface); color: var(--ink); border: 1px solid color-mix(in oklab, var(--brand) 30%, var(--line));
+  box-shadow: 0 16px 34px -14px color-mix(in oklab, var(--brand) 60%, transparent), var(--sh-soft);
+  transition: border-color .2s, transform .2s;
+}
+.bf-letter:hover { border-color: var(--brand); transform: scale(1.04); }
+.bf-letter-ic { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; flex-shrink: 0; border-radius: .55rem; background: var(--brand); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .bf-messenger { display: none; } }
+
+/* two butterflies talking: a question, then the institute's answer (Butterflies.tsx · TalkScene) */
+.bfc { position: fixed; inset: 0; z-index: 58; pointer-events: none; }
+.bfc-fly { position: absolute; left: 0; top: 0; translate: -50% -50%; will-change: transform; }
+.bfc-fly > .bf { position: relative; }
+.bfc-bubble {
+  position: absolute; max-width: min(300px, 70vw); padding: .65rem .95rem; border-radius: 1.15rem;
+  font-family: var(--font-display); font-weight: 700; font-size: .88rem; line-height: 1.65;
+  opacity: 0; transform: translate3d(0, -6px, 0) scale(.7);
+  animation: bfc-in .55s cubic-bezier(.34, 1.56, .64, 1) var(--in, 3s) forwards, bfc-out .4s ease var(--out, 10s) forwards;
+}
+@keyframes bfc-in { to { opacity: 1; transform: none; } }
+@keyframes bfc-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translate3d(0, -8px, 0) scale(.92); } }
+.bfc-bubble.ask {
+  transform-origin: calc(100% - 34px) 0; background: var(--surface); color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--brand) 26%, var(--line)); box-shadow: 0 16px 34px -16px rgb(0 0 0 / .3);
+}
+.bfc-bubble.answer {
+  transform-origin: 34px 0; color: #fff; border: 1px solid color-mix(in oklab, var(--brand) 60%, white);
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--brand) 70%, var(--glow)));
+  box-shadow: 0 18px 38px -16px color-mix(in oklab, var(--brand) 70%, transparent);
+}
+.bfc-bubble::before { /* tail pointing up at the speaker */
+  content: ""; position: absolute; top: -7px; width: 13px; height: 13px; rotate: 45deg; background: inherit; border: inherit; border-right: 0; border-bottom: 0;
+}
+.bfc-bubble.ask::before { right: 28px; background: var(--surface); }
+.bfc-bubble.answer::before { left: 28px; background: var(--primary); }
+.bfc-bubble.answer.tail-end { transform-origin: calc(100% - 34px) 0; }
+.bfc-bubble.answer.tail-end::before { left: auto; right: 28px; }
+.bfc-name { display: block; margin-bottom: .1rem; font-size: .68rem; font-weight: 800; letter-spacing: .01em; opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .bfc { display: none; } }
+
+/* the mobile menu is open: everything moving behind it pauses until it closes */
+html.menu-open .site-shell main *, html.menu-open .bf-orbit-host *, html.menu-open .bf-ring, html.menu-open .bfc *, html.menu-open .bf-messenger * {
+  animation-play-state: paused !important;
+}
+
+/* desktop hero extras: theme-coloured rays behind her and one sweep of light over the photo */
+.hd-rays {
+  position: absolute; left: 50%; top: 42%; width: 150%; aspect-ratio: 1; translate: -50% -50%; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--glow) 34%, transparent) 0deg 3deg, transparent 3deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 10%, transparent 60%); mask-image: radial-gradient(circle, #000 10%, transparent 60%);
+  opacity: .5; animation: bf-spin 100s linear infinite;
+}
+.hd-sheen { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in oklab, var(--glow) 85%, white) 50%, transparent 65%);
+  background-size: 250% 100%; background-position: 130% 0; opacity: 0;
+  -webkit-mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%); mask-image: radial-gradient(118% 92% at 50% 38%, #000 58%, transparent 78%);
+  animation: hm-sheen 1.8s cubic-bezier(.45, 0, .2, 1) 1.2s both;
+}
+/* the highlighted word in the home headline gets a brush stroke that draws itself (right → left) */
+.hero-title .text-gradient { position: relative; }
+.hero-title .text-gradient::after {
+  content: ""; position: absolute; left: -2%; right: -2%; bottom: -.12em; height: .2em; pointer-events: none;
+  background: linear-gradient(to left, var(--brand), var(--glow));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C40 4 90 3 130 6 C160 8 182 9 197 5' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C40 4 90 3 130 6 C160 8 182 9 197 5' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  clip-path: inset(0 0 0 100%); animation: brush-draw .9s cubic-bezier(.65, 0, .35, 1) 1.15s forwards;
+}
+@keyframes brush-draw { to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .hd-rays, .hd-sheen { animation: none !important; } .hero-title .text-gradient::after { animation: none; clip-path: none; } }
+
+/* =====================================================================
+   Phones / tablets / touch (same query as LITE in components/ui.tsx).
+   Same look, minus the effects that make mobile GPUs drop frames while scrolling.
+   ===================================================================== */
+@media (hover: none), (pointer: coarse), (max-width: 1023px) {
+  /* a live backdrop blur under moving content is re-blurred on every frame: solid frosted surfaces instead */
+  .site-shell .glass, .site-shell [class*="backdrop-blur"] { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .site-shell .glass { background-color: color-mix(in oklab, var(--surface) 94%, transparent); }
+  /* huge blurred aurora blobs + the morphing hero frame: painted once, not re-rendered forever */
+  .animate-aurora, .hero-blob { animation: none !important; }
+  .hero-blob { will-change: auto; }
+  /* gradient words stay still (a background-position animation repaints the text every frame) */
+  .text-gradient { animation: none; background-position: 30% 0; }
+  .hero-motes i:nth-child(n + 7) { display: none; }
+  /* scroll reveal: a short rise, no blur and no 3D tilt */
+  .fx-card.fx-in, .fx-title.fx-in { animation-name: fx-rise-lite; animation-duration: .6s; }
+  .fx-card.fx-in { animation-delay: calc(var(--fx-i, 0) * 60ms); }
+  .fx-img.fx-in { animation-duration: .8s; }
+  /* film grain is a blend mode over whole sections: expensive on phones, barely visible */
+  .grain::after { display: none; }
+  /* page-change curtain: quicker, so navigation feels instant */
+  .route-curtain { animation-duration: .7s; }
+  .rc-a, .rc-b, .rc-logo { animation-duration: .66s; }
+}
+@keyframes fx-rise-lite { from { opacity: 0; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
 
 /* the round logo badge (components/BrandLogo.tsx): white disc, brand→gold ring, the whole logo inside */
 @property --bl-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }

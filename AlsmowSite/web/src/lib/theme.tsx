@@ -71,7 +71,10 @@ function apply(mode: Mode, accent: Accent) {
 /** Runs a theme change with a circular reveal from (x, y) when the browser supports View Transitions. */
 function reveal(change: () => void, at?: { x: number; y: number }) {
   const d = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } }
-  if (!d.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { change(); return }
+  // phones / tablets / touch: change at once. The circular reveal snapshots the whole page (a View Transition),
+  // which is far too heavy for mobile GPUs and made the theme picker and the mobile menu stutter.
+  const lite = window.matchMedia('(hover: none), (pointer: coarse), (max-width: 1023px)').matches
+  if (!d.startViewTransition || lite || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { change(); return }
   const x = at?.x ?? innerWidth / 2
   const y = at?.y ?? innerHeight / 2
   const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))

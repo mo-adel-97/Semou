@@ -1,14 +1,15 @@
 import {
-  ArrowLeft, Award, BadgeCheck, Briefcase, CalendarDays, ClipboardCheck, Eye, GraduationCap, MousePointerClick, PhoneCall,
+  ArrowLeft, BadgeCheck, Briefcase, CalendarDays, ClipboardCheck, Eye, GraduationCap, MousePointerClick, PhoneCall,
   Quote, Rocket, ShieldCheck, Sparkles, Target, UserRound, Wallet, X,
 } from 'lucide-react'
 import { AnimatePresence, LayoutGroup, motion, useScroll, useTransform } from 'motion/react'
-import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Aurora, Counter, Img, Magnetic, Reveal, SectionHeading, Seo, Skeleton, SplitText, Stars, Tilt, stagger, useParallax,
+  Aurora, Counter, Img, LITE, Magnetic, Reveal, SectionHeading, Seo, Skeleton, SplitText, Stars, Tilt, stagger, useParallax,
 } from '../../components/ui'
 import { Capsule, Cube, Sphere } from '../../components/Shapes3D'
+import { ButterflyOrbit, ButterflySky } from '../../components/Butterflies'
 import BrandLogo from '../../components/BrandLogo'
 import { cx, fmtDate } from '../../lib/format'
 import { useHome } from '../../lib/queries'
@@ -21,13 +22,15 @@ const TYPE_ICON: Record<ProgramType, typeof GraduationCap> = { diploma: Graduati
 
 export default function Home() {
   const { data, isLoading } = useHome()
+  const wide = useWide()
   if (isLoading || !data) return <HomeSkeleton />
   const seo = data.settings.seo
   return (
     <>
       <Seo description={seo.description} image={seo.og_image} />
       {seo.title && <title>{seo.title}</title>}
-      <Hero data={data} />
+      {/* desktop keeps the original composition; phones/tablets get the full-screen stage */}
+      {wide ? <Hero data={data} /> : <HeroMobile data={data} />}
       <Ticker data={data} />
       <Accreditations items={data.accreditations} />
       <Paths data={data} />
@@ -65,13 +68,15 @@ function Hero({ data }: { data: HomeData }) {
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
 
   return (
-    <section ref={ref} className="relative overflow-hidden pt-32 pb-16 md:pt-36 lg:flex lg:min-h-[min(100svh,56rem)] lg:items-center lg:pt-28 lg:pb-14">
+    <section ref={ref} className="relative overflow-hidden pt-28 pb-14 sm:pt-32 md:pt-36 lg:flex lg:min-h-[min(100svh,56rem)] lg:items-center lg:pt-28 lg:pb-14">
       <HeroMotes />
       <Aurora />
+      {!data.settings.butterflies?.hide && <ButterflySky count={LITE ? 3 : 6} />}
       <div className="pattern absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
 
-      <div className="container-x relative grid items-center gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-10 xl:gap-16">
-        <motion.div style={{ y: textY, opacity: fade }}>
+      <div className="container-x relative grid items-center gap-10 sm:gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-10 xl:gap-16">
+        {/* scroll-linked drift is desktop only: on phones it is JS work on every scroll frame */}
+        <motion.div style={LITE ? undefined : { y: textY, opacity: fade }}>
           {h.eyebrow && (
             <motion.span initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="eyebrow">
               <span className="relative flex h-2 w-2">
@@ -87,34 +92,35 @@ function Hero({ data }: { data: HomeData }) {
             delay={0.1}
             text={title}
             accent={h.highlight}
-            className="mt-6 text-[clamp(2.1rem,1.2rem+3.2vw,4rem)] leading-[1.2] font-black tracking-tight text-balance text-ink"
+            className="hero-title mt-5 text-[clamp(2.1rem,1.2rem+3.2vw,4rem)] leading-[1.2] font-black tracking-tight text-balance text-ink sm:mt-6"
           />
           {h.subtitle && (
             <motion.p
-              initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.8, delay: 0.5, ease: EASE }}
-              className="mt-5 max-w-xl text-[clamp(1rem,0.9rem+0.4vw,1.2rem)] leading-[1.9] text-pretty text-muted"
+              initial={LITE ? { opacity: 0, y: 12 } : { opacity: 0, y: 20, filter: 'blur(6px)' }}
+              animate={LITE ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.8, delay: LITE ? 0.35 : 0.5, ease: EASE }}
+              className="mt-4 max-w-xl text-[clamp(1rem,0.9rem+0.4vw,1.2rem)] leading-[1.85] text-pretty text-muted sm:mt-5 sm:leading-[1.9]"
             >
               {h.subtitle}
             </motion.p>
           )}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.65, ease: EASE }} className="mt-8 flex flex-wrap items-center gap-3">
+          {/* phones: the two buttons share one row (equal width); from sm they size to their text */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: LITE ? 0.45 : 0.65, ease: EASE }} className="mt-7 grid grid-cols-2 gap-2.5 sm:mt-8 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
             <Magnetic>
-              <SmartLink to={h.cta_link || '/register'} className="btn-primary group !px-7 !py-3.5 text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
+              <SmartLink to={h.cta_link || '/register'} className="btn-primary group w-full !gap-1.5 !px-3 !py-3.5 text-[14.5px] sm:w-auto sm:!gap-2 sm:!px-7 sm:text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-l from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                {h.cta_text || 'ابدئي رحلتك الآن'} <ArrowLeft className="h-5 w-5 transition group-hover:-translate-x-1" />
+                {h.cta_text || 'ابدئي رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1 sm:h-5 sm:w-5" />
               </SmartLink>
             </Magnetic>
-            <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost !px-7 !py-3.5 text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
+            <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost w-full !px-3 !py-3.5 text-[14.5px] sm:w-auto sm:!px-7 sm:text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
               {h.secondary_text || 'استعرضي البرامج'}
             </SmartLink>
           </motion.div>
           {!!h.highlights?.length && (
-            <motion.ul variants={stagger.container} initial="hidden" animate="show" transition={{ delayChildren: 0.8 }} className="mt-9 flex flex-wrap gap-x-6 gap-y-3">
+            <motion.ul variants={stagger.container} initial="hidden" animate="show" transition={{ delayChildren: LITE ? 0.5 : 0.8 }} className="mt-7 grid grid-cols-2 gap-x-3 gap-y-2.5 sm:mt-9 sm:flex sm:flex-wrap sm:gap-x-6 sm:gap-y-3">
               {h.highlights.map((x) => (
-                <motion.li key={x} variants={stagger.item} className="flex items-center gap-2 text-[15px] font-semibold text-ink-2">
-                  <BadgeCheck className="h-5 w-5 text-brand-500" />
+                <motion.li key={x} variants={stagger.item} className="flex items-center gap-1.5 text-[13.5px] leading-snug font-semibold text-ink-2 sm:gap-2 sm:text-[15px]">
+                  <BadgeCheck className="h-[1.15rem] w-[1.15rem] shrink-0 text-brand-500 sm:h-5 sm:w-5" />
                   {x}
                 </motion.li>
               ))}
@@ -127,7 +133,7 @@ function Hero({ data }: { data: HomeData }) {
           initial={{ opacity: 0, scale: 0.92, rotate: -2 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 1.1, ease: EASE }}
-          className="relative mx-auto w-[min(100%,26rem)] sm:w-[min(100%,32rem)] lg:w-[min(100%,calc((100svh-10rem)*1.15),40rem)]"
+          className="relative mx-auto w-[min(100%,25rem)] sm:w-[min(100%,32rem)] lg:w-[min(100%,calc((100svh-10rem)*1.15),40rem)]"
           data-depth-scene
         >
           {/* rotating badge */}
@@ -138,11 +144,17 @@ function Hero({ data }: { data: HomeData }) {
                 <textPath href="#circ" textLength="236" lengthAdjust="spacingAndGlyphs">AL SUMOU INSTITUTE • CERTIFIED TRAINING • </textPath>
               </text>
             </svg>
-            <span className="absolute inset-0 m-auto grid h-14 w-14 place-items-center rounded-full bg-gold-400 text-deep-950 shadow-lift"><Award className="h-7 w-7" /></span>
+            {/* the institute's own logo in the centre, with butterflies circling it */}
+            <span className="absolute inset-0 grid place-items-center">
+              {data.settings.butterflies?.hide
+                ? <BrandLogo src={data.settings.general?.logo} animate={false} className="h-14 w-14 shadow-lift xl:h-16 xl:w-16" />
+                : <ButterflyOrbit><BrandLogo src={data.settings.general?.logo} animate={false} className="h-14 w-14 shadow-lift xl:h-16 xl:w-16" /></ButterflyOrbit>}
+            </span>
           </div>
 
           {/* Soft glow + slowly turning dashed ring behind the cut-out (the photo carries its own colour circles) */}
           <div className="depth-1 absolute inset-[8%_6%_4%] rounded-full bg-brand-500/20 blur-3xl" />
+          <div className="hd-rays depth-1" aria-hidden />
           <div className="hero-blob depth-1" />
           {/* real 3D shapes (CSS only): float on their own and follow the mouse / phone tilt */}
           <Sphere className="depth-3 top-[6%] right-[8%] [--sz:clamp(38px,9vw,70px)]" />
@@ -150,16 +162,21 @@ function Hero({ data }: { data: HomeData }) {
           <Sphere gold className="depth-2 bottom-[30%] right-[4%] [--sz:clamp(20px,4vw,30px)]" />
           <Capsule className="depth-3 top-[34%] left-[-3%] !z-[5] [--sz:clamp(46px,9vw,74px)] s3d-hide-sm" />
           <div className="absolute bottom-0 left-1/2 h-[14%] w-[80%] -translate-x-1/2 rounded-[50%] bg-deep-950/40 blur-2xl" />
-          <div className="depth-2 relative aspect-[1920/1585]">
+          {/* 6:5 frame, anchored to the top: anything below the person (e.g. a caption baked into an uploaded
+              photo) falls outside the frame and is never shown */}
+          <div className="depth-2 relative aspect-[6/5]">
             {h.image ? (
               <motion.img
-                style={{ y: imgY }}
+                style={LITE ? undefined : { y: imgY }}
                 src={h.image}
                 alt={title}
-                className="hero-photo-soft absolute inset-0 h-full w-full object-contain object-bottom"
-                initial={{ opacity: 0, y: 40 }}
+                width={1920}
+                height={1600}
+                className="hero-photo-soft absolute inset-0 h-full w-full object-cover object-top"
+                initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.2 }}
+                transition={{ duration: LITE ? 0.6 : 1, delay: LITE ? 0.1 : 0.2 }}
+                fetchPriority="high"
                 decoding="async"
               />
             ) : (
@@ -167,9 +184,10 @@ function Hero({ data }: { data: HomeData }) {
                 <BrandLogo className="h-40 w-40" />
               </div>
             )}
+            {h.image && <div className="hd-sheen" aria-hidden />}
           </div>
 
-          <FloatCard className="top-[30%] -right-1 sm:-right-4 xl:-right-8" delay={0.9}>
+          <FloatCard className="top-[24%] -right-1 sm:top-[30%] sm:-right-4 xl:-right-8" delay={LITE ? 0.6 : 0.9}>
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-gold-400/15 text-gold-600"><ShieldCheck className="h-6 w-6" /></span>
             <div>
               <div className="font-display text-sm font-extrabold text-ink">شهادات معتمدة</div>
@@ -177,7 +195,7 @@ function Hero({ data }: { data: HomeData }) {
             </div>
           </FloatCard>
           {total > 0 && (
-            <FloatCard className="bottom-[22%] -left-1 [animation-delay:-3s] sm:-left-4 xl:-left-8" delay={1.1}>
+            <FloatCard className="bottom-[26%] -left-1 [animation-delay:-3s] sm:bottom-[22%] sm:-left-4 xl:-left-8" delay={LITE ? 0.75 : 1.1}>
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-100 text-brand-700"><GraduationCap className="h-6 w-6" /></span>
               <div>
                 <div className="font-display text-2xl leading-none font-black text-brand-700"><Counter value={total} suffix="+" /></div>
@@ -185,7 +203,7 @@ function Hero({ data }: { data: HomeData }) {
               </div>
             </FloatCard>
           )}
-          <FloatCard className="-bottom-4 right-[18%] !py-2.5 [animation-delay:-5s]" delay={1.3}>
+          <FloatCard className="inset-x-0 -bottom-3 mx-auto w-max !py-2.5 whitespace-nowrap [animation-delay:-5s] sm:inset-x-auto sm:-bottom-4 sm:right-[18%] sm:mx-0" delay={LITE ? 0.9 : 1.3}>
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -215,6 +233,97 @@ function FloatCard({ className, delay, children }: { className: string; delay: n
     >
       {children}
     </motion.div>
+  )
+}
+
+/* ================= Hero: phones & tablets =================
+   A full-screen stage: the portrait on top (lit by slow light rays and an orbit of light), the words below it,
+   never over her face. Every colour comes from the visitor's theme (brand + glow), in light and dark mode. */
+
+const WIDE_QUERY = '(min-width: 1024px)'
+function useWide() {
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia(WIDE_QUERY).matches)
+  useEffect(() => {
+    const m = window.matchMedia(WIDE_QUERY)
+    const on = () => setWide(m.matches)
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  return wide
+}
+
+function HeroMobile({ data }: { data: HomeData }) {
+  const h = data.settings.hero
+  const title = h.title || 'معهد السمو للتدريب'
+  const total = data.counts.diploma + data.counts.qualifying + data.counts.development
+  return (
+    <section className="hm relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden">
+      <div className="hm-stage absolute inset-0 -z-20">
+        <div className="hm-glow" />
+        {h.image ? (
+          // 6:5 frame anchored to the top: anything baked in under the person (a caption…) stays out of view
+          <div className="hm-figure aspect-[6/5]">
+            <div className="hm-rays" aria-hidden />
+            <div className="hm-orbit" aria-hidden><i /></div>
+            <img src={h.image} alt={title} width={1920} height={1600} className="hero-photo-soft relative h-full w-full object-cover object-top" fetchPriority="high" decoding="async" />
+          </div>
+        ) : (
+          <div className="absolute inset-x-0 top-[18%] grid place-items-center"><BrandLogo className="h-36 w-36" /></div>
+        )}
+      </div>
+      <div className="hm-veil absolute inset-0 -z-10" />
+      <HeroMotes />
+      {!data.settings.butterflies?.hide && <ButterflySky count={3} />}
+
+      <div className="hm-words container-x relative pb-24">
+        {h.eyebrow && (
+          <motion.span initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15, ease: EASE }} className="eyebrow">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
+            </span>
+            {h.eyebrow}
+          </motion.span>
+        )}
+        <SplitText as="h1" immediate delay={0.2} text={title} accent={h.highlight} className="hero-title mt-5 text-[clamp(2.4rem,1.4rem+5vw,3.6rem)] leading-[1.15] font-black tracking-tight text-balance text-ink" />
+        <motion.span initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1, delay: 0.6, ease: EASE }} className="hm-rule" aria-hidden />
+        {h.subtitle && (
+          <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.45, ease: EASE }} className="mt-5 line-clamp-4 text-[1.02rem] leading-[1.85] text-pretty text-ink-2">
+            {h.subtitle}
+          </motion.p>
+        )}
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55, ease: EASE }} className="mt-7 grid grid-cols-2 gap-2.5">
+          <SmartLink to={h.cta_link || '/register'} className="btn-primary group w-full !gap-1.5 !px-3 !py-3.5 text-[14.5px]">
+            {h.cta_text || 'ابدئي رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1" />
+          </SmartLink>
+          <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost w-full !px-3 !py-3.5 text-[14.5px]">
+            {h.secondary_text || 'استعرضي البرامج'}
+          </SmartLink>
+        </motion.div>
+        <motion.dl initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="hm-facts mt-9 grid grid-cols-3">
+          {total > 0 && (
+            <div>
+              <dt className="font-display text-2xl leading-none font-black text-brand-600"><Counter value={total} suffix="+" /></dt>
+              <dd>برنامج تدريبي</dd>
+            </div>
+          )}
+          <div>
+            <dt className="flex items-center gap-1.5 font-display text-[15px] leading-none font-extrabold text-ink"><ShieldCheck className="h-4 w-4 text-brand-500" /> معتمد</dt>
+            <dd>التدريب التقني والمهني</dd>
+          </div>
+          <div>
+            <dt className="flex items-center gap-2 font-display text-[15px] leading-none font-extrabold text-ink">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              </span>
+              التسجيل
+            </dt>
+            <dd>مفتوح الآن</dd>
+          </div>
+        </motion.dl>
+      </div>
+    </section>
   )
 }
 

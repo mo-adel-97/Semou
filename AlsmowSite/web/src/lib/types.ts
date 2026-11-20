@@ -57,9 +57,17 @@ export interface Settings {
   contact: Partial<{ phone: string; whatsapp: string; email: string; address: string; hours: string; map_url: string }>
   social: Partial<Record<'x' | 'instagram' | 'snapchat' | 'tiktok' | 'facebook' | 'linkedin' | 'youtube', string>>
   seo: Partial<{ title: string; description: string; og_image: string }>
+  /** components/Butterflies.tsx: every word they show comes from here. */
+  butterflies?: Partial<{
+    hide: boolean; letters_hide: boolean; letters: TextPair[]; chat_hide: boolean; chat: TextPair[]
+    chat_asker: string | null; chat_answerer: string | null; first: string | null; every: string | null
+  }>
   /** Site texts changed without touching the code (see lib/textOverrides.ts). */
   texts?: Partial<{ rules: import('./textOverrides').TextRule[] }>
 }
+
+/** A row of a 'pairs' field: a text and a second text (a link, or an answer). */
+export interface TextPair { a: string; b: string | null }
 
 export type ProgramCounts = Record<ProgramType, number>
 
@@ -82,7 +90,7 @@ export interface HomeData {
 
 /* ---------- Admin ---------- */
 
-export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb'
+export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb' | 'pairs'
 
 export interface FieldSpec {
   key: string
@@ -97,6 +105,11 @@ export interface FieldSpec {
   default?: unknown
   column?: boolean
   options?: { value: string; label: string }[]
+  /** 'pairs' fields: the two inputs of each row */
+  labelA?: string
+  labelB?: string
+  placeholderA?: string
+  placeholderB?: string
 }
 
 export interface ResourceSpec {

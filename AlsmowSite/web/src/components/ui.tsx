@@ -8,6 +8,13 @@ import { cx } from '../lib/format'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
+/**
+ * Phones, tablets and touch screens get a lighter effect set: no blur filters in animations, no JS smooth-scroll
+ * loop (native scrolling is smoother there), no pointer tilt. Same query as the `lite` block in index.css.
+ */
+export const LITE_QUERY = '(hover: none), (pointer: coarse), (max-width: 1023px)'
+export const LITE = typeof window !== 'undefined' && window.matchMedia(LITE_QUERY).matches
+
 /* ---------------- Smooth scroll (Lenis) ---------------- */
 
 const LenisCtx = createContext<Lenis | null>(null)
@@ -17,7 +24,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduce = useReducedMotion()
   const [lenis, setLenis] = useState<Lenis | null>(null)
   useEffect(() => {
-    if (reduce) return
+    if (reduce || LITE) return
     const l = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true })
     setLenis(l)
     let raf = 0
@@ -40,10 +47,10 @@ export function Reveal({ children, delay = 0, className, y = 28 }: { children: R
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y, filter: 'blur(6px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, margin: '-70px' }}
-      transition={{ duration: 0.8, delay, ease: EASE }}
+      initial={LITE ? { opacity: 0, y: Math.min(y, 18) } : { opacity: 0, y, filter: 'blur(6px)' }}
+      whileInView={LITE ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: LITE ? '-40px' : '-70px' }}
+      transition={{ duration: LITE ? 0.55 : 0.8, delay: LITE ? Math.min(delay, 0.15) : delay, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -52,7 +59,9 @@ export function Reveal({ children, delay = 0, className, y = 28 }: { children: R
 
 export const stagger = {
   container: { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } } },
-  item: { hidden: { opacity: 0, y: 30, filter: 'blur(6px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.7, ease: EASE } } },
+  item: LITE
+    ? { hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } } }
+    : { hidden: { opacity: 0, y: 30, filter: 'blur(6px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.7, ease: EASE } } },
 }
 
 /** Word-by-word headline reveal. Words in `accent` get the gradient. */
@@ -93,7 +102,7 @@ export function Tilt({ children, className, max = 7 }: { children: ReactNode; cl
   const gx = useTransform(px, (v) => `${v * 100}%`)
   const gy = useTransform(py, (v) => `${v * 100}%`)
   const spot = useMotionTemplate`radial-gradient(420px circle at ${gx} ${gy}, color-mix(in oklab, var(--glow) 22%, transparent), transparent 60%)`
-  if (reduce) return <div className={className}>{children}</div>
+  if (reduce || LITE) return <div className={className}>{children}</div>
   return (
     <motion.div
       ref={ref}
@@ -117,6 +126,7 @@ export function Magnetic({ children, strength = 0.3 }: { children: ReactNode; st
   const ref = useRef<HTMLDivElement>(null)
   const x = useSpring(0, { stiffness: 250, damping: 15 })
   const y = useSpring(0, { stiffness: 250, damping: 15 })
+  if (LITE) return <div className="inline-block">{children}</div>
   return (
     <motion.div
       ref={ref}
@@ -138,7 +148,7 @@ export function Magnetic({ children, strength = 0.3 }: { children: ReactNode; st
 export function useParallax(range = 80): [RefObject<HTMLDivElement | null>, MotionValue<number>] {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], [range, -range])
+  const y = useTransform(scrollYProgress, [0, 1], LITE ? [0, 0] : [range, -range])
   return [ref, y]
 }
 

@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/
 import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useOutlet } from 'react-router-dom'
 import { SocialLinks, WhatsAppIcon } from '../components/BrandIcons'
-import { Magnetic, ScrollProgress, SmoothScroll, useLenis } from '../components/ui'
+import { LITE, Magnetic, ScrollProgress, SmoothScroll, useLenis } from '../components/ui'
 import { cx, waNumber } from '../lib/format'
 import { useSite } from '../lib/queries'
 import { useTheme } from '../lib/theme'
@@ -18,6 +18,7 @@ import { startTracking, trackView } from '../lib/track'
 import Fx from '../components/Fx'
 import RouteCurtain from '../components/RouteCurtain'
 import BrandLogo from '../components/BrandLogo'
+import { ButterflyOrbit, ButterflyShow } from '../components/Butterflies'
 
 const ChatWidget = lazy(() => import('./ChatWidget'))
 
@@ -40,16 +41,24 @@ function useNav(): NavItem[] {
   ]
 }
 
-function Logo({ light, compact }: { light?: boolean; compact?: boolean }) {
+function Logo({ light, compact, flutter }: { light?: boolean; compact?: boolean; flutter?: boolean }) {
   const { data } = useSite()
   const g = data?.settings.general
   return (
-    <Link to="/" className="group flex shrink-0 items-center gap-3" aria-label="الصفحة الرئيسية">
-      <BrandLogo src={g?.logo} className={compact ? 'h-12 w-12 shrink-0 md:h-14 md:w-14' : 'h-14 w-14 shrink-0 md:h-16 md:w-16'} />
-      {/* header: name only, on one line (hidden at lg where the menu needs the room); the tagline lives in the footer / mobile menu */}
-      <div className={cx('leading-tight', compact && 'hidden sm:block lg:hidden xl:block')}>
-        <div className={cx('font-display font-extrabold whitespace-nowrap', compact ? 'text-[16px]' : 'text-[17px]', light ? 'text-white' : 'text-ink')}>{g?.site_name || 'معهد السمو للتدريب'}</div>
-        {!compact && <div className={cx('text-xs', light ? 'text-white/55' : 'text-muted')}>{g?.tagline || 'مستقبلك يبدأ من هنا'}</div>}
+    <Link to="/" className={cx('group flex items-center gap-3', compact ? 'shrink-0' : 'min-w-0')} aria-label="الصفحة الرئيسية">
+      {flutter ? (
+        // home page: two small butterflies circle the logo
+        <ButterflyOrbit className="shrink-0" rings={[{ r: '165%', t: '8s', s: 22 }, { r: '210%', t: '12s', s: 17, reverse: true }]}>
+          <BrandLogo src={g?.logo} className="h-12 w-12 shrink-0 md:h-14 md:w-14" />
+        </ButterflyOrbit>
+      ) : (
+        <BrandLogo src={g?.logo} className={compact ? 'h-12 w-12 shrink-0 md:h-14 md:w-14' : 'h-14 w-14 shrink-0 md:h-16 md:w-16'} />
+      )}
+      {/* header: name only, on one line (hidden at lg where the menu needs the room); the tagline lives in the footer / mobile menu.
+          Full size (mobile menu, footer): the name may wrap and a long tagline is cut at two lines, never past the edge */}
+      <div className={cx('min-w-0 leading-tight', compact && 'hidden sm:block lg:hidden xl:block')}>
+        <div className={cx('font-display font-extrabold', compact ? 'text-[16px] whitespace-nowrap' : 'text-[17px] text-balance', light ? 'text-white' : 'text-ink')}>{g?.site_name || 'معهد السمو للتدريب'}</div>
+        {!compact && <div className={cx('mt-0.5 line-clamp-2 text-xs leading-relaxed', light ? 'text-white/55' : 'text-muted')}>{g?.tagline || 'مستقبلك يبدأ من هنا'}</div>}
       </div>
     </Link>
   )
@@ -115,6 +124,8 @@ function Header() {
   useEffect(() => {
     if (open) lenis?.stop(); else lenis?.start()
     document.body.style.overflow = open ? 'hidden' : ''
+    // while the mobile menu is open, the page behind it holds still (frees the GPU for the menu)
+    document.documentElement.classList.toggle('menu-open', open)
   }, [open, lenis])
 
   const ann = data?.settings.general.announcement
@@ -154,7 +165,7 @@ function Header() {
         </AnimatePresence>
         <div className="container-x pt-3">
           <div className={cx('flex items-center justify-between gap-3 rounded-[1.75rem] px-3 py-2.5 transition-all duration-500 md:px-4', scrolled ? 'glass shadow-lift' : 'border border-transparent')}>
-            <Logo compact />
+            <Logo compact flutter={loc.pathname === '/' && !data?.settings.butterflies?.hide} />
             <nav className="hidden items-center lg:flex" aria-label="القائمة الرئيسية" onMouseLeave={() => setDrop(null)}>
               {nav.map((item) => {
                 const active = item.to ? (item.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(item.to)) : item.children?.some((c) => loc.pathname === c.to)
@@ -229,9 +240,9 @@ function Header() {
               className="absolute inset-y-0 right-0 flex w-[90%] max-w-sm flex-col bg-bg shadow-2xl"
               aria-label="قائمة الجوال"
             >
-              <div className="flex items-center justify-between border-b border-line p-4">
+              <div className="flex items-center justify-between gap-3 border-b border-line p-4">
                 <Logo />
-                <button onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl bg-surface" aria-label="إغلاق"><X className="h-5 w-5" /></button>
+                <button onClick={() => setOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface" aria-label="إغلاق"><X className="h-5 w-5" /></button>
               </div>
               <motion.nav className="flex-1 overflow-y-auto p-4" variants={{ show: { transition: { staggerChildren: 0.05, delayChildren: 0.15 } } }}>
                 {nav.map((item) => (
@@ -424,6 +435,11 @@ export default function Layout() {
   useEffect(() => { setDefaults(data?.settings.general.theme_accent, data?.settings.general.theme_mode) }, [data, setDefaults])
   useEffect(() => { startTracking() }, [])
   useEffect(() => { trackView(pathname) }, [pathname])
+  // the butterflies' scenes: everything (on/off, words, links, timing) comes from the dashboard
+  const bf = data?.settings.butterflies
+  const bfOn = !bf?.hide
+  const letters = bfOn && !bf?.letters_hide ? (bf?.letters ?? []).map((x) => ({ text: x.a, to: x.b })) : []
+  const talks = bfOn && !bf?.chat_hide ? (bf?.chat ?? []).filter((x) => x.b).map((x) => ({ q: x.a, a: x.b! })) : []
 
   return (
     <SmoothScroll>
@@ -437,10 +453,11 @@ export default function Layout() {
             id="main"
             key={pathname}
             className="flex-1"
-            initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -12, filter: 'blur(6px)' }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            // phones: a quick fade only; blurring the whole page every navigation is very heavy on mobile GPUs
+            initial={LITE ? { opacity: 0 } : { opacity: 0, y: 24, filter: 'blur(8px)' }}
+            animate={LITE ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={LITE ? { opacity: 0 } : { opacity: 0, y: -12, filter: 'blur(6px)' }}
+            transition={{ duration: LITE ? 0.22 : 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             {outlet}
           </motion.main>
@@ -450,6 +467,16 @@ export default function Layout() {
         <Suspense fallback={null}><ChatWidget /></Suspense>
       </div>
       <IntroBirds />
+      {(letters.length > 0 || talks.length > 0) && (
+        <ButterflyShow
+          letters={letters}
+          talks={talks}
+          asker={bf?.chat_asker}
+          answerer={bf?.chat_answerer}
+          first={Number(bf?.first) || 10}
+          every={Number(bf?.every) || 35}
+        />
+      )}
       <Fx />
       <RouteCurtain />
       <SiteTexts />
@@ -461,7 +488,7 @@ function ScrollToTop({ pathname }: { pathname: string }) {
   const lenis = useLenis()
   useEffect(() => {
     // after the exit animation of the previous page
-    const t = setTimeout(() => (lenis ? lenis.scrollTo(0, { immediate: true }) : window.scrollTo(0, 0)), 450)
+    const t = setTimeout(() => (lenis ? lenis.scrollTo(0, { immediate: true }) : window.scrollTo(0, 0)), LITE ? 220 : 450)
     return () => clearTimeout(t)
   }, [pathname, lenis])
   return null
