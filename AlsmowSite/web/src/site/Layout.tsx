@@ -438,8 +438,8 @@ export default function Layout() {
   // the butterflies' scenes: everything (on/off, words, links, timing) comes from the dashboard
   const bf = data?.settings.butterflies
   const bfOn = !bf?.hide
-  const letters = bfOn && !bf?.letters_hide ? (bf?.letters ?? []).map((x) => ({ text: x.a, to: x.b })) : []
-  const talks = bfOn && !bf?.chat_hide ? (bf?.chat ?? []).filter((x) => x.b).map((x) => ({ q: x.a, a: x.b! })) : []
+  const letters = bfOn && !bf?.letters_hide ? (Array.isArray(bf?.letters) ? bf.letters : []).map((x) => ({ text: x.a, to: x.b })) : []
+  const talks = bfOn && !bf?.chat_hide ? (Array.isArray(bf?.chat) ? bf.chat : []).filter((x) => x.b).map((x) => ({ q: x.a, a: x.b! })) : []
 
   return (
     <SmoothScroll>

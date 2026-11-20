@@ -11,7 +11,8 @@ import type { SectionPick, Settings } from './types'
 export type PageKey = 'home' | 'about' | 'program' | 'contact'
 
 export function sectionOrder(settings: Settings | undefined, page: PageKey, defaults: string[]): string[] {
-  const saved = (settings?.layout?.[page] ?? []) as SectionPick[]
+  const raw = settings?.layout?.[page]
+  const saved = (Array.isArray(raw) ? raw : []) as SectionPick[]
   const known = saved.filter((s) => defaults.includes(s.key))
   const seen = new Set(known.map((s) => s.key))
   return [...known, ...defaults.filter((k) => !seen.has(k)).map((key) => ({ key, hidden: false }))]

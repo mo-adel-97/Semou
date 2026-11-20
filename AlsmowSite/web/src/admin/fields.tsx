@@ -80,13 +80,14 @@ export function Field({ f, control, error }: { f: FieldSpec; control: Control<Fi
             input = <StatsField value={(field.value as StatItem[]) ?? []} onChange={field.onChange} max={f.maxItems ?? 6} />
             break
           case 'sections':
-            input = <SectionsField f={f} value={(field.value as SectionPick[]) ?? []} onChange={field.onChange} />
+            // a group never saved yet gives '' / {} here, not a list
+            input = <SectionsField f={f} value={Array.isArray(field.value) ? (field.value as SectionPick[]) : []} onChange={field.onChange} />
             break
           case 'color':
             input = <ColorField value={(field.value as string) ?? ''} onChange={field.onChange} placeholder={f.placeholder} />
             break
           case 'pairs':
-            input = <PairsField f={f} value={(field.value as TextPair[]) ?? []} onChange={field.onChange} />
+            input = <PairsField f={f} value={Array.isArray(field.value) ? (field.value as TextPair[]) : []} onChange={field.onChange} />
             break
           case 'kb':
             input = (
