@@ -42,7 +42,7 @@ export async function sealHtml(type: SealType, guid: string) {
   const qr = await QRCode.toDataURL(url, { errorCorrectionLevel: 'M', margin: 1, width: 240 })
   const at = new Date().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })
   const host = publicBase().replace(/^https?:\/\//, '')
-  return `<div class="wm"><img src="${location.origin}/logo.jpeg"></div>
+  return `<div class="wm"><img src="${location.origin}/logo.png"></div>
   <div class="seal">
     <img class="vq" src="${qr}" alt="">
     <div class="txt"><b class="h">مستند رسمي موثّق إلكترونياً من ${esc(s.issuer)}</b>
@@ -105,7 +105,7 @@ function openPrint(title: string, page: string) {
 }
 
 const letterhead = (o: { name: string; address?: string | null; vat?: string | null; cr?: string | null; tel?: string | null; title: string; sub?: string; no: string }) => `
-  <div class="lh"><img src="${location.origin}/logo.jpeg" alt="">
+  <div class="lh"><img src="${location.origin}/logo.png" alt="">
     <div class="co"><h1>${esc(o.name)}</h1>
       <div>${esc(o.address ?? '')}</div>
       <div>${o.vat ? `الرقم الضريبي <b dir="ltr">${esc(o.vat)}</b>` : ''}${o.cr ? ` &nbsp;•&nbsp; السجل التجاري <b dir="ltr">${esc(o.cr)}</b>` : ''}${o.tel ? ` &nbsp;•&nbsp; هاتف <span dir="ltr">${esc(o.tel)}</span>` : ''}</div></div>

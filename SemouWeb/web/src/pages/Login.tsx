@@ -41,7 +41,7 @@ export function Login() {
         <div style={{ position: 'absolute', top: 0, insetInline: 0 }}><TestBanner /></div>
         <div className="theme-corner"><ThemePicker /></div>
         <motion.div className="auth-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
-          <img className="logo-big" src="/logo.jpeg" alt="معهد السمو" />
+          <img className="logo-big" src="/logo.png" alt="معهد السمو" />
           <h2>أهلاً بعودتك</h2>
           <p className="sub">سجّل دخولك لمتابعة العمل على نظام معهد السمو</p>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -69,7 +69,7 @@ export function Login() {
         <span className="ring" style={{ width: 340, height: 340, top: -90, left: -70 }} />
         <span className="ring" style={{ width: 300, height: 300, bottom: -120, right: -80 }} />
         <div className="brand">
-          <span className="logo"><img src="/logo.jpeg" alt="" /></span>
+          <span className="logo"><img src="/logo.png" alt="" /></span>
           <span><b>معهد السمو المتخصص العالي للتدريب</b><small>حفر الباطن · المملكة العربية السعودية</small></span>
         </div>
         <motion.div className="copy" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.5 }}>

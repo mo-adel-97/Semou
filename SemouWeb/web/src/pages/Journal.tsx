@@ -274,7 +274,7 @@ async function printJournal(guid: string, title: string, code: string, date: str
   .top img{height:66px}.top h1{margin:0;font-size:19px}.t{margin-inline-start:auto;border:2px solid ${brand};border-radius:12px;padding:6px 18px;text-align:center}.t b{display:block;font-size:20px;color:${brand}}
   p{margin:16px 0}table{width:100%;border-collapse:collapse;font-size:13px}th{background:${brand};color:#fff;padding:8px;text-align:start}td{border-bottom:1px solid #ddd;padding:8px}
   .n{text-align:left;direction:ltr;font-weight:700}tfoot td{font-weight:800;background:#f4f4ef}.sign{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:60px;text-align:center}.sign div{border-top:1px solid #999;padding-top:6px}</style></head><body>
-  <div class="top"><img src="${location.origin}/logo.jpeg"><h1>معهد السمو المتخصص العالي للتدريب</h1><div class="t"><b>${title}</b>رقم ${esc(code)} • ${esc(date)}</div></div>
+  <div class="top"><img src="${location.origin}/logo.png"><h1>معهد السمو المتخصص العالي للتدريب</h1><div class="t"><b>${title}</b>رقم ${esc(code)} • ${esc(date)}</div></div>
   <p><b>البيان:</b> ${esc(notes)}</p>
   <table><thead><tr><th>#</th><th>الحساب</th><th>البيان</th><th>مركز التكلفة</th><th>مدين</th><th>دائن</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr><td colspan="4">الإجمالي</td><td class="n">${money(tm)}</td><td class="n">${money(td)}</td></tr></tfoot></table>

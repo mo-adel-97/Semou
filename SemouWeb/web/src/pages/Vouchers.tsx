@@ -366,7 +366,7 @@ async function printVoucher(kind: VoucherKind, guid: string, v: { code: string; 
     .sign{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:60px;text-align:center} .sign div{border-top:1px solid #999;padding-top:6px}
     @media print{body{padding:0}}
   </style></head><body>
-  <div class="top"><img src="${location.origin}/logo.jpeg"><div><h1>معهد السمو المتخصص العالي للتدريب</h1><small>${esc(v.branch)}</small></div>
+  <div class="top"><img src="${location.origin}/logo.png"><div><h1>معهد السمو المتخصص العالي للتدريب</h1><small>${esc(v.branch)}</small></div>
     <div class="title"><b>${title}</b>رقم ${esc(v.code)}</div></div>
   <div class="meta"><div><span>التاريخ</span>${esc(v.date)}</div><div><span>${kind === 'receipt' ? 'إلى' : 'من'} الخزينة / البنك</span>${esc(v.account)}</div><div><span>${kind === 'payment' ? 'المورد' : 'الفرع'}</span>${esc((kind === 'payment' ? v.vendor : v.branch) || '—')}</div></div>
   <div class="amount"><b>${money(v.amount)} ر.س</b><span>${esc(v.words.trim())}</span></div>

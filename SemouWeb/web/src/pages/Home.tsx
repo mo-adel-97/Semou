@@ -21,7 +21,7 @@ export function Home() {
       <motion.section className="welcome" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <span className="blob" style={{ width: 280, height: 280, left: -80, top: -120 }} />
         <span className="blob" style={{ width: 160, height: 160, left: 160, bottom: -90 }} />
-        <img className="wings" src="/logo.jpeg" alt="" />
+        <img className="wings" src="/logo.png" alt="" />
         <h1>{greeting}، {me?.fullName?.split(' ')[0]} 👋</h1>
         <p>هذه هي الشاشات المتاحة لك حسب صلاحياتك. استخدم البحث السريع للوصول لأي شاشة في ثانية، وغيّر شكل النظام من زر الألوان <Palette size={14} style={{ verticalAlign: 'middle' }} /> في أعلى الشاشة.</p>
         <div className="row">

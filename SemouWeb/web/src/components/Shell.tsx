@@ -75,7 +75,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className={`shell ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       <aside className="side">
         <Link to="/" className="side-brand" onClick={() => setMobileOpen(false)}>
-          <span className="logo"><img src="/logo.jpeg" alt="" /></span>
+          <span className="logo"><img src="/logo.png" alt="" /></span>
           <span className="txt"><b>{brand.name}</b><small>{brand.tagline}</small></span>
         </Link>
         <nav className="side-nav">

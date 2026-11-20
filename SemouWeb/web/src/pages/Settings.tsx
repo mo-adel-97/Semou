@@ -436,7 +436,7 @@ function SidebarPreview({ cfg }: { cfg: MenuConfig }) {
       </div>
       <div className="side gs-side" data-no-texts>
         <div className="side-brand">
-          <span className="logo"><img src="/logo.jpeg" alt="" /></span>
+          <span className="logo"><img src="/logo.png" alt="" /></span>
           <span className="txt"><b>{b.name}</b><small>{b.tagline}</small></span>
         </div>
         <nav className="side-nav">

@@ -31,7 +31,7 @@ export function VerifyDoc() {
     <div className="verify-page">
       <div className="theme-corner"><ThemePicker /></div>
       <motion.div className="verify-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="vf-brand"><img src="/logo.jpeg" alt="" /><div><b>معهد السمو المتخصص العالي للتدريب</b><small>خدمة التحقق من المستندات</small></div></div>
+        <div className="vf-brand"><img src="/logo.png" alt="" /><div><b>معهد السمو المتخصص العالي للتدريب</b><small>خدمة التحقق من المستندات</small></div></div>
 
         {view === 'loading' && <div className="vf-state"><Spinner size={30} /><p>جاري التحقق من المستند...</p></div>}
 
