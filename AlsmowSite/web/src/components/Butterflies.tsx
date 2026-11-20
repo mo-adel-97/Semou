@@ -117,7 +117,8 @@ export function ButterflyShow({ letters, talks, asker, answerer, first = 10, eve
     let timer = 0
     const next = () => {
       const { letters, talks } = data.current
-      const kinds = [...(letters.length ? ['letter' as const] : []), ...(talks.length ? ['talk' as const] : [])]
+      // the conversation opens the show (it's the richer scene), then they alternate
+      const kinds = [...(talks.length ? ['talk' as const] : []), ...(letters.length ? ['letter' as const] : [])]
       if (kinds.length && !busy.current && !document.hidden && !document.documentElement.classList.contains('intro-on')) {
         const c = count.current
         const kind = kinds.length > 1 && c.last === kinds[0] ? kinds[1] : kinds[0]
@@ -184,7 +185,11 @@ function LetterScene({ msg, onDone }: { msg: ButterflyMessage; onDone: () => voi
   )
 }
 
-/** Two butterflies fly in from both sides and meet: the first asks, the institute's butterfly answers. */
+/**
+ * Two butterflies fly in from both sides and stop face to face, hovering. Then a little conversation, like a chat:
+ * "typing…" over the one who asks, her question; "typing…" over the institute's butterfly, its answer.
+ * They stay a moment so it can be read, then fly away.
+ */
 function TalkScene({ talk, asker, answerer, onDone }: { talk: ButterflyTalk; asker?: string | null; answerer?: string | null; onDone: () => void }) {
   const a = useRef<HTMLDivElement>(null)
   const b = useRef<HTMLDivElement>(null)
@@ -192,43 +197,61 @@ function TalkScene({ talk, asker, answerer, onDone }: { talk: ButterflyTalk; ask
   done.current = onDone
   const [geo] = useState(() => {
     const W = window.innerWidth, H = window.innerHeight, phone = W < 640
-    const cy = H * 0.27
-    const ax = phone ? W * 0.78 : W / 2 + 170 // the one who asks: on the right (read first in Arabic)
-    const bx = phone ? W * 0.22 : W / 2 - 170 // the institute: on the left
+    const cy = H * (phone ? 0.25 : 0.27)
+    const ax = phone ? W * 0.74 : W / 2 + 150 // the one who asks: on the right (read first in Arabic)
+    const bx = phone ? W * 0.26 : W / 2 - 150 // the institute: on the left
     return {
       W, H, cy, ax, bx,
-      q: phone ? { top: cy + 34, right: 12 } : { top: cy + 36, right: W - ax - 46 },
-      // wide screens: each bubble grows away from the other one (question → right side, answer → left side)
-      r: phone ? { top: cy + 120, left: 12 } : { top: cy + 36, right: W - bx - 46 },
+      // under each speaker, tail pointing up at her; on wide screens each bubble grows away from the other one
+      q: phone ? { top: cy + 36, right: 12 } : { top: cy + 38, right: W - ax - 40 },
+      r: phone ? { top: cy + 36 + 96, left: 12 } : { top: cy + 38, right: W - bx - 40 },
     }
   })
-  const IN = 2.4, HOLD = 8.6, OUT = 2.4, ALL = IN + HOLD + OUT
+  // timeline (seconds)
+  const IN = 2.4, MEET = 0.5
+  const ASK_TYPING = IN + MEET, ASK = ASK_TYPING + 1.3
+  const ANS_TYPING = ASK + 1.6, ANS = ANS_TYPING + 1.5
+  const LEAVE = ANS + 5.2, OUT = 2.4, ALL = LEAVE + OUT
   useEffect(() => {
     const { W, H, cy, ax, bx } = geo
-    const fly = (from: number, at: number, to: number, phase: number) => (t: number): Frame => {
-      const wave = Math.sin(t * 2.4 + phase) * 9 + Math.sin(t * 0.9 + phase) * 6
-      if (t < IN) { const k = easeOut(t / IN); return { x: from + (at - from) * k, y: cy + wave, r: (1 - k) * (from > at ? -10 : 10) } }
-      if (t < IN + HOLD) { const h = t - IN; return { x: at + Math.sin(h * 1.3 + phase) * 10, y: cy + wave, r: Math.sin(h * 1.3 + phase) * 5 } }
-      const k = easeIn(clamp01((t - IN - HOLD) / OUT))
-      return { x: at + (to - at) * k, y: cy + wave - k * H * 0.12, r: (to > at ? 12 : -12) * k }
+    // `face`: how much each one leans towards the other while they talk
+    const fly = (from: number, at: number, to: number, face: number, phase: number) => (t: number): Frame => {
+      const wave = Math.sin(t * 2.2 + phase) * 7 + Math.sin(t * 0.8 + phase) * 4
+      if (t < IN) {
+        const k = easeOut(t / IN)
+        return { x: from + (at - from) * k, y: cy + wave + (1 - k) * 30, r: (1 - k) * (from > at ? -14 : 14) + k * face }
+      }
+      if (t < LEAVE) { // face to face, hovering gently in place
+        const h = t - IN
+        return { x: at + Math.sin(h * 1.1 + phase) * 6, y: cy + wave, r: face + Math.sin(h * 1.4 + phase) * 4 }
+      }
+      const k = easeIn(clamp01((t - LEAVE) / OUT))
+      return { x: at + (to - at) * k, y: cy + wave - k * H * 0.14, r: face * (1 - k) + (to > at ? 14 : -14) * k }
     }
     const opts = { duration: ALL * 1000, easing: 'linear', fill: 'forwards' as const }
     const anims = [
-      a.current!.animate(bake(fly(W + 90, ax, W + 140, 0), ALL), opts),
-      b.current!.animate(bake(fly(-90, bx, -140, 1.7), ALL), opts),
+      a.current!.animate(bake(fly(W + 90, ax, W + 140, -16, 0), ALL), opts),
+      b.current!.animate(bake(fly(-90, bx, -140, 16, 1.7), ALL), opts),
     ]
     Promise.all(anims.map((x) => x.finished)).then(() => done.current(), () => {})
     return () => anims.forEach((x) => x.cancel())
-  }, [geo])
+  }, [geo, ALL, LEAVE])
+  const t = (s: number) => `${s}s`
+  const end = t(LEAVE - 0.3)
+  const answerEnd = 'right' in geo.r && geo.r.right !== undefined && !('left' in geo.r)
   return (
     <div className="bfc" data-no-texts>
-      <div ref={a} className="bfc-fly"><Butterfly style={{ '--s': '40px', '--flap': '.22s' } as CSSProperties} /></div>
-      <div ref={b} className="bfc-fly inst"><Butterfly style={{ '--s': '46px', '--flap': '.26s' } as CSSProperties} /></div>
-      <div className="bfc-bubble ask" style={{ top: geo.q.top, right: geo.q.right, '--in': `${IN + 0.4}s`, '--out': `${IN + HOLD - 0.5}s` } as CSSProperties}>
+      <div ref={a} className="bfc-fly"><Butterfly style={{ '--s': '44px', '--flap': '.24s' } as CSSProperties} /></div>
+      <div ref={b} className="bfc-fly inst"><Butterfly style={{ '--s': '50px', '--flap': '.27s' } as CSSProperties} /></div>
+
+      <div className="bfc-typing ask" style={{ ...geo.q, ...({ '--in': t(ASK_TYPING), '--out': t(ASK) } as CSSProperties) }} aria-hidden><i /><i /><i /></div>
+      <div className="bfc-bubble ask" style={{ ...geo.q, ...({ '--in': t(ASK), '--out': end } as CSSProperties) }}>
         {asker && <span className="bfc-name">{asker}</span>}
         <span>{talk.q}</span>
       </div>
-      <div className={cx('bfc-bubble answer', 'right' in geo.r && 'tail-end')} style={{ ...geo.r, ...({ '--in': `${IN + 2.6}s`, '--out': `${IN + HOLD - 0.5}s` } as CSSProperties) }}>
+
+      <div className={cx('bfc-typing answer', answerEnd && 'tail-end')} style={{ ...geo.r, ...({ '--in': t(ANS_TYPING), '--out': t(ANS) } as CSSProperties) }} aria-hidden><i /><i /><i /></div>
+      <div className={cx('bfc-bubble answer', answerEnd && 'tail-end')} style={{ ...geo.r, ...({ '--in': t(ANS), '--out': end } as CSSProperties) }}>
         {answerer && <span className="bfc-name">{answerer}</span>}
         <span>{talk.a}</span>
       </div>

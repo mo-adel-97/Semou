@@ -775,35 +775,46 @@ html.fx-on .fx-img:not(.fx-in) { clip-path: inset(0 0 100% 0); }
 .bf-letter-ic { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; flex-shrink: 0; border-radius: .55rem; background: var(--brand); color: #fff; }
 @media (prefers-reduced-motion: reduce) { .bf-messenger { display: none; } }
 
-/* two butterflies talking: a question, then the institute's answer (Butterflies.tsx · TalkScene) */
+/* two butterflies talking: "typing…", the question; "typing…", the institute's answer (Butterflies.tsx · TalkScene) */
 .bfc { position: fixed; inset: 0; z-index: 58; pointer-events: none; }
 .bfc-fly { position: absolute; left: 0; top: 0; translate: -50% -50%; will-change: transform; }
 .bfc-fly > .bf { position: relative; }
-.bfc-bubble {
-  position: absolute; max-width: min(300px, 70vw); padding: .65rem .95rem; border-radius: 1.15rem;
-  font-family: var(--font-display); font-weight: 700; font-size: .88rem; line-height: 1.65;
-  opacity: 0; transform: translate3d(0, -6px, 0) scale(.7);
-  animation: bfc-in .55s cubic-bezier(.34, 1.56, .64, 1) var(--in, 3s) forwards, bfc-out .4s ease var(--out, 10s) forwards;
+.bfc-bubble, .bfc-typing {
+  position: absolute; opacity: 0; transform: translate3d(0, -6px, 0) scale(.7);
+  animation: bfc-in .5s cubic-bezier(.34, 1.56, .64, 1) var(--in, 3s) forwards, bfc-out .35s ease var(--out, 10s) forwards;
 }
 @keyframes bfc-in { to { opacity: 1; transform: none; } }
-@keyframes bfc-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translate3d(0, -8px, 0) scale(.92); } }
-.bfc-bubble.ask {
-  transform-origin: calc(100% - 34px) 0; background: var(--surface); color: var(--ink);
-  border: 1px solid color-mix(in oklab, var(--brand) 26%, var(--line)); box-shadow: 0 16px 34px -16px rgb(0 0 0 / .3);
+@keyframes bfc-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translate3d(0, -6px, 0) scale(.92); } }
+.bfc-bubble {
+  max-width: min(300px, 74vw); padding: .7rem 1rem .75rem; border-radius: 1.25rem;
+  font-family: var(--font-display); font-weight: 700; font-size: .9rem; line-height: 1.65;
 }
-.bfc-bubble.answer {
-  transform-origin: 34px 0; color: #fff; border: 1px solid color-mix(in oklab, var(--brand) 60%, white);
-  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--brand) 70%, var(--glow)));
-  box-shadow: 0 18px 38px -16px color-mix(in oklab, var(--brand) 70%, transparent);
+.bfc-bubble.ask, .bfc-typing.ask {
+  transform-origin: calc(100% - 32px) 0; background: color-mix(in oklab, var(--surface) 96%, transparent); color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--brand) 22%, var(--line));
+  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 18px 40px -18px rgb(0 0 0 / .35);
 }
-.bfc-bubble::before { /* tail pointing up at the speaker */
-  content: ""; position: absolute; top: -7px; width: 13px; height: 13px; rotate: 45deg; background: inherit; border: inherit; border-right: 0; border-bottom: 0;
+.bfc-bubble.answer, .bfc-typing.answer {
+  transform-origin: 32px 0; color: #fff; border: 1px solid color-mix(in oklab, var(--brand) 55%, white);
+  background: linear-gradient(140deg, var(--primary) 0%, color-mix(in oklab, var(--brand) 72%, var(--glow)) 100%);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .25) inset, 0 20px 42px -18px color-mix(in oklab, var(--brand) 75%, transparent);
 }
-.bfc-bubble.ask::before { right: 28px; background: var(--surface); }
-.bfc-bubble.answer::before { left: 28px; background: var(--primary); }
-.bfc-bubble.answer.tail-end { transform-origin: calc(100% - 34px) 0; }
-.bfc-bubble.answer.tail-end::before { left: auto; right: 28px; }
-.bfc-name { display: block; margin-bottom: .1rem; font-size: .68rem; font-weight: 800; letter-spacing: .01em; opacity: .7; }
+.bfc-bubble.answer.tail-end, .bfc-typing.answer.tail-end { transform-origin: calc(100% - 32px) 0; }
+.bfc-bubble::before, .bfc-typing::before { /* the tail, pointing up at the speaker */
+  content: ""; position: absolute; top: -6px; width: 12px; height: 12px; rotate: 45deg; border-radius: 2px 0 0 0;
+}
+.bfc-bubble.ask::before, .bfc-typing.ask::before { right: 26px; background: var(--surface); border-top: 1px solid color-mix(in oklab, var(--brand) 22%, var(--line)); border-left: 1px solid color-mix(in oklab, var(--brand) 22%, var(--line)); }
+.bfc-bubble.answer::before, .bfc-typing.answer::before { left: 26px; background: var(--primary); }
+.bfc-bubble.answer.tail-end::before, .bfc-typing.answer.tail-end::before { left: auto; right: 26px; }
+.bfc-name { display: flex; align-items: center; gap: .35rem; margin-bottom: .15rem; font-size: .68rem; font-weight: 800; opacity: .75; }
+.bfc-name::before { content: ""; width: .4rem; height: .4rem; border-radius: 50%; background: currentColor; opacity: .7; }
+/* "typing…": three dots taking turns */
+.bfc-typing { display: flex; gap: .3rem; padding: .7rem .9rem; border-radius: 1.1rem; }
+.bfc-typing i { width: .42rem; height: .42rem; border-radius: 50%; background: currentColor; opacity: .55; animation: bfc-dot 1s ease-in-out infinite; }
+.bfc-typing.ask i { color: var(--brand); }
+.bfc-typing i:nth-child(2) { animation-delay: .15s; }
+.bfc-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes bfc-dot { 0%, 60%, 100% { transform: translate3d(0, 0, 0); opacity: .45; } 30% { transform: translate3d(0, -4px, 0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bfc { display: none; } }
 
 /* the mobile menu is open: everything moving behind it pauses until it closes */
