@@ -20,7 +20,7 @@ export default function Programs() {
   }, [data, q])
 
   const title = t ? PROGRAM_TYPES[t].plural : 'برامجنا التدريبية'
-  const text = t ? PROGRAM_TYPES[t].blurb : 'دبلومات ودورات معتمدة صُممت لتواكب احتياجات سوق العمل وتفتح لكِ آفاقًا مهنية جديدة.'
+  const text = t ? PROGRAM_TYPES[t].blurb : 'دبلومات ودورات معتمدة صُممت لتواكب احتياجات سوق العمل وتفتح لك آفاقًا مهنية جديدة.'
   const counts = site.data?.counts
 
   return (
@@ -39,7 +39,7 @@ export default function Programs() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="ابحثي عن برنامج..."
+              placeholder="ابحث عن برنامج..."
               className="w-full rounded-full border border-line bg-surface py-3 ps-12 pe-4 text-ink shadow-soft placeholder:text-muted focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 focus:outline-none"
             />
           </label>
@@ -55,7 +55,7 @@ export default function Programs() {
             {list.map((p, i) => <ProgramCard key={p.id} p={p} index={i} />)}
           </motion.div>
         ) : (
-          <EmptyState icon={<SearchX className="h-8 w-8" />} title="لا توجد برامج مطابقة" text="جربي كلمة بحث أخرى أو تصفحي جميع البرامج." />
+          <EmptyState icon={<SearchX className="h-8 w-8" />} title="لا توجد برامج مطابقة" text="جرّب كلمة بحث أخرى أو تصفّح جميع البرامج." />
         )}
       </section>
     </>

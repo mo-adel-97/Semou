@@ -311,11 +311,11 @@ function as_program_answer(array $p, array $focus): string
         $any = true;
         if ($p['duration']) $lines[] = "- **المدة:** {$p['duration']}";
         if ($p['hours']) $lines[] = "- **الساعات المعتمدة:** {$p['hours']} ساعة";
-        if (!$p['duration'] && !$p['hours']) $lines[] = '- **المدة:** غير مذكورة على الموقع، تواصلي معنا لمعرفة الجدول.';
+        if (!$p['duration'] && !$p['hours']) $lines[] = '- **المدة:** غير مذكورة على الموقع، تواصل معنا لمعرفة الجدول.';
     }
     if ($want('#mode')) {
         $any = true;
-        $lines[] = $p['mode'] ? '- **طريقة الدراسة:** ' . (PROGRAM_MODES[$p['mode']] ?? $p['mode']) : '- **طريقة الدراسة:** غير محددة على الموقع، تواصلي معنا للتأكد.';
+        $lines[] = $p['mode'] ? '- **طريقة الدراسة:** ' . (PROGRAM_MODES[$p['mode']] ?? $p['mode']) : '- **طريقة الدراسة:** غير محددة على الموقع، تواصل معنا للتأكد.';
     }
     if ($want('#cert')) {
         $any = true;
@@ -349,7 +349,7 @@ function as_programs_list(?string $type): string
         foreach ($list as $p) $lines[] = "- {$p['title']}";
     }
     $lines[] = "كل البرامج: $site/programs";
-    $lines[] = 'اسأليني عن أي برنامج لأعطيك تفاصيله.';
+    $lines[] = 'اسألني عن أي برنامج لأعطيك تفاصيله.';
     return implode("\n", $lines);
 }
 
@@ -480,7 +480,7 @@ function as_resolve(array $r, array $tok, array $docs): array
             return $r;
         }
     }
-    $r['answer'] = "تواصلي معنا لمعرفة التفاصيل:\n" . as_contact_block();
+    $r['answer'] = "تواصل معنا لمعرفة التفاصيل:\n" . as_contact_block();
     return $r;
 }
 
@@ -495,14 +495,14 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     $focus = array_keys($tags);
     $sug = fn(array $extra = []) => array_values(array_slice(array_unique(array_merge($extra, ['ما البرامج المتاحة؟', 'كيف أسجل؟', 'كيف أتواصل معكم؟'])), 0, 3));
 
-    if ($question === '') return ['answer' => 'اكتبي سؤالك وسأساعدك 🌿', 'suggestions' => $sug(), 'confident' => true];
+    if ($question === '') return ['answer' => 'اكتب سؤالك وسأساعدك 🌿', 'suggestions' => $sug(), 'confident' => true];
 
     // greetings / thanks (only when that's all the message says)
     if ($has('#hello') && count($words) <= 1 && count($tags) === 1) {
-        return ['answer' => "أهلًا وسهلًا بكِ 🌿 أنا **{$set['name']}**، مساعدتك في المعهد. اسأليني عن البرامج، التسجيل، الرسوم، المواعيد، أو السياسات.", 'suggestions' => $sug(), 'confident' => true];
+        return ['answer' => "أهلًا وسهلًا بك 🌿 أنا **{$set['name']}**، مساعدتك في المعهد. اسألني عن البرامج، التسجيل، الرسوم، المواعيد، أو السياسات.", 'suggestions' => $sug(), 'confident' => true];
     }
     if ($has('#thanks') && count($words) <= 2) {
-        return ['answer' => 'العفو، سعدت بمساعدتك 🌿 إن احتجتِ أي شيء آخر فأنا هنا.', 'suggestions' => $sug(), 'confident' => true];
+        return ['answer' => 'العفو، سعدت بمساعدتك 🌿 إن احتجت أي شيء آخر فأنا هنا.', 'suggestions' => $sug(), 'confident' => true];
     }
 
     // the dashboard's Q&A wins when it clearly matches
@@ -537,7 +537,7 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     if (!$progs && $has('#register')) $ctx = as_last_program($history)[0] ?? null;
 
     if (count($progs) > 1) {
-        $lines = ['أي برنامج تقصدين؟'];
+        $lines = ['أي برنامج تقصد؟'];
         foreach ($progs as $p) $lines[] = "- {$p['title']}";
         return ['answer' => implode("\n", $lines), 'suggestions' => array_slice(array_map(fn($p) => $p['title'], $progs), 0, 3), 'confident' => true];
     }
@@ -577,8 +577,8 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     }
     if ($has('#register') && !$has('#refund')) {
         $a = $ctx
-            ? "للتسجيل في **{$ctx['title']}**:\n- عبّئي نموذج التسجيل: $site/register\n- اختاري البرنامج في النموذج، وسيتواصل معك فريق القبول لإكمال الإجراءات."
-            : "التسجيل سهل:\n- اختاري البرنامج المناسب من صفحة البرامج: $site/programs\n- عبّئي نموذج التسجيل: $site/register\n- سيتواصل معك فريق القبول لإكمال الإجراءات.";
+            ? "للتسجيل في **{$ctx['title']}**:\n- عبّئ نموذج التسجيل: $site/register\n- اختر البرنامج في النموذج، وسيتواصل معك فريق القبول لإكمال الإجراءات."
+            : "التسجيل سهل:\n- اختر البرنامج المناسب من صفحة البرامج: $site/programs\n- عبّئ نموذج التسجيل: $site/register\n- سيتواصل معك فريق القبول لإكمال الإجراءات.";
         if ($has('#reqs')) $a .= "\nأما الشروط والمستندات المطلوبة فيوضحها لك فريق القبول حسب البرنامج.";
         return ['answer' => $a . "\nللاستفسار:\n" . implode("\n", as_contact_lines(true)), 'suggestions' => $sug(['ما البرامج المتاحة؟']), 'confident' => true];
     }
@@ -590,11 +590,11 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
         elseif ($acc) { $lines[] = 'برامج المعهد معتمدة، وجهات الاعتماد:'; foreach ($acc as $x) $lines[] = "- $x"; }
         if ($names) $lines[] = 'اعتمادات المعهد: ' . implode('، ', $names);
         if (!$lines) $lines[] = 'تفاصيل الاعتماد يوضحها لك فريق القبول حسب البرنامج.';
-        $lines[] = 'اذكري اسم البرنامج لأعطيك تفاصيل اعتماده.';
+        $lines[] = 'اذكر اسم البرنامج لأعطيك تفاصيل اعتماده.';
         return ['answer' => implode("\n", $lines), 'suggestions' => $sug(['ما البرامج المتاحة؟']), 'confident' => true];
     }
     if ($has('#portal')) {
-        $a = "لمتابعة برامجك وحسابك ومدفوعاتك ادخلي **بوابة المتدربات**: $site/portal";
+        $a = "لمتابعة برامجك وحسابك ومدفوعاتك ادخل **بوابة المتدربين**: $site/portal";
         if ($has('#lms') && !empty(all_settings()['general']['lms_url'])) $a .= "\nومنصة التعليم الإلكتروني: " . all_settings()['general']['lms_url'];
         return ['answer' => $a, 'suggestions' => $sug(), 'confident' => true];
     }
@@ -602,7 +602,7 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
         return ['answer' => 'منصة التعليم الإلكتروني: ' . all_settings()['general']['lms_url'], 'suggestions' => $sug(), 'confident' => true];
     }
     if ($has('#fees') && !$progs) {
-        return ['answer' => "الرسوم تختلف حسب البرنامج. اذكري اسم البرنامج وسأخبرك بما هو منشور عنه، أو تواصلي مع فريق القبول لمعرفة الرسوم وخيارات السداد:\n" . implode("\n", as_contact_lines(true)), 'suggestions' => array_slice(array_map(fn($p) => "كم رسوم {$p['title']}؟", as_programs()), 0, 3), 'confident' => true];
+        return ['answer' => "الرسوم تختلف حسب البرنامج. اذكر اسم البرنامج وسأخبرك بما هو منشور عنه، أو تواصل مع فريق القبول لمعرفة الرسوم وخيارات السداد:\n" . implode("\n", as_contact_lines(true)), 'suggestions' => array_slice(array_map(fn($p) => "كم رسوم {$p['title']}؟", as_programs()), 0, 3), 'confident' => true];
     }
 
     // best document from the knowledge (pages, about, posts, Q&A…): its title must share a word with the
@@ -616,7 +616,7 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     // not sure: say so, offer the closest topics and a human
     $related = array_slice(array_map(fn($r) => $r['doc']['title'], array_filter($ranked, fn($r) => $r['score'] > 1)), 0, 3);
     $a = $set['fallback'] . "\nيمكنك سؤال فريق القبول مباشرة:\n" . implode("\n", as_contact_lines(true));
-    if ($related) $a = $set['fallback'] . "\nقد يفيدك أحد هذه المواضيع، أو تواصلي مع فريق القبول:\n" . implode("\n", as_contact_lines(true));
+    if ($related) $a = $set['fallback'] . "\nقد يفيدك أحد هذه المواضيع، أو تواصل مع فريق القبول:\n" . implode("\n", as_contact_lines(true));
     return ['answer' => $a, 'suggestions' => $related ? array_values(array_unique($related)) : $sug(), 'confident' => false];
 }
 

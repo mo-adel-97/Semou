@@ -106,7 +106,7 @@ function resources(): array
             ],
         ],
         'testimonials' => [
-            'label' => 'آراء المتدربات', 'singular' => 'رأي', 'icon' => 'message-square-quote',
+            'label' => 'آراء المتدربين', 'singular' => 'رأي', 'icon' => 'message-square-quote',
             'table' => 'testimonials', 'title' => 'name', 'order' => 'sort ASC, id DESC',
             'search' => ['name', 'text'],
             'fields' => [

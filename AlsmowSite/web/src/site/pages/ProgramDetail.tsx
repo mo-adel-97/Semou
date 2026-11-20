@@ -67,7 +67,7 @@ export default function ProgramDetail() {
           )}
           {p.features.length > 0 && (
             <div className="card mt-8 p-7">
-              <h2 className="text-2xl font-extrabold">ماذا ستكتسبين؟</h2>
+              <h2 className="text-2xl font-extrabold">ماذا ستكتسب؟</h2>
               <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-3">
@@ -84,12 +84,12 @@ export default function ProgramDetail() {
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <div className="card overflow-hidden">
             <div className="bg-deep-800 p-6 text-white">
-              <h2 className="text-xl font-bold">سجلي في البرنامج</h2>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">اتركي بياناتك وسيتواصل معك فريق القبول خلال يوم عمل.</p>
+              <h2 className="text-xl font-bold">سجّل في البرنامج</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">اترك بياناتك وسيتواصل معك فريق القبول خلال يوم عمل.</p>
             </div>
             <div className="space-y-3 p-6">
               <Link to={`/register?program=${encodeURIComponent(p.title)}`} className="btn-primary w-full">
-                سجلي الآن <ArrowLeft className="h-4 w-4" />
+                سجّل الآن <ArrowLeft className="h-4 w-4" />
               </Link>
               {wa && (
                 <a

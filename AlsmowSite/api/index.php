@@ -185,7 +185,7 @@ $r->post('/public/messages', function () {
     if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = 'البريد الإلكتروني غير صحيح';
     if ($kind === 'contact' && !$text) $errors['body'] = 'يرجى كتابة رسالتك';
     $mode = in_array($in['study_mode'] ?? '', ['onsite', 'online'], true) ? $in['study_mode'] : null;
-    if ($kind === 'register' && !$mode) $errors['study_mode'] = 'اختاري طريقة الدراسة';
+    if ($kind === 'register' && !$mode) $errors['study_mode'] = 'اختر طريقة الدراسة';
     $nid = preg_replace('/\D+/', '', (string) ($in['national_id'] ?? '')) ?: null;
     if ($nid !== null && !preg_match('/^[12]\d{9}$/', $nid)) $errors['national_id'] = 'رقم الهوية أو الإقامة يتكون من 10 أرقام';
     if ($errors) throw new HttpError(422, 'يرجى مراجعة الحقول المظللة', $errors);

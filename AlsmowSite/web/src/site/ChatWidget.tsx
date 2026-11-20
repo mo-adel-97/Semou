@@ -83,7 +83,7 @@ export default function ChatWidget() {
   const cfg = data?.settings.assistant ?? {}
   const name = cfg.name?.trim() || 'السمو'
   const title = cfg.title?.trim() || 'تحدث إلى السمو'
-  const welcome = cfg.welcome?.trim() || `أهلًا بكِ 👋 أنا ${name}، مساعدتك في المعهد. اسأليني عن البرامج والدبلومات، التسجيل، الرسوم، المواعيد، أو السياسات.`
+  const welcome = cfg.welcome?.trim() || `أهلًا بك 👋 أنا ${name}، مساعدتك في المعهد. اسألني عن البرامج والدبلومات، التسجيل، الرسوم، المواعيد، أو السياسات.`
   const starters = cfg.suggestions?.length ? cfg.suggestions : DEFAULT_SUGGESTIONS
 
   const [open, setOpen] = useState(false)
@@ -143,7 +143,7 @@ export default function ChatWidget() {
         signal: ctrl.signal,
       })
       const j = (await res.json().catch(() => null)) as { answer?: string; suggestions?: string[]; message?: string } | null
-      if (!res.ok || !j?.answer) throw new Error(j?.message ?? 'تعذر الوصول إلى المساعد، حاولي مرة أخرى')
+      if (!res.ok || !j?.answer) throw new Error(j?.message ?? 'تعذر الوصول إلى المساعد، حاول مرة أخرى')
       setMsgs([...next, { role: 'assistant', content: j.answer, suggestions: j.suggestions ?? [] }])
       setTypingAt(next.length)
     } catch (e) {
@@ -277,14 +277,14 @@ export default function ChatWidget() {
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
                   rows={1}
                   maxLength={400}
-                  placeholder="اكتبي سؤالك..."
+                  placeholder="اكتب سؤالك..."
                   className="max-h-28 min-h-10 flex-1 resize-none bg-transparent py-2 text-[15px] text-ink placeholder:text-muted focus:outline-none"
                 />
                 <button type="submit" disabled={busy || !input.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-white transition disabled:opacity-40" aria-label="إرسال">
                   <ArrowUp className="h-5 w-5" />
                 </button>
               </div>
-              <p className="mt-2 text-center text-[11px] text-muted">الإجابات من معلومات المعهد المنشورة · للتأكيد تواصلي مع فريق القبول</p>
+              <p className="mt-2 text-center text-[11px] text-muted">الإجابات من معلومات المعهد المنشورة · للتأكيد تواصل مع فريق القبول</p>
             </form>
           </motion.section>
         )}

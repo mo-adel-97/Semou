@@ -98,8 +98,8 @@ function ProgramsMega() {
         <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-brand-500/50 blur-3xl transition group-hover:scale-125" />
         <BookOpen className="relative mb-auto h-8 w-8 text-gold-300" />
         <div className="relative mt-10 font-display text-xl font-extrabold">كل البرامج</div>
-        <div className="relative mt-1 text-sm text-white/65">استكشفي جميع الدبلومات والدورات المعتمدة</div>
-        <span className="relative mt-4 inline-flex items-center gap-1 text-sm font-bold text-gold-300">تصفحي الآن <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" /></span>
+        <div className="relative mt-1 text-sm text-white/65">استكشف جميع الدبلومات والدورات المعتمدة</div>
+        <span className="relative mt-4 inline-flex items-center gap-1 text-sm font-bold text-gold-300">تصفّح الآن <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" /></span>
       </Link>
     </div>
   )
@@ -130,12 +130,12 @@ function Header() {
 
   const ann = data?.settings.general.announcement
   const annLink = data?.settings.general.announcement_link
-  const annCta = data?.settings.general.announcement_cta?.trim() || 'سجلي الآن'
+  const annCta = data?.settings.general.announcement_cta?.trim() || 'سجّل الآن'
   const registerHref = data?.settings.general.register_url
-  const registerText = data?.settings.general.register_text?.trim() || 'سجلي الآن'
+  const registerText = data?.settings.general.register_text?.trim() || 'سجّل الآن'
   const gen = data?.settings.general
   const portalShow = gen?.portal_hide !== true
-  const portalText = gen?.portal_text?.trim() || 'بوابة المتدربات'
+  const portalText = gen?.portal_text?.trim() || 'بوابة المتدربين'
   const portalLink = gen?.portal_link?.trim() || '/portal'
   const PortalBtn = ({ className, children }: { className: string; children: ReactNode }) =>
     /^https?:\/\//.test(portalLink)
@@ -304,22 +304,22 @@ function Footer() {
       <div className="container-x relative pt-20 pb-8">
         <div className="mb-16 flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-white/10 bg-white/[.04] p-8 backdrop-blur md:flex-row md:items-center md:p-10">
           <div>
-            <h2 className="text-3xl font-black text-white md:text-4xl">جاهزة تبدئي رحلتك؟</h2>
+            <h2 className="text-3xl font-black text-white md:text-4xl">جاهز تبدأ رحلتك؟</h2>
             <p className="mt-2 text-white/60">فريق القبول بانتظارك لمساعدتك في اختيار البرنامج المناسب.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Magnetic><Link to="/register" className="btn-gold !px-7 !py-3.5">سجلي الآن <ArrowLeft className="h-4 w-4" /></Link></Magnetic>
-            <Link to="/contact" className="btn border border-white/20 !px-7 !py-3.5 text-white hover:bg-white/10">تواصلي معنا</Link>
+            <Magnetic><Link to="/register" className="btn-gold !px-7 !py-3.5">سجّل الآن <ArrowLeft className="h-4 w-4" /></Link></Magnetic>
+            <Link to="/contact" className="btn border border-white/20 !px-7 !py-3.5 text-white hover:bg-white/10">تواصل معنا</Link>
           </div>
         </div>
 
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           <div>
             <Logo light />
-            <p className="mt-5 max-w-sm leading-relaxed text-white/55">{s?.about.summary ? `${s.about.summary.slice(0, 170)}…` : 'مؤسسة تدريبية نسائية معتمدة في حفر الباطن.'}</p>
+            <p className="mt-5 max-w-sm leading-relaxed text-white/55">{s?.about.summary ? `${s.about.summary.slice(0, 170)}…` : 'مؤسسة تدريبية معتمدة في حفر الباطن.'}</p>
             {s?.social && <SocialLinks social={s.social} className="mt-6" itemClass="bg-white/10 text-white hover:bg-gold-400 hover:text-deep-950 hover:-translate-y-1" />}
           </div>
-          <FooterCol title="روابط سريعة" links={[['الرئيسية', '/'], ['عن المعهد', '/about'], ['جميع البرامج', '/programs'], ['المدونة', '/blog'], ['بوابة المتدربات', '/portal'], ['تواصل معنا', '/contact']]} />
+          <FooterCol title="روابط سريعة" links={[['الرئيسية', '/'], ['عن المعهد', '/about'], ['جميع البرامج', '/programs'], ['المدونة', '/blog'], ['بوابة المتدربين', '/portal'], ['تواصل معنا', '/contact']]} />
           <FooterCol
             title="برامجنا"
             links={[

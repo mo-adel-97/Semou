@@ -102,7 +102,7 @@ export function ThemePicker({ align = 'left', up }: { align?: 'left' | 'right'; 
               value={hue}
               onChange={(e) => { const h = +e.target.value; setHue(h); t.setAccent(fromHue(h)); used() }}
               className="hue-slider w-full"
-              aria-label="اختاري درجة اللون"
+              aria-label="اختر درجة اللون"
               style={{ ['--thumb' as string]: fromHue(hue) }}
             />
             <div className="mt-3 flex items-center gap-2">

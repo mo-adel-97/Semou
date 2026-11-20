@@ -69,7 +69,7 @@ export function Blog() {
             )}
           </>
         ) : (
-          <EmptyState icon={<Newspaper className="h-8 w-8" />} title="لا توجد مقالات بعد" text="تابعينا قريبًا لقراءة أحدث المقالات والأخبار." />
+          <EmptyState icon={<Newspaper className="h-8 w-8" />} title="لا توجد مقالات بعد" text="تابعنا قريبًا لقراءة أحدث المقالات والأخبار." />
         )}
       </section>
     </>

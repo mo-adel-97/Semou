@@ -41,8 +41,8 @@ function MessageForm({ kind }: { kind: 'contact' | 'register' }) {
   const send = useMutation({
     mutationFn: (v: FormValues) => {
       if (kind === 'register' && !v.study_mode) {
-        form.setError('study_mode', { message: 'اختاري طريقة الدراسة' })
-        return Promise.reject(new ApiError(422, 'اختاري طريقة الدراسة', { study_mode: 'اختاري طريقة الدراسة' }))
+        form.setError('study_mode', { message: 'اختر طريقة الدراسة' })
+        return Promise.reject(new ApiError(422, 'اختر طريقة الدراسة', { study_mode: 'اختر طريقة الدراسة' }))
       }
       return api.post('/public/messages', { ...v, kind })
     },
@@ -61,7 +61,7 @@ function MessageForm({ kind }: { kind: 'contact' | 'register' }) {
         </motion.span>
         <h3 className="mt-6 text-2xl font-extrabold">{kind === 'register' ? 'تم استلام طلبك بنجاح' : 'تم إرسال رسالتك'}</h3>
         <p className="mt-3 max-w-sm leading-relaxed text-muted">شكرًا لتواصلك مع معهد السمو، سيتواصل معك فريقنا في أقرب وقت.</p>
-        <Link to="/programs" className="btn-ghost mt-8">تصفحي البرامج</Link>
+        <Link to="/programs" className="btn-ghost mt-8">تصفّح البرامج</Link>
       </motion.div>
     )
   }
@@ -176,7 +176,7 @@ function ContactCards() {
   const c = data?.settings.contact
   const wa = waNumber(c?.whatsapp || c?.phone)
   const items = [
-    c?.phone && { icon: Phone, label: 'اتصلي بنا', value: c.phone, href: `tel:${c.phone}`, ltr: true },
+    c?.phone && { icon: Phone, label: 'اتصل بنا', value: c.phone, href: `tel:${c.phone}`, ltr: true },
     wa && { icon: WhatsAppIcon, label: 'واتساب', value: 'راسلينا مباشرة', href: `https://wa.me/${wa}` },
     c?.email && { icon: Mail, label: 'البريد الإلكتروني', value: c.email, href: `mailto:${c.email}` },
     c?.address && { icon: MapPin, label: 'العنوان', value: c.address },
@@ -218,13 +218,13 @@ export function Contact() {
   const map = data?.settings.contact.map_url
   return (
     <>
-      <Seo title="تواصل معنا" description="تواصلي مع معهد السمو للتدريب" />
-      <PageHero title="تواصلي معنا" text="فريقنا جاهز للإجابة عن استفساراتك ومساعدتك في اختيار البرنامج المناسب." crumbs={<><Link to="/" className="transition hover:text-brand-700">الرئيسية</Link> / تواصل معنا</>} />
+      <Seo title="تواصل معنا" description="تواصل مع معهد السمو للتدريب" />
+      <PageHero title="تواصل معنا" text="فريقنا جاهز للإجابة عن استفساراتك ومساعدتك في اختيار البرنامج المناسب." crumbs={<><Link to="/" className="transition hover:text-brand-700">الرئيسية</Link> / تواصل معنا</>} />
       <section className="container-x grid gap-8 py-14 md:py-20 lg:grid-cols-[360px_1fr]">
         <ContactCards />
         <Reveal className="card overflow-hidden">
           <div className="border-b border-line px-6 py-5 md:px-8">
-            <h2 className="text-2xl font-extrabold">أرسلي رسالة</h2>
+            <h2 className="text-2xl font-extrabold">أرسل رسالة</h2>
           </div>
           <MessageForm kind="contact" />
         </Reveal>
@@ -241,8 +241,8 @@ export function Contact() {
 export function Register() {
   return (
     <>
-      <Seo title="التسجيل" description="سجلي اهتمامك في برامج معهد السمو للتدريب" />
-      <PageHero title="سجلي اهتمامك الآن" text="املئي النموذج وسيتواصل معك فريق القبول لإكمال إجراءات التسجيل." crumbs={<><Link to="/" className="transition hover:text-brand-700">الرئيسية</Link> / التسجيل</>} />
+      <Seo title="التسجيل" description="سجّل اهتمامك في برامج معهد السمو للتدريب" />
+      <PageHero title="سجّل اهتمامك الآن" text="املأ النموذج وسيتواصل معك فريق القبول لإكمال إجراءات التسجيل." crumbs={<><Link to="/" className="transition hover:text-brand-700">الرئيسية</Link> / التسجيل</>} />
       <section className="container-x grid gap-8 py-14 md:py-20 lg:grid-cols-[1fr_360px]">
         <Reveal className="card overflow-hidden">
           <div className="border-b border-line px-6 py-5 md:px-8">

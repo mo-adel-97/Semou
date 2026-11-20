@@ -44,7 +44,7 @@ export default function Portal() {
 
   return (
     <>
-      <Seo title="بوابة المتدربات" description="تابعي برامجك وحسابك ومدفوعاتك في معهد السمو" />
+      <Seo title="بوابة المتدربين" description="تابع برامجك وحسابك ومدفوعاتك في معهد السمو" />
       <meta name="robots" content="noindex" />
       <section className="relative min-h-[85vh] overflow-hidden pt-32 pb-20 md:pt-40">
         <Aurora />
@@ -86,9 +86,9 @@ function Login({ onDone }: { onDone: (s: PortalStudent) => void }) {
   return (
     <div className="grid items-center gap-12 lg:grid-cols-2">
       <div>
-        <span className="eyebrow"><ShieldCheck className="h-4 w-4" /> بوابة المتدربات</span>
-        <SplitText as="h1" immediate text="أهلًا بكِ في بوابتك الخاصة" accent="بوابتك الخاصة" className="mt-6 text-4xl leading-tight font-black text-ink md:text-6xl" />
-        <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted">تابعي برنامجك ومستواك ودفعتك، واطّلعي على حسابك ومدفوعاتك لحظة بلحظة، مباشرة من نظام المعهد.</p>
+        <span className="eyebrow"><ShieldCheck className="h-4 w-4" /> بوابة المتدربين</span>
+        <SplitText as="h1" immediate text="أهلًا بك في بوابتك الخاصة" accent="بوابتك الخاصة" className="mt-6 text-4xl leading-tight font-black text-ink md:text-6xl" />
+        <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted">تابع برنامجك ومستواك ودفعتك، واطّلع على حسابك ومدفوعاتك لحظة بلحظة، مباشرة من نظام المعهد.</p>
         <motion.ul variants={stagger.container} initial="hidden" animate="show" className="mt-10 grid max-w-lg gap-4 sm:grid-cols-2">
           {[
             { icon: GraduationCap, t: 'برامجي ومستواي' },
@@ -148,7 +148,7 @@ function Login({ onDone }: { onDone: (s: PortalStudent) => void }) {
           </button>
           <div className="mt-6 border-t border-line pt-5 text-center text-sm text-muted">
             لم تتمكني من الدخول؟{' '}
-            {wa ? <a href={`https://wa.me/${wa}?text=${encodeURIComponent('السلام عليكم، لم أتمكن من الدخول إلى بوابة المتدربات')}`} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-700 hover:underline">تواصلي معنا</a> : <Link to="/contact" className="font-bold text-brand-700 hover:underline">تواصلي معنا</Link>}
+            {wa ? <a href={`https://wa.me/${wa}?text=${encodeURIComponent('السلام عليكم، لم أتمكن من الدخول إلى بوابة المتدربين')}`} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-700 hover:underline">تواصل معنا</a> : <Link to="/contact" className="font-bold text-brand-700 hover:underline">تواصل معنا</Link>}
           </div>
         </div>
       </motion.form>
@@ -175,7 +175,7 @@ function Dashboard({ s, onLogout, onRefresh, refreshing }: { s: PortalStudent; o
             <p className="text-muted">مرحبًا بعودتك 👋</p>
             <SplitText as="h1" immediate text={s.name} accent={first} className="text-3xl font-black text-ink md:text-4xl" />
             <div className="mt-2 flex flex-wrap gap-2 text-sm">
-              {s.code && <span className="chip bg-brand-50 text-brand-700">رقم المتدربة: {s.code}</span>}
+              {s.code && <span className="chip bg-brand-50 text-brand-700">رقم المتدرب: {s.code}</span>}
               <span className="chip bg-sand text-ink-2" dir="ltr">ID {s.national_id}</span>
               {s.branch && <span className="chip bg-sand text-ink-2"><Building2 className="h-3 w-3" /> {s.branch}</span>}
             </div>
@@ -201,7 +201,7 @@ function Dashboard({ s, onLogout, onRefresh, refreshing }: { s: PortalStudent; o
             </div>
           </div>
           <div className="relative mt-7 rounded-2xl bg-white/10 p-4">
-            <div className="text-sm text-white/65">المتبقي عليكِ</div>
+            <div className="text-sm text-white/65">المتبقي عليك</div>
             <div className="mt-1 font-display text-3xl font-black text-gold-300"><Counter value={Math.round(f.balance)} /> <span className="text-base font-bold text-white/60">ر.س</span></div>
           </div>
         </motion.div>
@@ -283,7 +283,7 @@ function Dashboard({ s, onLogout, onRefresh, refreshing }: { s: PortalStudent; o
         )}
       </div>
       <p className="mt-6 flex items-center gap-2 text-xs text-muted">
-        <RefreshCw className="h-3.5 w-3.5" /> آخر تحديث من نظام المعهد: {fmtDateTime(s.synced_at)} · لأي استفسار عن الحساب تواصلي مع الإدارة المالية
+        <RefreshCw className="h-3.5 w-3.5" /> آخر تحديث من نظام المعهد: {fmtDateTime(s.synced_at)} · لأي استفسار عن الحساب تواصل مع الإدارة المالية
         <WhatsAppIcon className="ms-1 h-3.5 w-3.5 text-[#25D366]" />
       </p>
     </div>

@@ -39,7 +39,7 @@ function portal_login(string $nationalId, string $phone): array
     foreach ($rows as $s) {
         if ($s['locked_until'] && strtotime($s['locked_until']) > time()) {
             $mins = (int) ceil((strtotime($s['locked_until']) - time()) / 60);
-            throw new HttpError(429, "تم إيقاف الدخول مؤقتًا بسبب محاولات خاطئة متكررة، حاولي بعد $mins دقيقة");
+            throw new HttpError(429, "تم إيقاف الدخول مؤقتًا بسبب محاولات خاطئة متكررة، حاول بعد $mins دقيقة");
         }
     }
     $match = null;

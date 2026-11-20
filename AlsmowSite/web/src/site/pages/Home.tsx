@@ -109,11 +109,11 @@ function Hero({ data }: { data: HomeData }) {
             <Magnetic>
               <SmartLink to={h.cta_link || '/register'} className="btn-primary group w-full !gap-1.5 !px-3 !py-3.5 text-[14.5px] sm:w-auto sm:!gap-2 sm:!px-7 sm:text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-l from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                {h.cta_text || 'ابدئي رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1 sm:h-5 sm:w-5" />
+                {h.cta_text || 'ابدأ رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1 sm:h-5 sm:w-5" />
               </SmartLink>
             </Magnetic>
             <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost w-full !px-3 !py-3.5 text-[14.5px] sm:w-auto sm:!px-7 sm:text-[15px] xl:!px-8 xl:!py-4 xl:text-base">
-              {h.secondary_text || 'استعرضي البرامج'}
+              {h.secondary_text || 'استعرض البرامج'}
             </SmartLink>
           </motion.div>
           {!!h.highlights?.length && (
@@ -217,7 +217,7 @@ function Hero({ data }: { data: HomeData }) {
         <span className="flex h-10 w-6 justify-center rounded-full border-2 border-line pt-2">
           <motion.span animate={{ y: [0, 10, 0], opacity: [1, 0.2, 1] }} transition={{ duration: 1.8, repeat: Infinity }} className="h-2 w-1 rounded-full bg-brand-500" />
         </span>
-        اكتشفي المزيد
+        اكتشف المزيد
       </motion.div>
     </section>
   )
@@ -294,10 +294,10 @@ function HeroMobile({ data }: { data: HomeData }) {
         )}
         <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55, ease: EASE }} className="mt-7 grid grid-cols-2 gap-2.5">
           <SmartLink to={h.cta_link || '/register'} className="btn-primary group w-full !gap-1.5 !px-3 !py-3.5 text-[14.5px]">
-            {h.cta_text || 'ابدئي رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1" />
+            {h.cta_text || 'ابدأ رحلتك الآن'} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1" />
           </SmartLink>
           <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost w-full !px-3 !py-3.5 text-[14.5px]">
-            {h.secondary_text || 'استعرضي البرامج'}
+            {h.secondary_text || 'استعرض البرامج'}
           </SmartLink>
         </motion.div>
         <motion.dl initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="hm-facts mt-9 grid grid-cols-3">
@@ -359,7 +359,7 @@ function Accreditations({ items }: { items: Accreditation[] }) {
   return (
     <section className="py-14">
       <div className="container-x">
-        <Reveal><p className="mb-8 text-center font-display text-sm font-bold tracking-wide text-muted">معتمدون من جهات موثوقة · اضغطي على الشعار لعرض الشهادة</p></Reveal>
+        <Reveal><p className="mb-8 text-center font-display text-sm font-bold tracking-wide text-muted">معتمدون من جهات موثوقة · اضغط على الشعار لعرض الشهادة</p></Reveal>
         <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true }} className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
           {items.map((a) => (
             <motion.button key={a.id} variants={stagger.item} onClick={() => a.certificate && setOpen(a)} className={cx('group flex flex-col items-center gap-2', !a.certificate && 'cursor-default')} title={a.name}>
@@ -391,7 +391,7 @@ function Paths({ data }: { data: HomeData }) {
   return (
     <section className="py-20 md:py-28">
       <div className="container-x">
-        <SectionHeading eyebrow="اختاري مسارك" title="ثلاثة مسارات لمستقبل مهني أقوى" accent="مهني أقوى" text="سواء كنتِ تبحثين عن دبلوم معتمد أو دورة لتطوير مهارة محددة، لدينا المسار المناسب لكِ." />
+        <SectionHeading eyebrow="اختر مسارك" title="ثلاثة مسارات لمستقبل مهني أقوى" accent="مهني أقوى" text="سواء كنت تبحث عن دبلوم معتمد أو دورة لتطوير مهارة محددة، لدينا المسار المناسب لك." />
         <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="grid gap-5 md:grid-cols-3 md:grid-rows-2">
           {types.map((t, i) => {
             const Icon = TYPE_ICON[t]
@@ -418,7 +418,7 @@ function Paths({ data }: { data: HomeData }) {
                       <h3 className={cx('mt-1 leading-snug font-black', big ? 'text-3xl md:text-4xl' : 'text-2xl')}>{PROGRAM_TYPES[t].plural}</h3>
                       <p className={cx('mt-3 leading-relaxed', big ? 'max-w-sm text-white/70' : 'text-muted')}>{PROGRAM_TYPES[t].blurb}</p>
                       <span className={cx('mt-6 inline-flex items-center gap-2 font-bold', big ? 'text-gold-300' : 'text-brand-700')}>
-                        استكشفي <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1.5" />
+                        استكشف <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1.5" />
                       </span>
                     </div>
                   </Link>
@@ -430,8 +430,8 @@ function Paths({ data }: { data: HomeData }) {
             <Link to="/register" className="group relative flex h-full min-h-[9rem] items-center justify-between gap-6 overflow-hidden rounded-[2rem] bg-gradient-to-l from-gold-400 to-gold-300 p-8 text-deep-950">
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-l from-transparent via-white/40 to-transparent transition duration-1000 group-hover:translate-x-full" />
               <div className="relative">
-                <h3 className="text-2xl font-black md:text-3xl">لم تحددي برنامجك بعد؟</h3>
-                <p className="mt-1 font-medium text-deep-900/75">سجلي اهتمامك وسيساعدك فريق القبول في اختيار البرنامج الأنسب لكِ.</p>
+                <h3 className="text-2xl font-black md:text-3xl">لم تحدد برنامجك بعد؟</h3>
+                <p className="mt-1 font-medium text-deep-900/75">سجّل اهتمامك وسيساعدك فريق القبول في اختيار البرنامج الأنسب لك.</p>
               </div>
               <span className="relative grid h-14 w-14 shrink-0 place-items-center rounded-full bg-deep-950 text-white transition group-hover:scale-110"><ArrowLeft className="h-6 w-6" /></span>
             </Link>
@@ -456,7 +456,7 @@ function Programs({ data }: { data: HomeData }) {
         <SectionHeading
           align="start"
           eyebrow="برامجنا التدريبية"
-          title="برامج معتمدة تفتح لكِ أبواب المستقبل"
+          title="برامج معتمدة تفتح لك أبواب المستقبل"
           accent="أبواب المستقبل"
           action={
             <LayoutGroup>
@@ -527,7 +527,7 @@ function About({ data }: { data: HomeData }) {
             })}
           </motion.div>
           <Reveal delay={0.2} className="mt-10">
-            <Link to="/about" className="btn-primary group">اعرفي المزيد عنا <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" /></Link>
+            <Link to="/about" className="btn-primary group">اعرف المزيد عنا <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" /></Link>
           </Reveal>
         </div>
       </div>
@@ -570,10 +570,10 @@ function Stats({ data }: { data: HomeData }) {
 /* ================= Journey (timeline) ================= */
 
 const STEPS = [
-  { icon: MousePointerClick, title: 'اختاري برنامجك', text: 'تصفحي الدبلومات والدورات المعتمدة واختاري ما يناسب طموحك.' },
-  { icon: ClipboardCheck, title: 'سجلي اهتمامك', text: 'املئي نموذج التسجيل في أقل من دقيقة من أي جهاز.' },
+  { icon: MousePointerClick, title: 'اختر برنامجك', text: 'تصفّح الدبلومات والدورات المعتمدة واختر ما يناسب طموحك.' },
+  { icon: ClipboardCheck, title: 'سجّل اهتمامك', text: 'املأ نموذج التسجيل في أقل من دقيقة من أي جهاز.' },
   { icon: PhoneCall, title: 'تواصل فريق القبول', text: 'نتواصل معك لتأكيد التسجيل والإجابة عن كل استفساراتك.' },
-  { icon: Rocket, title: 'ابدئي رحلتك', text: 'انطلقي في التدريب وتابعي برنامجك ومدفوعاتك من بوابة المتدربات.' },
+  { icon: Rocket, title: 'ابدأ رحلتك', text: 'انطلق في التدريب وتابع برنامجك ومدفوعاتك من بوابة المتدربين.' },
 ]
 
 function Journey() {
@@ -611,7 +611,7 @@ function Testimonials({ data }: { data: HomeData }) {
   return (
     <section className="bg-sand/70 py-20 md:py-28">
       <div className="container-x">
-        <SectionHeading eyebrow="قصص نجاح" title="ماذا تقول متدرباتنا" accent="متدرباتنا" />
+        <SectionHeading eyebrow="قصص نجاح" title="ماذا يقول متدربونا" accent="متدربونا" />
         <div className="columns-1 gap-6 md:columns-2 lg:columns-3">
           {items.map((t, i) => (
             <Reveal key={t.id} delay={(i % 3) * 0.08} className="mb-6 break-inside-avoid">
@@ -646,9 +646,9 @@ function PortalPromo() {
             <div className="pattern-light absolute inset-0" />
             <div className="absolute -top-32 left-1/3 h-80 w-80 rounded-full bg-brand-500/40 blur-[100px]" />
             <div className="relative">
-              <span className="eyebrow !border-white/15 !bg-white/10 !text-gold-300"><UserRound className="h-4 w-4" /> بوابة المتدربات</span>
+              <span className="eyebrow !border-white/15 !bg-white/10 !text-gold-300"><UserRound className="h-4 w-4" /> بوابة المتدربين</span>
               <SplitText text="كل تفاصيل رحلتك التدريبية في مكان واحد" accent="مكان واحد" className="mt-6 text-3xl leading-tight font-black md:text-5xl" />
-              <p className="mt-5 max-w-md text-lg leading-relaxed text-white/70">ادخلي برقم الهوية ورقم الجوال المسجّل لدينا، وتابعي برنامجك ومستواك ودفعتك وحسابك ومدفوعاتك لحظة بلحظة.</p>
+              <p className="mt-5 max-w-md text-lg leading-relaxed text-white/70">ادخل برقم الهوية ورقم الجوال المسجّل لدينا، وتابع برنامجك ومستواك ودفعتك وحسابك ومدفوعاتك لحظة بلحظة.</p>
               <Magnetic>
                 <Link to="/portal" className="btn-gold group mt-8 !px-8 !py-4">دخول البوابة <ArrowLeft className="h-5 w-5 transition group-hover:-translate-x-1" /></Link>
               </Magnetic>
@@ -658,7 +658,7 @@ function PortalPromo() {
                 { icon: GraduationCap, t: 'برامجي ومستواي', d: 'الدبلوم أو الدورة، المستوى والدفعة والفرع' },
                 { icon: Wallet, t: 'حسابي ومدفوعاتي', d: 'الرسوم والمدفوع والمتبقي وسجل السدادات' },
                 { icon: CalendarDays, t: 'مواعيد وتنبيهات', d: 'كل ما يخص رحلتك التدريبية' },
-                { icon: ShieldCheck, t: 'آمنة ومحمية', d: 'بياناتك لا تظهر إلا لكِ' },
+                { icon: ShieldCheck, t: 'آمنة ومحمية', d: 'بياناتك لا تظهر إلا لك' },
               ].map((c, i) => (
                 <motion.div
                   key={c.t}

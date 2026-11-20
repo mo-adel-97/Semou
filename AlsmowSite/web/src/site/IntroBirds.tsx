@@ -157,7 +157,7 @@ export default function IntroBirds() {
 
   const name = pick(it?.title, '', false) || g?.site_name || 'معهد السمو للتدريب'
   const message = pick(it?.message, '', false) || g?.tagline || 'مستقبلك يبدأ من هنا'
-  const kicker = pick(it?.kicker, 'أهلاً بكِ في', saved)
+  const kicker = pick(it?.kicker, 'أهلاً بك في', saved)
   const quote = pick(it?.quote, '﴿وَقُل رَّبِّ زِدْنِي عِلْمًا﴾', saved)
   const skip = pick(it?.skip, 'تخطّي', false)
   const logo = g?.logo || '/logo.jpeg'
