@@ -370,7 +370,7 @@ function Accreditations({ items }: { items: Accreditation[] }) {
               <span className="eyebrow !border-white/15 !bg-white/10 !text-white"><BadgeCheck className="h-4 w-4" /> اعتماداتنا</span>
               <h2 className="mt-4 text-[clamp(1.6rem,1.1rem+1.8vw,2.4rem)] leading-tight font-black">معتمدون من جهات رسمية موثوقة</h2>
             </div>
-            <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true }} className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+            <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true }} className="relative flex flex-wrap justify-center gap-3 sm:gap-4">
               {items.map((a) => (
                 <motion.button
                   key={a.id}
