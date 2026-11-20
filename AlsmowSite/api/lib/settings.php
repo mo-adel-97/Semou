@@ -30,6 +30,8 @@ function settings_schema(): array
                     'indigo' => 'نيلي', 'royal' => 'ملكي', 'lavender' => 'لافندر', 'plum' => 'برقوقي', 'rose' => 'وردي', 'ruby' => 'ياقوتي',
                     'coral' => 'مرجاني', 'sunset' => 'غروب', 'gold' => 'ذهبي', 'olive' => 'زيتوني', 'mocha' => 'موكا', 'graphite' => 'فحمي',
                 ], 'help' => 'الزائرة تقدر تغيّره من زر الألوان، وده اللي يظهر لها أول مرة'],
+                'theme_color' => ['type' => 'color', 'label' => 'كود لون الموقع (اختياري)', 'placeholder' => '#8b1538',
+                    'help' => 'اكتب كود اللون (مثل ‎#8B1538‎) أو اختره من المربع؛ يحل محل «لون الموقع الافتراضي». اتركه فارغًا لاستخدام اللون المختار من القائمة'],
                 'theme_mode' => ['type' => 'enum', 'label' => 'المظهر الافتراضي', 'options' => ['auto' => 'تلقائي (حسب الجهاز)', 'light' => 'فاتح', 'dark' => 'داكن']],
             ],
         ],
@@ -246,6 +248,11 @@ function save_settings_group(string $group, array $input): array
                     $items[] = ['value' => max(0, $value), 'label' => $label, 'suffix' => plain_text($item['suffix'] ?? '+', 4) ?? ''];
                 }
                 $clean[$key] = array_slice($items, 0, $f['maxItems'] ?? 6);
+                break;
+            case 'color': // a hex colour code (#abc or #aabbcc)
+                $c = strtolower(trim((string) $v));
+                $clean[$key] = !$empty && preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $c) ? $c : null;
+                if (!$empty && $clean[$key] === null) $errors[$key] = 'كود اللون غير صحيح، مثال: #8b1538';
                 break;
             case 'pairs': // a list of two short texts per row; with bLink the second one is a link
                 $items = [];

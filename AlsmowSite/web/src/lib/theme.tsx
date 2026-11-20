@@ -134,7 +134,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Site-wide defaults from the dashboard apply only when the visitor hasn't chosen their own.
   const setDefaults = useCallback((a?: string, m?: string) => {
     const s = read()
-    const okA = !!a && isPreset(a)
+    // a preset id, or a colour code set in the dashboard (e.g. #8b1538)
+    const okA = !!a && (isPreset(a) || /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(a))
     const okM = !!m && ['light', 'dark', 'auto'].includes(m)
     try { localStorage.setItem(DEFAULTS_KEY, JSON.stringify({ ...(okA ? { accent: a } : {}), ...(okM ? { mode: m } : {}) })) } catch { /* */ }
     if (!s.accent && okA) setAccentState(a as Accent)

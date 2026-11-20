@@ -87,7 +87,7 @@ type Frame = { x: number; y: number; r?: number }
 /** Bakes a flight path into Web Animations keyframes: the browser then plays it on the compositor,
  *  so the flight stays perfectly smooth even while the page is busy. */
 function bake(path: (t: number) => Frame, seconds: number): Keyframe[] {
-  const n = Math.round(seconds * 30)
+  const n = Math.round(seconds * 60) // 60 points a second: smooth curves even on 120 Hz screens
   return Array.from({ length: n + 1 }, (_, i) => {
     const p = path((i / n) * seconds)
     return { offset: i / n, transform: `translate3d(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px, 0) rotate(${(p.r ?? 0).toFixed(1)}deg)` }
@@ -173,7 +173,7 @@ function LetterScene({ msg, onDone }: { msg: ButterflyMessage; onDone: () => voi
     </>
   )
   return (
-    <div ref={ref} className="bf-messenger" data-no-texts>
+    <div ref={ref} className="bf-messenger" data-no-texts data-no-fx>
       <Butterfly style={{ '--s': '44px', '--flap': '.24s' } as CSSProperties} />
       <span className="bf-thread" aria-hidden />
       <div className="bf-letter-swing">
@@ -240,7 +240,7 @@ function TalkScene({ talk, asker, answerer, onDone }: { talk: ButterflyTalk; ask
   const end = t(LEAVE - 0.3)
   const answerEnd = 'right' in geo.r && geo.r.right !== undefined && !('left' in geo.r)
   return (
-    <div className="bfc" data-no-texts>
+    <div className="bfc" data-no-texts data-no-fx>
       <div ref={a} className="bfc-fly"><Butterfly style={{ '--s': '44px', '--flap': '.24s' } as CSSProperties} /></div>
       <div ref={b} className="bfc-fly inst"><Butterfly style={{ '--s': '50px', '--flap': '.27s' } as CSSProperties} /></div>
 

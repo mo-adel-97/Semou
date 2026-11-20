@@ -432,7 +432,7 @@ export default function Layout() {
   const outlet = useOutlet()
   const { data } = useSite()
   const { setDefaults } = useTheme()
-  useEffect(() => { setDefaults(data?.settings.general.theme_accent, data?.settings.general.theme_mode) }, [data, setDefaults])
+  useEffect(() => { setDefaults(data?.settings.general.theme_color || data?.settings.general.theme_accent, data?.settings.general.theme_mode) }, [data, setDefaults])
   useEffect(() => { startTracking() }, [])
   useEffect(() => { trackView(pathname) }, [pathname])
   // the butterflies' scenes: everything (on/off, words, links, timing) comes from the dashboard

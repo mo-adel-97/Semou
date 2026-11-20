@@ -79,6 +79,9 @@ export function Field({ f, control, error }: { f: FieldSpec; control: Control<Fi
           case 'stats':
             input = <StatsField value={(field.value as StatItem[]) ?? []} onChange={field.onChange} max={f.maxItems ?? 6} />
             break
+          case 'color':
+            input = <ColorField value={(field.value as string) ?? ''} onChange={field.onChange} placeholder={f.placeholder} />
+            break
           case 'pairs':
             input = <PairsField f={f} value={(field.value as TextPair[]) ?? []} onChange={field.onChange} />
             break
@@ -267,6 +270,21 @@ function ListField({ value, onChange, max }: { value: string[]; onChange: (v: st
           <button type="button" onClick={add} className="btn-ghost shrink-0 !rounded-xl !px-4" aria-label="إضافة"><Plus className="h-4 w-4" /></button>
         </div>
       )}
+    </div>
+  )
+}
+
+function ColorField({ value, onChange, placeholder }: { value: string; onChange: (v: string | null) => void; placeholder?: string }) {
+  const valid = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)
+  const full = valid && value.length === 4 ? `#${[...value.slice(1)].map((c) => c + c).join('')}` : value
+  return (
+    <div className="flex items-center gap-2">
+      <label className="relative h-11 w-14 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-line" style={{ background: valid ? value : undefined }} title={placeholder}>
+        <input type="color" className="absolute inset-0 h-full w-full cursor-pointer opacity-0" value={valid ? full : '#3f7a58'} onChange={(e) => onChange(e.target.value)} />
+        {!valid && <span className="pattern absolute inset-0" />}
+      </label>
+      <input className="input font-mono" dir="ltr" value={value} onChange={(e) => onChange(e.target.value.trim() || null)} placeholder={placeholder} maxLength={7} />
+      {value && <button type="button" onClick={() => onChange(null)} className="rounded-lg p-2 text-muted hover:bg-red-500/10 hover:text-red-600" aria-label="مسح"><X className="h-4 w-4" /></button>}
     </div>
   )
 }

@@ -48,7 +48,7 @@ export interface StatItem { value: number; label: string; suffix: string }
 export interface KbEntry { q: string; variants: string[]; a: string; link: string | null }
 
 export interface Settings {
-  general: Partial<{ site_name: string; tagline: string; logo: string; announcement: string; announcement_link: string; announcement_cta: string; register_text: string; register_url: string; portal_hide: boolean; portal_text: string; portal_link: string; lms_url: string; theme_accent: string; theme_mode: string }>
+  general: Partial<{ site_name: string; tagline: string; logo: string; announcement: string; announcement_link: string; announcement_cta: string; register_text: string; register_url: string; portal_hide: boolean; portal_text: string; portal_link: string; lms_url: string; theme_accent: string; theme_color: string | null; theme_mode: string }>
   hero: Partial<{ eyebrow: string; title: string; highlight: string; subtitle: string; cta_text: string; cta_link: string; secondary_text: string; secondary_link: string; image: string; highlights: string[] }>
   assistant?: Partial<{ disabled: boolean; name: string | null; title: string | null; welcome: string | null; suggestions: string[]; fallback: string | null; kb: KbEntry[] }>
   intro?: Partial<{ mode: 'off' | 'first' | 'session' | 'always'; kicker: string | null; title: string | null; message: string | null; quote: string | null; skip: string | null }>
@@ -90,7 +90,7 @@ export interface HomeData {
 
 /* ---------- Admin ---------- */
 
-export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb' | 'pairs'
+export type FieldType = 'string' | 'text' | 'html' | 'int' | 'bool' | 'enum' | 'date' | 'image' | 'url' | 'list' | 'slug' | 'stats' | 'textrules' | 'kb' | 'pairs' | 'color'
 
 export interface FieldSpec {
   key: string

@@ -50,7 +50,13 @@ export default function Fx() {
     }, 900)
     cleanups.push(() => clearInterval(sweep))
     let scanT = 0
-    const mo = new MutationObserver(() => { clearTimeout(scanT); scanT = window.setTimeout(scan, 80) })
+    const mo = new MutationObserver((records) => {
+      // the butterflies' scenes come and go above the page: they are not content, don't re-scan the page for them
+      const page = records.some((r) => !(r.target instanceof Element && r.target.closest('[data-no-fx]'))
+        && [...r.addedNodes].some((n) => !(n instanceof Element && n.closest('[data-no-fx]'))))
+      if (!page) return
+      clearTimeout(scanT); scanT = window.setTimeout(scan, 80)
+    })
     mo.observe(document.body, { childList: true, subtree: true })
     cleanups.push(() => { io.disconnect(); mo.disconnect(); clearTimeout(scanT); document.documentElement.classList.remove('fx-on') })
 
