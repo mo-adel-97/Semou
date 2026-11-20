@@ -1,0 +1,74 @@
+# Builds the alsmow site (AlsmowSite/) and deploys it to Hostinger on every push to main.
+# Target: new.alsmow.com  ->  ~/domains/alsmow.com/public_html/new
+# The server keeps api/config.php and uploads/ untouched (same rules as AlsmowSite/deploy.sh).
+#
+# Repository secret needed:  HOSTINGER_SSH_KEY  (private deploy key; its public half is in ~/.ssh/authorized_keys on Hostinger)
+name: Deploy site (new.alsmow.com)
+
+on:
+  push:
+    branches: [main]
+    paths: ['AlsmowSite/**', '.github/workflows/deploy-site.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+env:
+  HOST: 147.93.92.68
+  PORT: '65002'
+  USER_: u920789781
+  DOCROOT: domains/alsmow.com/public_html/new
+  # pinned server key (verified against AlsmowSite/deploy.sh HOSTKEY SHA256:hJg0zax3LfUTlG9TMwDCFWtXxO1TPe7/T2NgMEv6OrA)
+  KNOWN_HOST: '[147.93.92.68]:65002 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHHtzN4hHFiPYnqbnJ7hcoE4HBsZKUKHELcPR5v77Zvl'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: AlsmowSite
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: AlsmowSite/web/package-lock.json
+
+      - name: Build
+        run: cd web && npm ci && npm run build
+
+      - name: Package
+        run: |
+          rm -rf .deploy && mkdir -p .deploy/pkg/api
+          cp -r web/dist/. .deploy/pkg/
+          cp -r api/index.php api/.htaccess api/config.sample.php api/lib api/migrations api/tools .deploy/pkg/api/
+          cp deploy/uploads.htaccess .deploy/pkg/uploads.htaccess
+          tar -czf .deploy/release.tgz -C .deploy/pkg .
+
+      - name: SSH setup
+        env:
+          KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOST" > ~/.ssh/known_hosts
+
+      - name: Upload + install
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes"
+          scp $SSH_OPTS -P "$PORT" .deploy/release.tgz "$USER_@$HOST:alsmow_release.tgz"
+          ssh $SSH_OPTS -p "$PORT" "$USER_@$HOST" DOCROOT="$DOCROOT" bash -s <<'EOF'
+          set -e
+          cd ~/"$DOCROOT"
+          rm -rf assets api/lib api/migrations api/tools
+          tar -xzf ~/alsmow_release.tgz
+          rm -f ~/alsmow_release.tgz
+          mkdir -p uploads && mv -f uploads.htaccess uploads/.htaccess
+          for f in api/index.php api/lib/*.php api/tools/*.php; do php -l "$f" >/dev/null || { echo "PHP syntax error in $f"; exit 1; }; done
+          if [ -f api/config.php ]; then php api/tools/install.php migrate; else echo "!! api/config.php missing: create it before the API can work"; fi
+          echo "deployed: $(date)"
+          EOF

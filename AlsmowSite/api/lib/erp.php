@@ -153,6 +153,8 @@ function erp_prune_students(array $guids): array
 {
     $keep = array_values(array_filter(array_map(fn($g) => strtolower((string) $g), $guids), fn($g) => preg_match('/^[0-9a-f-]{36}$/', $g)));
     if (!$keep) throw new HttpError(422, 'empty guid list'); // never wipe everyone by mistake
+    // a persistent connection (local php -S) keeps temp tables between requests
+    DB::run('DROP TEMPORARY TABLE IF EXISTS keep_guids');
     DB::run('CREATE TEMPORARY TABLE keep_guids (g CHAR(36) PRIMARY KEY)');
     foreach (array_chunk($keep, 500) as $chunk) {
         DB::run('INSERT IGNORE INTO keep_guids (g) VALUES ' . implode(',', array_fill(0, count($chunk), '(?)')), $chunk);

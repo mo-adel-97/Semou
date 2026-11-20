@@ -79,11 +79,14 @@ builder.Services.AddScoped<Semou.Api.Features.Screens.ScreenService>();
 // ---------- Website link (alsmow.com): study requests in, trainee portal data out ----------
 builder.Services.Configure<Semou.Api.Features.Website.WebsiteOptions>(cfg.GetSection("Website"));
 // The test copy never talks to the real website: no automatic pull, no manual "تحديث الآن", no portal push.
-if (testMode) builder.Services.PostConfigure<Semou.Api.Features.Website.WebsiteOptions>(o => o.Enabled = false);
+// Exception for local development: App:TestSync=true lets it sync with a site on localhost only.
+var websiteUrl = cfg["Website:BaseUrl"] ?? "";
+var testSync = testMode && cfg.GetValue("App:TestSync", false)
+    && Uri.TryCreate(websiteUrl, UriKind.Absolute, out var siteUri) && siteUri.IsLoopback;
+if (testMode && !testSync) builder.Services.PostConfigure<Semou.Api.Features.Website.WebsiteOptions>(o => o.Enabled = false);
 builder.Services.AddHttpClient<Semou.Api.Features.Website.WebsiteClient>(c => c.Timeout = TimeSpan.FromSeconds(60));
 builder.Services.AddScoped<Semou.Api.Features.Website.WebsiteSyncService>();
-// Test mode never talks to the real website.
-if (!testMode) builder.Services.AddHostedService<Semou.Api.Features.Website.WebsiteSyncWorker>();
+if (!testMode || testSync) builder.Services.AddHostedService<Semou.Api.Features.Website.WebsiteSyncWorker>();
 
 // ---------- Auth ----------
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

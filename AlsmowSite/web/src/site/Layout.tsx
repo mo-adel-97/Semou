@@ -44,11 +44,12 @@ function Logo({ light, compact }: { light?: boolean; compact?: boolean }) {
   const { data } = useSite()
   const g = data?.settings.general
   return (
-    <Link to="/" className="group flex items-center gap-3" aria-label="الصفحة الرئيسية">
-      <BrandLogo src={g?.logo} className="h-14 w-14 md:h-16 md:w-16" />
-      <div className={cx('leading-tight', compact && 'hidden sm:block')}>
-        <div className={cx('font-display text-[17px] font-extrabold', light ? 'text-white' : 'text-ink')}>{g?.site_name || 'معهد السمو للتدريب'}</div>
-        <div className={cx('text-xs', light ? 'text-white/55' : 'text-muted')}>{g?.tagline || 'مستقبلك يبدأ من هنا'}</div>
+    <Link to="/" className="group flex shrink-0 items-center gap-3" aria-label="الصفحة الرئيسية">
+      <BrandLogo src={g?.logo} className={compact ? 'h-12 w-12 shrink-0 md:h-14 md:w-14' : 'h-14 w-14 shrink-0 md:h-16 md:w-16'} />
+      {/* header: name only, on one line (hidden at lg where the menu needs the room); the tagline lives in the footer / mobile menu */}
+      <div className={cx('leading-tight', compact && 'hidden sm:block lg:hidden xl:block')}>
+        <div className={cx('font-display font-extrabold whitespace-nowrap', compact ? 'text-[16px]' : 'text-[17px]', light ? 'text-white' : 'text-ink')}>{g?.site_name || 'معهد السمو للتدريب'}</div>
+        {!compact && <div className={cx('text-xs', light ? 'text-white/55' : 'text-muted')}>{g?.tagline || 'مستقبلك يبدأ من هنا'}</div>}
       </div>
     </Link>
   )
@@ -157,7 +158,7 @@ function Header() {
             <nav className="hidden items-center lg:flex" aria-label="القائمة الرئيسية" onMouseLeave={() => setDrop(null)}>
               {nav.map((item) => {
                 const active = item.to ? (item.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(item.to)) : item.children?.some((c) => loc.pathname === c.to)
-                const cls = cx('relative flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors xl:px-4', active ? 'text-brand-700' : 'text-ink-2 hover:text-ink')
+                const cls = cx('relative flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2 text-[14.5px] font-semibold transition-colors 2xl:px-4', active ? 'text-brand-700' : 'text-ink-2 hover:text-ink')
                 const pill = active && <motion.span layoutId="nav-pill" className="absolute inset-0 -z-10 rounded-full bg-brand-50" transition={{ type: 'spring', stiffness: 380, damping: 30 }} />
                 if (item.mega || item.children) {
                   return (
@@ -201,14 +202,14 @@ function Header() {
                 )
               })}
             </nav>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <div className="hidden sm:block"><ThemePicker /></div>
               {portalShow && (
-                <PortalBtn className="hidden h-11 items-center gap-2 rounded-2xl border border-line bg-surface/70 px-4 text-sm font-bold text-ink-2 transition hover:border-brand-300 hover:text-brand-700 md:flex">
-                  <UserRound className="h-4 w-4" /> {portalText}
+                <PortalBtn className="hidden h-11 items-center gap-2 whitespace-nowrap rounded-2xl border border-line bg-surface/70 px-3 text-sm font-bold text-ink-2 transition hover:border-brand-300 hover:text-brand-700 md:flex 2xl:px-4">
+                  <UserRound className="h-4 w-4 shrink-0" /> <span className="md:inline lg:hidden 2xl:inline">{portalText}</span>
                 </PortalBtn>
               )}
-              <Magnetic><RegisterBtn className="btn-primary hidden !h-11 !px-5 !py-0 sm:inline-flex" /></Magnetic>
+              <Magnetic><RegisterBtn className="btn-primary hidden !h-11 !px-5 !py-0 whitespace-nowrap sm:inline-flex" /></Magnetic>
               <button onClick={() => setOpen(true)} className="grid h-11 w-11 place-items-center rounded-2xl bg-primary text-white lg:hidden" aria-label="فتح القائمة">
                 <Menu className="h-5 w-5" />
               </button>
