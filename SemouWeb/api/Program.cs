@@ -12,6 +12,8 @@ using Semou.Api.Infrastructure;
 using Semou.Api.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+// Runs as a Windows service on the ERP machine (no effect under `dotnet run`).
+builder.Host.UseWindowsService();
 var cfg = builder.Configuration;
 
 // ---------- Configuration (secrets come from user-secrets / environment variables, never from git) ----------
