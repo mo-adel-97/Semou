@@ -160,7 +160,7 @@ export default function IntroBirds() {
   const kicker = pick(it?.kicker, 'أهلاً بك في', saved)
   const quote = pick(it?.quote, '﴿وَقُل رَّبِّ زِدْنِي عِلْمًا﴾', saved)
   const skip = pick(it?.skip, 'تخطّي', false)
-  const logo = g?.logo || '/logo.jpeg'
+  const logo = g?.logo || '/logo.png'
 
   useEffect(() => {
     if (!show) return

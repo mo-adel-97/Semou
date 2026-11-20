@@ -1,7 +1,8 @@
 import { Loader2 } from 'lucide-react'
 import { MotionConfig } from 'motion/react'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useSite } from './lib/queries'
 import Layout from './site/Layout'
 import About from './site/pages/About'
 import { Blog, PostPage } from './site/pages/Blog'
@@ -52,9 +53,25 @@ const router = createBrowserRouter([
   },
 ])
 
+/** The browser-tab icon (and the iPhone home-screen icon) follow the logo chosen in the dashboard. */
+function SiteIcon() {
+  const logo = useSite().data?.settings.general.logo
+  useEffect(() => {
+    if (!logo) return
+    for (const rel of ['icon', 'apple-touch-icon']) {
+      let l = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
+      if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l) }
+      l.removeAttribute('type')
+      l.href = logo
+    }
+  }, [logo])
+  return null
+}
+
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
+      <SiteIcon />
       <RouterProvider router={router} />
     </MotionConfig>
   )

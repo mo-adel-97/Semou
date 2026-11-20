@@ -210,7 +210,7 @@ export function Img({ src, alt, className, eager }: { src?: string | null; alt: 
   if (!src) {
     return (
       <div className={cx('pattern flex items-center justify-center bg-brand-50', className)}>
-        <img src="/logo.jpeg" alt="" className="h-14 w-14 rounded-2xl opacity-40 grayscale" />
+        <img src="/logo.png" alt="" className="h-14 w-14 rounded-2xl opacity-40 grayscale" />
       </div>
     )
   }

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import { cx } from '../lib/format'
+import { useSite } from '../lib/queries'
 
 /**
  * The institute's logo as a round badge: a white disc with a brand→gold ring, the whole logo inside
@@ -7,6 +8,9 @@ import { cx } from '../lib/format'
  * and the ring turns on hover.
  */
 export default function BrandLogo({ src, className, animate = true }: { src?: string | null; className?: string; animate?: boolean }) {
+  // no explicit image → the logo chosen in the dashboard (Settings → General), so the admin panel and login follow it too
+  const { data } = useSite()
+  const img = src || data?.settings.general.logo || '/logo.png'
   return (
     <motion.span
       className={cx('brand-logo', className)}
@@ -16,7 +20,7 @@ export default function BrandLogo({ src, className, animate = true }: { src?: st
       whileHover={{ scale: 1.06 }}
     >
       <span className="brand-logo-disc">
-        <img src={src || '/logo.jpeg'} alt="" draggable={false} />
+        <img src={img} alt="" draggable={false} />
       </span>
     </motion.span>
   )
