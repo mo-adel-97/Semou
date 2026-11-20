@@ -1,9 +1,9 @@
 # Builds the alsmow site (AlsmowSite/) and deploys it to Hostinger on every push to main.
-# Target: new.alsmow.com  ->  ~/domains/alsmow.com/public_html/new
+# Target: alsmow.com  ->  ~/domains/alsmow.com/public_html  (new.alsmow.com redirects there)
 # The server keeps api/config.php and uploads/ untouched (same rules as AlsmowSite/deploy.sh).
 #
 # Repository secret needed:  HOSTINGER_SSH_KEY  (private deploy key; its public half is in ~/.ssh/authorized_keys on Hostinger)
-name: Deploy site (new.alsmow.com)
+name: Deploy site (alsmow.com)
 
 on:
   push:
@@ -19,7 +19,7 @@ env:
   HOST: 147.93.92.68
   PORT: '65002'
   USER_: u920789781
-  DOCROOT: domains/alsmow.com/public_html/new
+  DOCROOT: domains/alsmow.com/public_html
   # pinned server key (verified against AlsmowSite/deploy.sh HOSTKEY SHA256:hJg0zax3LfUTlG9TMwDCFWtXxO1TPe7/T2NgMEv6OrA)
   KNOWN_HOST: '[147.93.92.68]:65002 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHHtzN4hHFiPYnqbnJ7hcoE4HBsZKUKHELcPR5v77Zvl'
 
