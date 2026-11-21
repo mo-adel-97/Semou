@@ -181,6 +181,13 @@ function settings_schema(): array
                 'title' => ['type' => 'string', 'label' => 'عنوان الموقع في جوجل', 'max' => 70],
                 'description' => ['type' => 'text', 'label' => 'الوصف في جوجل', 'max' => 170],
                 'og_image' => ['type' => 'image', 'label' => 'صورة المشاركة (واتساب وتويتر)'],
+                'keywords' => ['type' => 'list', 'label' => 'كلمات البحث المهمة', 'max' => 80, 'maxItems' => 30,
+                    'help' => 'العبارات التي يكتبها الناس في جوجل ويجب أن يظهر المعهد فيها، مثل: معهد تدريب في حفر الباطن، دبلوم معتمد عن بعد'],
+                'alt_names' => ['type' => 'list', 'label' => 'أسماء أخرى للمعهد', 'max' => 80, 'maxItems' => 10,
+                    'help' => 'كل الأسماء التي قد يبحث بها الناس عن المعهد (بالعربي والإنجليزي)'],
+                'google_verify' => ['type' => 'string', 'label' => 'رمز التحقق من Google Search Console', 'max' => 120,
+                    'help' => 'من Search Console: إضافة موقع ← طريقة «علامة HTML» ← انسخ قيمة content فقط'],
+                'bing_verify' => ['type' => 'string', 'label' => 'رمز التحقق من Bing Webmaster', 'max' => 120],
             ],
         ],
         // «تحدث إلى السمو»: the institute's own assistant (api/lib/assistant.php), no external AI.

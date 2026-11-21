@@ -1,3 +1,7 @@
 User-agent: *
+Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /portal
+
+Sitemap: https://alsmow.com/sitemap.xml

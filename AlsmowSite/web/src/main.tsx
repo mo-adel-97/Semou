@@ -16,6 +16,9 @@ const queryClient = new QueryClient({
   },
 })
 
+// seo.php puts the page's head tags (title, description, canonical, cards) in for crawlers; from here on the app owns them
+document.querySelectorAll('[data-ssr]').forEach((el) => el.remove())
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>

@@ -68,7 +68,7 @@ jobs:
           tar -xzf ~/alsmow_release.tgz
           rm -f ~/alsmow_release.tgz
           mkdir -p uploads && mv -f uploads.htaccess uploads/.htaccess
-          for f in api/index.php api/lib/*.php api/tools/*.php; do php -l "$f" >/dev/null || { echo "PHP syntax error in $f"; exit 1; }; done
+          for f in seo.php api/index.php api/lib/*.php api/tools/*.php; do php -l "$f" >/dev/null || { echo "PHP syntax error in $f"; exit 1; }; done
           if [ -f api/config.php ]; then php api/tools/install.php migrate; else echo "!! api/config.php missing: create it before the API can work"; fi
           echo "deployed: $(date)"
           EOF

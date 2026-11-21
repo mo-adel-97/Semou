@@ -1,5 +1,5 @@
 Options -Indexes
-DirectoryIndex index.html
+DirectoryIndex seo.php index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -10,11 +10,12 @@ DirectoryIndex index.html
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # Real files and folders (assets, uploads, api/) are served as-is;
-  # every other path is a React route.
+  # every other path (pages, /sitemap.xml) goes through seo.php: index.html + the page's title, description,
+  # structured data and text for search engines (it falls back to the plain index.html on any problem).
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
-  RewriteRule ^ index.html [L]
+  RewriteRule ^ seo.php [L]
 </IfModule>
 
 <IfModule mod_headers.c>

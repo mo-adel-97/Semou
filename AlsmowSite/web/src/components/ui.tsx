@@ -294,6 +294,7 @@ export function Seo({ title, description, image }: { title?: string; description
     <>
       <title>{full}</title>
       {description && <meta name="description" content={description} />}
+      {typeof location !== 'undefined' && <link rel="canonical" href={location.origin + location.pathname} />}
       <meta property="og:title" content={full} />
       {description && <meta property="og:description" content={description} />}
       {image && <meta property="og:image" content={image} />}
