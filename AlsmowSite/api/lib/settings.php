@@ -94,6 +94,29 @@ function settings_schema(): array
                 ]],
             ],
         ],
+        // The programmes box (web/src/site/GiftBox.tsx): a small box above WhatsApp; now and then a small envelope rises
+        // out of it and opens on one programme. "seed": until the group is saved once, these defaults are what the site shows.
+        'gift' => [
+            'label' => 'صندوق البرامج', 'icon' => 'gift', 'seed' => true,
+            'fields' => [
+                'mode' => ['type' => 'enum', 'label' => 'الحالة', 'default' => 'on', 'options' => ['on' => 'ظاهر', 'off' => 'متوقف'],
+                    'help' => 'صندوق صغير أسفل الشاشة فوق زر واتساب، تخرج منه كل فترة ظروف صغيرة تطير في الصفحة وعلى كل ظرف اسم برنامج. للمعاينة: ‎?gift‎ في آخر الرابط'],
+                'mobile_hide' => ['type' => 'bool', 'label' => 'إخفاؤه على الجوال', 'default' => false],
+                'source' => ['type' => 'enum', 'label' => 'البرامج التي تخرج من الصندوق', 'default' => 'diploma', 'options' => [
+                    'diploma' => 'الدبلومات', 'qualifying' => 'الدورات التأهيلية', 'development' => 'الدورات التطويرية', 'all' => 'كل البرامج',
+                ], 'help' => 'كل ظرف يحمل برنامجًا مختلفًا، بالتناوب على كل البرامج'],
+                'delay' => ['type' => 'enum', 'label' => 'أول مرة بعد فتح الموقع', 'default' => '6', 'options' => [
+                    '3' => 'بعد 3 ثوانٍ', '6' => 'بعد 6 ثوانٍ', '10' => 'بعد 10 ثوانٍ', '20' => 'بعد 20 ثانية', '30' => 'بعد 30 ثانية',
+                ]],
+                'count' => ['type' => 'enum', 'label' => 'عدد الظروف في كل مرة', 'default' => '3', 'options' => ['1' => 'ظرف واحد', '2' => 'ظرفان', '3' => '3 ظروف', '4' => '4 ظروف', '5' => '5 ظروف']],
+                'every' => ['type' => 'enum', 'label' => 'الفاصل بين كل مرة والتي تليها', 'default' => '45', 'options' => [
+                    '20' => 'كل 20 ثانية', '30' => 'كل 30 ثانية', '45' => 'كل 45 ثانية', '60' => 'كل دقيقة', '120' => 'كل دقيقتين', '300' => 'كل 5 دقائق',
+                ]],
+                'flight' => ['type' => 'enum', 'label' => 'سرعة طيران الظروف', 'default' => '12', 'options' => [
+                    '8' => 'سريعة', '12' => 'متوسطة', '16' => 'هادئة', '22' => 'بطيئة جدًا',
+                ], 'help' => 'يقف الظرف في مكانه ما دام الزائر واضعًا المؤشر عليه، والضغط عليه يفتح صفحة البرنامج'],
+            ],
+        ],
         // Page layouts: the order of each page's sections and which are hidden (web/src/lib/layout.tsx)
         'layout' => [
             'label' => 'ترتيب الصفحات', 'icon' => 'layout-dashboard',
@@ -204,9 +227,16 @@ function settings_admin_schema(): array
 
 function all_settings(): array
 {
-    $out = array_fill_keys(array_keys(settings_schema()), []);
+    $schema = settings_schema();
+    $out = array_fill_keys(array_keys($schema), []);
+    $saved = [];
     foreach (DB::all('SELECT k, v FROM settings') as $r) {
-        if (array_key_exists($r['k'], $out)) $out[$r['k']] = json_decode($r['v'], true) ?: [];
+        if (array_key_exists($r['k'], $out)) { $out[$r['k']] = json_decode($r['v'], true) ?: []; $saved[$r['k']] = true; }
+    }
+    // "seed" groups show their defaults until they are saved for the first time
+    foreach ($schema as $g => $def) {
+        if (empty($def['seed']) || isset($saved[$g])) continue;
+        foreach ($def['fields'] as $k => $f) if (array_key_exists('default', $f)) $out[$g][$k] = $f['default'];
     }
     // contact.notify_email is private: never part of the public payload
     return $out;

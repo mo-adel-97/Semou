@@ -60,6 +60,7 @@ export interface Settings {
   /** lib/layout.tsx: the order of each page's sections and which are hidden. */
   layout?: Partial<Record<'home' | 'about' | 'program' | 'contact', SectionPick[]>>
   /** components/Butterflies.tsx: every word they show comes from here. */
+  gift?: Partial<{ mode: 'on' | 'off'; mobile_hide: boolean; source: 'diploma' | 'qualifying' | 'development' | 'all'; delay: string; count: string; every: string; flight: string }>
   butterflies?: Partial<{
     hide: boolean; letters_hide: boolean; letters: TextPair[]; chat_hide: boolean; chat: TextPair[]
     chat_asker: string | null; chat_answerer: string | null; first: string | null; every: string | null

@@ -1,6 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { createReadStream, statSync } from 'node:fs'
+import { createReadStream, readFileSync, statSync } from 'node:fs'
 import { extname, resolve, sep } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
@@ -40,8 +40,32 @@ function localUploads(): Plugin {
   }
 }
 
+// Dev only: preview settings that aren't on the server yet. ALSMOW_PREVIEW_SETTINGS = a JSON file of {group: {...}}
+// merged over the settings that /api/public/site and /api/public/home return. Unset = no effect.
+function previewSettings(file: string): Plugin {
+  return {
+    name: 'preview-settings',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const path = (req.url ?? '').split('?')[0]
+        if (req.method !== 'GET' || (path !== '/api/public/site' && path !== '/api/public/home')) return next()
+        try {
+          const extra = JSON.parse(readFileSync(file, 'utf8')) as Record<string, Record<string, unknown>>
+          const j = (await (await fetch(API + req.url)).json()) as { settings: Record<string, Record<string, unknown>> }
+          for (const [g, v] of Object.entries(extra)) j.settings[g] = { ...(j.settings[g] ?? {}), ...v }
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify(j))
+        } catch (e) {
+          next(e as Error)
+        }
+      })
+    },
+  }
+}
+const PREVIEW = process.env.ALSMOW_PREVIEW_SETTINGS
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), ...(LOCAL_API ? [localUploads()] : [])],
+  plugins: [react(), tailwindcss(), ...(LOCAL_API ? [localUploads()] : []), ...(PREVIEW ? [previewSettings(PREVIEW)] : [])],
   server: {
     port: 5180,
     // prepare the site's modules as soon as the dev server starts, so the first page load isn't slow

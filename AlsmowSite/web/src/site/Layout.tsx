@@ -13,6 +13,7 @@ import { useTheme } from '../lib/theme'
 import { PROGRAM_TYPES, type ProgramType } from '../lib/types'
 
 import IntroBirds from './IntroBirds'
+import GiftBox from './GiftBox'
 import SiteTexts from './SiteTexts'
 import { startTracking, trackView } from '../lib/track'
 import Fx from '../components/Fx'
@@ -391,6 +392,7 @@ function Floating() {
   useMotionValueEvent(scrollY, 'change', (y) => setShow(y > 700))
   return (
     <div className="fixed bottom-5 left-5 z-40 flex flex-col items-center gap-3">
+      <GiftBox />
       <AnimatePresence>
         {show && (
           <motion.button

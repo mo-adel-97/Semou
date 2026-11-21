@@ -959,3 +959,103 @@ a:hover .brand-logo, .brand-logo:hover { --bl-a: 360deg; }
 /* the old square-logo rules of the curtain / intro plaque must not touch the round badge */
 .rc-logo { border-radius: 50%; background: transparent; }
 .pl-brand .brand-logo-disc img { width: 88%; height: 88%; border-radius: 0; box-shadow: none; object-fit: contain; background: none; }
+
+/* ================= صندوق البرامج (site/GiftBox.tsx) — a small box in the floating column; pure CSS art, theme colours only ================= */
+.dock { position: relative; z-index: 1; --s: 64px; --cw: min(228px, calc(100vw - 40px)); --ew: 168px;
+  --rb: color-mix(in oklab, var(--glow) 50%, white); --rb-d: color-mix(in oklab, var(--glow) 55%, var(--brand));
+  width: var(--s); height: calc(var(--s) * .92); animation: dock-in .7s cubic-bezier(.34, 1.56, .64, 1) both; }
+@media (max-width: 639px) { .dock { --s: 54px; } }
+html.menu-open .dock { opacity: 0; pointer-events: none; }
+@keyframes dock-in { from { opacity: 0; transform: translateY(30px) scale(.5); } }
+
+/* the box */
+.dock-box { position: absolute; inset: 0; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 100%; -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 10px 14px color-mix(in oklab, var(--brand) 45%, transparent)); }
+.dock:not(.dock-open) .dock-box { animation: dock-bob 3.2s ease-in-out infinite; }
+@keyframes dock-bob { 50% { transform: translateY(-4px); } }
+.gift-body { position: absolute; left: 7%; right: 7%; bottom: 0; height: 64%; overflow: hidden; border-radius: calc(var(--s) * .07) calc(var(--s) * .07) calc(var(--s) * .1) calc(var(--s) * .1);
+  background: linear-gradient(160deg, color-mix(in oklab, var(--brand) 78%, white) 0%, var(--brand) 45%, color-mix(in oklab, var(--brand) 60%, black) 100%);
+  box-shadow: inset 0 -6px 12px rgb(0 0 0 / .25), inset 0 4px 8px rgb(255 255 255 / .16); }
+.gift-body::before, .gift-lid::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 18%; translate: -50% 0; background: linear-gradient(90deg, var(--rb-d), var(--rb) 45%, var(--rb-d)); }
+.gift-body::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / .18) 1px, transparent 1.4px); background-size: 8px 8px; }
+.gift-lid { position: absolute; left: 0; right: 0; top: 16%; height: 24%; z-index: 2; border-radius: calc(var(--s) * .07); transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
+  background: linear-gradient(170deg, color-mix(in oklab, var(--brand) 72%, white), color-mix(in oklab, var(--brand) 82%, black));
+  box-shadow: 0 4px 8px -4px rgb(0 0 0 / .45), inset 0 1px 0 rgb(255 255 255 / .3); }
+.gift-bow { position: absolute; left: 50%; bottom: 92%; width: 66%; height: calc(var(--s) * .3); translate: -50% 0; }
+.gift-bow i { position: absolute; bottom: 0; width: 50%; height: 100%; border: calc(var(--s) * .06) solid var(--rb); border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%; }
+.gift-bow i:first-child { left: 2%; transform: rotate(-26deg); transform-origin: 100% 100%; }
+.gift-bow i:nth-child(2) { right: 2%; transform: rotate(26deg); transform-origin: 0 100%; }
+.gift-bow b { position: absolute; left: 50%; bottom: -10%; width: 26%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle at 35% 32%, #fff, var(--rb) 45%, var(--rb-d)); }
+.dock-open .gift-lid { transform: translate(-8%, -70%) rotate(-16deg); }
+.dock-open .dock-box { animation: dock-shake .4s ease-in-out; }
+@keyframes dock-shake { 25% { transform: rotate(-8deg) scale(1.08); } 60% { transform: rotate(6deg) scale(1.06); } }
+
+/* little theme balls that pop out when the lid opens */
+.dock-pops { position: absolute; left: 50%; top: 34%; width: 0; height: 0; z-index: 3; }
+.dock-pops i { position: absolute; left: calc(var(--sz) / -2); top: calc(var(--sz) / -2); width: var(--sz); height: var(--sz); border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle at 32% 28%, #fff 0 8%, color-mix(in oklab, var(--c) 50%, white) 22%, var(--c) 60%, color-mix(in oklab, var(--c) 60%, black)); }
+.dock-pops i.t0 { --c: var(--brand); } .dock-pops i.t1 { --c: var(--glow); } .dock-pops i.t2 { --c: color-mix(in oklab, var(--brand) 70%, black); }
+.dock-open .dock-pops i { animation: dock-pop 1s cubic-bezier(.2, .8, .3, 1) forwards; }
+@keyframes dock-pop { 0% { opacity: 1; transform: translate(0, 0) scale(.3); } 45% { opacity: 1; transform: translate(var(--x), var(--y)) scale(1); } 100% { opacity: 0; transform: translate(calc(var(--x) * 1.2), calc(var(--y) + 40px)) scale(.8); } }
+
+/* the envelopes that fly out of the box and float up the page, each with a programme's name */
+.dock { --fw: 156px; }
+@media (max-width: 639px) { .dock { --fw: 128px; } }
+.dock-fly { position: absolute; left: 0; bottom: calc(var(--s) * .45); width: var(--fw); opacity: 0; display: block;
+  animation: dock-fly var(--fly) ease-in-out both; transition: scale .25s; -webkit-tap-highlight-color: transparent; }
+.dock-fly:hover, .dock-fly:focus-visible, .dock-fly:hover .fly-env { animation-play-state: paused; }
+.dock-fly:hover { scale: 1.1; z-index: 2; }
+@keyframes dock-fly {
+  0% { opacity: 0; transform: translate(0, 30px) scale(.2) rotate(-14deg); }
+  7% { opacity: 1; transform: translate(8px, -50px) scale(1) rotate(var(--rot)); }
+  30% { transform: translate(var(--x1), -24vh) rotate(calc(var(--rot) * -1)); }
+  55% { transform: translate(var(--x2), -44vh) rotate(var(--rot)); }
+  82% { opacity: 1; transform: translate(var(--x3), -60vh) rotate(calc(var(--rot) * -.6)); }
+  100% { opacity: 0; transform: translate(var(--x4), -72vh) rotate(var(--rot)); }
+}
+.fly-env { position: relative; display: block; width: 100%; height: calc(var(--fw) * .64); animation: fly-flutter 1.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 10px 16px rgb(0 0 0 / .35)) drop-shadow(0 0 14px color-mix(in oklab, var(--glow) 55%, transparent)); }
+@keyframes fly-flutter { from { transform: rotate(-4deg); } to { transform: rotate(4deg) scaleY(.95); } }
+.fly-env > span { position: absolute; }
+.fly-back { inset: 0; border-radius: 9px; background: linear-gradient(165deg, color-mix(in oklab, var(--brand) 80%, white), var(--brand) 55%, color-mix(in oklab, var(--brand) 72%, black)); }
+.fly-back::after { content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), rgb(255 255 255 / .28) 50%, transparent calc(50% + 1px)) left bottom / 50% 62% no-repeat,
+    linear-gradient(to top left, transparent calc(50% - 1px), rgb(255 255 255 / .28) 50%, transparent calc(50% + 1px)) right bottom / 50% 62% no-repeat; }
+.fly-flap { left: 0; right: 0; top: 0; height: 46%; clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 9px 9px 0 0;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 60%, black), color-mix(in oklab, var(--brand) 85%, black)); }
+.fly-label { left: 8%; right: 8%; bottom: 9%; z-index: 1; padding: 4px 6px; border-radius: 6px; text-align: center; font-size: 11.5px; font-weight: 800; line-height: 1.35;
+  color: color-mix(in oklab, var(--brand) 55%, black); background: rgb(255 255 255 / .96); box-shadow: 0 2px 6px rgb(0 0 0 / .18);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 639px) { .fly-label { font-size: 10.5px; } }
+.fly-seal { left: 50%; top: 44%; z-index: 2; width: 15%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, var(--rb), var(--rb-d)); box-shadow: 0 2px 6px -1px rgb(0 0 0 / .4), inset 0 0 0 1.5px rgb(255 255 255 / .35); }
+.fly-seal svg { width: 58%; fill: color-mix(in oklab, var(--brand) 70%, black); }
+
+/* eye-catchers: a breathing halo behind the box, light rays when it opens, a shine and twinkles on each envelope */
+.dock-halo { position: absolute; left: 50%; top: 55%; width: 190%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklab, var(--glow) 55%, transparent) 0%, color-mix(in oklab, var(--brand) 30%, transparent) 38%, transparent 68%);
+  animation: dock-halo 2.6s ease-in-out infinite; }
+@keyframes dock-halo { 0%, 100% { transform: scale(.82); opacity: .55; } 50% { transform: scale(1.08); opacity: 1; } }
+.dock-box::after { content: ""; position: absolute; left: 50%; top: 58%; width: 150%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: -1; pointer-events: none;
+  border: 2px solid color-mix(in oklab, var(--glow) 70%, transparent); opacity: 0; animation: dock-ring 2.6s ease-out infinite; }
+@keyframes dock-ring { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(1.5); opacity: 0; } }
+.dock-rays { position: absolute; left: 50%; top: 30%; width: 360%; aspect-ratio: 1; translate: -50% -50%; z-index: -1; pointer-events: none; opacity: 0; transform: scale(.3);
+  background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--glow) 60%, transparent) 0deg 6deg, transparent 6deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, #000 6%, transparent 55%); mask-image: radial-gradient(circle, #000 6%, transparent 55%); transition: opacity .5s, transform .8s cubic-bezier(.2, .8, .3, 1); }
+.dock-open .dock-rays { opacity: 1; transform: scale(1) rotate(30deg); }
+.fly-shine { inset: 0; z-index: 3; border-radius: 9px; overflow: hidden; pointer-events: none; }
+.fly-shine::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .75) 50%, transparent 65%);
+  transform: translateX(-120%); animation: fly-shine 2.4s ease-in-out infinite; mix-blend-mode: soft-light; }
+@keyframes fly-shine { 0%, 45% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+.fly-spark { inset: -14px; z-index: 4; pointer-events: none; }
+.fly-spark i { position: absolute; width: 9px; height: 9px; opacity: 0; background: #fff; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 4px var(--glow)); animation: fly-twinkle 1.6s ease-in-out infinite; }
+.fly-spark i:nth-child(1) { left: 0; top: 30%; } .fly-spark i:nth-child(2) { right: 4%; top: 0; animation-delay: .4s; }
+.fly-spark i:nth-child(3) { right: 0; bottom: 18%; animation-delay: .8s; width: 7px; height: 7px; } .fly-spark i:nth-child(4) { left: 22%; bottom: -2px; animation-delay: 1.2s; width: 6px; height: 6px; }
+@keyframes fly-twinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
+
+/* close it for the visit */
+.dock-close { position: absolute; top: -7px; right: -7px; z-index: 4; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%;
+  color: var(--muted); background: var(--surface); border: 1px solid var(--line); box-shadow: 0 2px 6px rgb(0 0 0 / .2); opacity: .9; transition: opacity .2s, color .2s; }
+@media (hover: hover) { .dock-close { opacity: 0; } .dock:hover .dock-close, .dock-close:focus-visible { opacity: 1; } }
+.dock-close:hover { color: var(--ink); }
