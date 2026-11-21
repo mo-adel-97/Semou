@@ -52,7 +52,7 @@ export function SectionLife({ index = 0, butterflies, children }: { index?: numb
       <span className="sec-orb b" aria-hidden />
       {/* phones: still orbs only, no motes and no butterflies in every section (lighter, and a calmer screen) */}
       {!LITE && <span className="sec-motes" aria-hidden><i /><i /><i /><i /><i /></span>}
-      {butterflies && !LITE && <ButterflySky count={2} className="sec-bf" />}
+      {butterflies && !LITE && <ButterflySky count={1} className="sec-bf" />}
       {children}
     </div>
   )

@@ -239,13 +239,16 @@ export function Stars({ n }: { n: number }) {
   )
 }
 
-/** Animated aurora blobs used behind heroes. */
+/**
+ * Soft aurora glows behind heroes. Radial gradients (no blur filter) and still: a 100px blur that also scales and
+ * rotates forever is the most expensive thing a page can paint, and these look the same without it.
+ */
 export function Aurora({ className }: { className?: string }) {
   return (
     <div className={cx('pointer-events-none absolute inset-0 overflow-hidden', className)} aria-hidden="true">
-      <div className="absolute -top-1/3 -left-1/4 h-[70%] w-[60%] animate-aurora rounded-full bg-brand-300/40 blur-[100px] dark:bg-brand-500/25" />
-      <div className="absolute -right-1/4 top-0 h-[60%] w-[55%] animate-aurora rounded-full bg-gold-300/35 blur-[110px] [animation-delay:-6s] dark:bg-gold-500/15" />
-      <div className="absolute -bottom-1/3 left-1/4 h-[55%] w-[50%] animate-aurora rounded-full bg-glow/30 blur-[120px] [animation-delay:-12s] dark:bg-glow/10" />
+      <div className="aur aur-1" />
+      <div className="aur aur-2" />
+      <div className="aur aur-3" />
     </div>
   )
 }

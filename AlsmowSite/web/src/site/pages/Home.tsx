@@ -75,7 +75,7 @@ function Hero({ data }: { data: HomeData }) {
     <section ref={ref} className="relative overflow-hidden pt-28 pb-14 sm:pt-32 md:pt-36 lg:flex lg:min-h-[min(100svh,56rem)] lg:items-center lg:pt-28 lg:pb-14">
       <HeroMotes />
       <Aurora />
-      {!data.settings.butterflies?.hide && <ButterflySky count={LITE ? 3 : 6} />}
+      {!data.settings.butterflies?.hide && <ButterflySky count={LITE ? 2 : 3} />}
       <div className="pattern absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
 
       <div className="container-x relative grid items-center gap-10 sm:gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-10 xl:gap-16">
@@ -277,7 +277,7 @@ function HeroMobile({ data }: { data: HomeData }) {
       </div>
       <div className="hm-veil absolute inset-0 -z-10" />
       <HeroMotes />
-      {!data.settings.butterflies?.hide && <ButterflySky count={3} />}
+      {!data.settings.butterflies?.hide && <ButterflySky count={2} />}
 
       <div className="hm-words container-x relative pb-24">
         {h.eyebrow && (

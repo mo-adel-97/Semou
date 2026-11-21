@@ -638,8 +638,7 @@ html.fx-on .fx-img:not(.fx-in) { clip-path: inset(0 0 100% 0); }
     radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--glow) 55%, transparent), transparent 60%),
     linear-gradient(140deg, color-mix(in oklab, var(--brand) 26%, var(--surface)), color-mix(in oklab, var(--color-gold-400) 22%, var(--surface)));
   border-radius: 58% 42% 38% 62% / 52% 38% 62% 48%;
-  animation: hero-morph 14s ease-in-out infinite;
-  will-change: border-radius;
+  /* no morphing: animating border-radius repaints the whole frame every frame */
 }
 @keyframes hero-morph {
   0%, 100% { border-radius: 58% 42% 38% 62% / 52% 38% 62% 48%; }
@@ -885,7 +884,7 @@ html.menu-open .site-shell main *, html.menu-open .bf-orbit-host *, html.menu-op
 .sec-orb {
   position: absolute; z-index: 0; width: min(46rem, 90vw); aspect-ratio: 1; border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle, color-mix(in oklab, var(--glow) 22%, transparent) 0%, color-mix(in oklab, var(--brand) 10%, transparent) 38%, transparent 68%);
-  will-change: transform; animation: sec-drift 22s ease-in-out infinite alternate;
+  /* still: big soft orbs that drift and scale forever cost a lot to repaint and add little */
 }
 .sec-orb.a { top: -18%; inset-inline-start: -14%; }
 .sec-orb.b { bottom: -22%; inset-inline-end: -16%; width: min(38rem, 80vw); animation-duration: 28s; animation-delay: -9s;
@@ -1089,3 +1088,17 @@ html.menu-open .dock * { animation-play-state: paused !important; }
 @media (hover: none), (pointer: coarse), (max-width: 1023px) {
   .sec-orb, .hm-rays { animation: none !important; }
 }
+
+/* soft aurora glows behind heroes (components/ui.tsx Aurora): radial gradients, no blur filter, no animation */
+.aur { position: absolute; border-radius: 50%; }
+.aur-1 { top: -55%; left: -40%; width: 90%; height: 110%; background: radial-gradient(closest-side, color-mix(in oklab, var(--b-300) 42%, transparent), transparent); }
+.aur-2 { top: -25%; right: -40%; width: 85%; height: 100%; background: radial-gradient(closest-side, color-mix(in oklab, var(--glow) 30%, transparent), transparent); }
+.aur-3 { bottom: -55%; left: 10%; width: 80%; height: 95%; background: radial-gradient(closest-side, color-mix(in oklab, var(--glow) 28%, transparent), transparent); }
+[data-mode="dark"] .aur-1 { background: radial-gradient(closest-side, color-mix(in oklab, var(--brand) 26%, transparent), transparent); }
+[data-mode="dark"] .aur-2 { background: radial-gradient(closest-side, color-mix(in oklab, var(--glow) 13%, transparent), transparent); }
+[data-mode="dark"] .aur-3 { background: radial-gradient(closest-side, color-mix(in oklab, var(--glow) 10%, transparent), transparent); }
+
+/* all devices: no live backdrop blur in the site (the floating header re-blurred the page on every scroll frame);
+   near-opaque surfaces look the same and cost nothing */
+.site-shell .glass, .site-shell [class*="backdrop-blur"] { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.site-shell .glass { background-color: color-mix(in oklab, var(--surface) 94%, transparent); }
