@@ -288,8 +288,8 @@ export function EmptyState({ title, text, icon }: { title: string; text?: string
 }
 
 /** Sets <title> + description (React 19 hoists these into <head>). */
-export function Seo({ title, description, image }: { title?: string; description?: string | null; image?: string | null }) {
-  const full = title ? `${title} | معهد السمو للتدريب` : 'معهد السمو للتدريب | دبلومات ودورات معتمدة'
+export function Seo({ title, fullTitle, description, image }: { title?: string; fullTitle?: string | null; description?: string | null; image?: string | null }) {
+  const full = fullTitle || (title ? `${title} | معهد السمو للتدريب` : 'معهد السمو للتدريب | دبلومات ودورات معتمدة')
   return (
     <>
       <title>{full}</title>

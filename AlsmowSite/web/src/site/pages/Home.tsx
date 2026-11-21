@@ -28,8 +28,7 @@ export default function Home() {
   const seo = data.settings.seo
   return (
     <>
-      <Seo description={seo.description} image={seo.og_image} />
-      {seo.title && <title>{seo.title}</title>}
+      <Seo fullTitle={seo.title} description={seo.description} image={seo.og_image} />
       {/* desktop keeps the original composition; phones/tablets get the full-screen stage */}
       {wide ? <Hero data={data} /> : <HeroMobile data={data} />}
       {/* every other section in the order (and visibility) set in the dashboard › ترتيب الصفحات */}
