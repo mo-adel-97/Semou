@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { LITE } from '../components/ui'
 import { api, qs } from '../lib/api'
 import { useSite } from '../lib/queries'
+import { stage } from '../lib/stage'
 import type { Program } from '../lib/types'
 
 /**
@@ -65,7 +66,7 @@ export default function GiftBox() {
   const first = (Number(g?.delay) || 6) * 1000
   const every = (Number(g?.every) || 45) * 1000
   const flight = (Number(g?.flight) || 12) * 1000
-  const count = Math.max(1, Math.min(Number(g?.count) || 3, list.length || 1))
+  const count = Math.max(1, Math.min(Number(g?.count) || 3, LITE ? 1 : 5, list.length || 1)) // phones: one at a time (a calm screen)
   const STAGGER = 900
 
   // the box appears once the opening doves are gone
@@ -82,11 +83,11 @@ export default function GiftBox() {
   // one wave: the lid pops, `count` envelopes fly out one after another, then the lid closes; a quiet gap; the next wave
   const wave = () => {
     clear()
-    if (document.hidden) { later(2000, wave); return }
+    if (document.hidden || !stage.claim('dock')) { later(3000, wave); return } // the butterflies may be on stage
     setOpen(true)
     // the envelopes fan out, each in its own direction (the box is at the left edge, so: from straight up to across the page)
     const vw = window.innerWidth, vh = window.innerHeight
-    const reach = Math.min(vh * 0.42, LITE ? 300 : 380)
+    const reach = LITE ? Math.min(vh * 0.26, 220) : Math.min(vh * 0.42, 380) // phones: a short hop, so it opens low (not over the hero faces)
     const fw = LITE ? 128 : 156
     const batch: Flyer[] = Array.from({ length: count }, (_, i) => {
       const k = serial.current++
@@ -100,6 +101,7 @@ export default function GiftBox() {
     })
     setFlyers((f) => [...f, ...batch])
     later(count * STAGGER + 500, () => setOpen(false))
+    later(count * STAGGER + flight, () => stage.release('dock'))
     later(count * STAGGER + flight + every, wave) // each envelope removes itself when its flight ends
   }
 
@@ -112,6 +114,7 @@ export default function GiftBox() {
 
   const close = () => {
     clear()
+    stage.release('dock')
     try { sessionStorage.setItem(OFF_KEY, '1') } catch { /* private mode */ }
     setVisible(false)
     setFlyers([])

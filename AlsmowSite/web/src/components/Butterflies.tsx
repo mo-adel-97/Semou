@@ -1,4 +1,6 @@
 import { Mail } from 'lucide-react'
+import { stage } from '../lib/stage'
+import { LITE } from './ui'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { cx } from '../lib/format'
@@ -118,7 +120,13 @@ export function ButterflyShow({ letters, talks, asker, answerer, first = 10, eve
     const next = () => {
       const { letters, talks } = data.current
       // the conversation opens the show (it's the richer scene), then they alternate
-      const kinds = [...(talks.length ? ['talk' as const] : []), ...(letters.length ? ['letter' as const] : [])]
+      // phones: no conversation scene (a calmer, lighter screen); the banner butterfly stays
+      const kinds = [...(talks.length && !LITE ? ['talk' as const] : []), ...(letters.length ? ['letter' as const] : [])]
+      // the programmes box may be on stage: then wait a little and try again
+      if (kinds.length && !busy.current && !document.hidden && !document.documentElement.classList.contains('intro-on') && !stage.claim('butterflies')) {
+        timer = window.setTimeout(next, 3000)
+        return
+      }
       if (kinds.length && !busy.current && !document.hidden && !document.documentElement.classList.contains('intro-on')) {
         const c = count.current
         const kind = kinds.length > 1 && c.last === kinds[0] ? kinds[1] : kinds[0]
@@ -134,7 +142,7 @@ export function ButterflyShow({ letters, talks, asker, answerer, first = 10, eve
   }, [first, every])
 
   if (!scene) return null
-  const end = () => { busy.current = false; setScene(null) }
+  const end = () => { busy.current = false; stage.release('butterflies'); setScene(null) }
   if (scene.kind === 'letter') {
     const msg = letters[scene.i % Math.max(1, letters.length)]
     return msg ? <LetterScene key={scene.n} msg={msg} onDone={end} /> : null

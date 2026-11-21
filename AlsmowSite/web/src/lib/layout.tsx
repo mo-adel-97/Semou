@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, type ReactNode, useEffect, useRef } from 'react'
 import { ButterflySky } from '../components/Butterflies'
 import { LITE } from '../components/ui'
 import type { SectionPick, Settings } from './types'
@@ -37,12 +37,22 @@ export function Sections({ settings, page, sections }: { settings: Settings | un
  * and (every other section) a couple of butterflies crossing. Transform/opacity only, on their own layers.
  */
 export function SectionLife({ index = 0, butterflies, children }: { index?: number; butterflies?: boolean; children: ReactNode }) {
+  // a section that is off screen pauses all its CSS animations (orbs, motes, butterflies, ticker…): nothing to paint there
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => { el.toggleAttribute('data-off', !e.isIntersecting) }, { rootMargin: '200px 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   return (
-    <div className={`sec-live ${index % 2 ? 'alt' : ''}`}>
+    <div ref={ref} className={`sec-live ${index % 2 ? 'alt' : ''}`}>
       <span className="sec-orb a" aria-hidden />
       <span className="sec-orb b" aria-hidden />
-      <span className="sec-motes" aria-hidden><i /><i /><i /><i /><i /></span>
-      {butterflies && <ButterflySky count={LITE ? 1 : 2} className="sec-bf" />}
+      {/* phones: still orbs only, no motes and no butterflies in every section (lighter, and a calmer screen) */}
+      {!LITE && <span className="sec-motes" aria-hidden><i /><i /><i /><i /><i /></span>}
+      {butterflies && !LITE && <ButterflySky count={2} className="sec-bf" />}
       {children}
     </div>
   )
