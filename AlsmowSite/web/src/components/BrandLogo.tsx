@@ -10,7 +10,8 @@ import { useSite } from '../lib/queries'
 export default function BrandLogo({ src, className, animate = true }: { src?: string | null; className?: string; animate?: boolean }) {
   // no explicit image → the logo chosen in the dashboard (Settings → General), so the admin panel and login follow it too
   const { data } = useSite()
-  const img = src || data?.settings.general.logo || '/logo.png'
+  // until the settings arrive, the disc stays empty (no throw-away download of a placeholder image)
+  const img = src || data?.settings.general.logo || (data ? '/logo.png' : '')
   return (
     <motion.span
       className={cx('brand-logo', className)}
@@ -20,7 +21,7 @@ export default function BrandLogo({ src, className, animate = true }: { src?: st
       whileHover={{ scale: 1.06 }}
     >
       <span className="brand-logo-disc">
-        <img src={img} alt="" draggable={false} />
+        {img && <img src={img} alt="" draggable={false} decoding="async" />}
       </span>
     </motion.span>
   )

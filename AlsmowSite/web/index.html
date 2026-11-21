@@ -25,9 +25,23 @@
     </script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>
+      // start the API calls the first screen needs now, in parallel with the scripts (the app picks these answers up)
+      (function () {
+        var p = location.pathname;
+        if (/^\/admin/.test(p)) return;
+        var urls = ['/api/public/site'];
+        if (p === '/' || p === '') urls.push('/api/public/home');
+        urls.forEach(function (u) {
+          var l = document.createElement('link');
+          l.rel = 'preload'; l.as = 'fetch'; l.href = u; l.crossOrigin = 'anonymous';
+          document.head.appendChild(l);
+        });
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet" />
     <title>معهد السمو للتدريب | دبلومات ودورات معتمدة</title>
     <meta name="description" content="معهد السمو للتدريب: دبلومات ودورات معتمدة من المؤسسة العامة للتدريب التقني والمهني، حضوريًا في حفر الباطن وقريبًا في الدمام والرياض والمدينة المنورة وخميس مشيط، وعن بُعد في جميع أنحاء المملكة، للرجال والنساء." />
     <meta property="og:type" content="website" />
