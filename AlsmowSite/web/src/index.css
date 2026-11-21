@@ -998,38 +998,55 @@ html.menu-open .dock { opacity: 0; pointer-events: none; }
 .dock-open .dock-pops i { animation: dock-pop 1s cubic-bezier(.2, .8, .3, 1) forwards; }
 @keyframes dock-pop { 0% { opacity: 1; transform: translate(0, 0) scale(.3); } 45% { opacity: 1; transform: translate(var(--x), var(--y)) scale(1); } 100% { opacity: 0; transform: translate(calc(var(--x) * 1.2), calc(var(--y) + 40px)) scale(.8); } }
 
-/* the envelopes that fly out of the box and float up the page, each with a programme's name */
+/* the envelopes: each flies out of the box closed, in its own direction, then opens with a little celebration on a programme */
 .dock { --fw: 156px; }
 @media (max-width: 639px) { .dock { --fw: 128px; } }
 .dock-fly { position: absolute; left: 0; bottom: calc(var(--s) * .45); width: var(--fw); opacity: 0; display: block;
-  animation: dock-fly var(--fly) ease-in-out both; transition: scale .25s; -webkit-tap-highlight-color: transparent; }
-.dock-fly:hover, .dock-fly:focus-visible, .dock-fly:hover .fly-env { animation-play-state: paused; }
+  animation: dock-fly var(--fly) cubic-bezier(.22, .9, .3, 1) var(--d) both; transition: scale .25s; -webkit-tap-highlight-color: transparent; }
+.dock-fly:hover, .dock-fly:hover *, .dock-fly:focus-visible, .dock-fly:focus-visible * { animation-play-state: paused !important; }
 .dock-fly:hover { scale: 1.1; z-index: 2; }
 @keyframes dock-fly {
-  0% { opacity: 0; transform: translate(0, 30px) scale(.2) rotate(-14deg); }
-  7% { opacity: 1; transform: translate(8px, -50px) scale(1) rotate(var(--rot)); }
-  30% { transform: translate(var(--x1), -24vh) rotate(calc(var(--rot) * -1)); }
-  55% { transform: translate(var(--x2), -44vh) rotate(var(--rot)); }
-  82% { opacity: 1; transform: translate(var(--x3), -60vh) rotate(calc(var(--rot) * -.6)); }
-  100% { opacity: 0; transform: translate(var(--x4), -72vh) rotate(var(--rot)); }
+  0% { opacity: 0; transform: translate(0, 30px) scale(.2) rotate(-24deg); }
+  5% { opacity: 1; }
+  13% { transform: translate(var(--px), var(--py)) scale(1.1) rotate(var(--rot)); }
+  18% { transform: translate(var(--px), var(--py)) scale(1) rotate(0); }
+  84% { opacity: 1; transform: translate(calc(var(--px) + var(--dx)), calc(var(--py) - 6vh)) rotate(calc(var(--rot) * -.4)); }
+  100% { opacity: 0; transform: translate(calc(var(--px) + var(--dx) * 1.5), calc(var(--py) - 13vh)) scale(.9); }
 }
-.fly-env { position: relative; display: block; width: 100%; height: calc(var(--fw) * .64); animation: fly-flutter 1.5s ease-in-out infinite alternate;
+.fly-env { position: relative; display: block; width: 100%; height: calc(var(--fw) * .64); animation: fly-flutter 1.6s ease-in-out var(--d) infinite alternate;
   filter: drop-shadow(0 10px 16px rgb(0 0 0 / .35)) drop-shadow(0 0 14px color-mix(in oklab, var(--glow) 55%, transparent)); }
-@keyframes fly-flutter { from { transform: rotate(-4deg); } to { transform: rotate(4deg) scaleY(.95); } }
+@keyframes fly-flutter { from { transform: rotate(-3deg); } to { transform: rotate(3deg) scaleY(.96); } }
 .fly-env > span { position: absolute; }
-.fly-back { inset: 0; border-radius: 9px; background: linear-gradient(165deg, color-mix(in oklab, var(--brand) 80%, white), var(--brand) 55%, color-mix(in oklab, var(--brand) 72%, black)); }
-.fly-back::after { content: ""; position: absolute; inset: 0; border-radius: inherit;
-  background: linear-gradient(to top right, transparent calc(50% - 1px), rgb(255 255 255 / .28) 50%, transparent calc(50% + 1px)) left bottom / 50% 62% no-repeat,
-    linear-gradient(to top left, transparent calc(50% - 1px), rgb(255 255 255 / .28) 50%, transparent calc(50% + 1px)) right bottom / 50% 62% no-repeat; }
-.fly-flap { left: 0; right: 0; top: 0; height: 46%; clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 9px 9px 0 0;
-  background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 60%, black), color-mix(in oklab, var(--brand) 85%, black)); }
-.fly-label { left: 8%; right: 8%; bottom: 9%; z-index: 1; padding: 4px 6px; border-radius: 6px; text-align: center; font-size: 11.5px; font-weight: 800; line-height: 1.35;
-  color: color-mix(in oklab, var(--brand) 55%, black); background: rgb(255 255 255 / .96); box-shadow: 0 2px 6px rgb(0 0 0 / .18);
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-@media (max-width: 639px) { .fly-label { font-size: 10.5px; } }
-.fly-seal { left: 50%; top: 44%; z-index: 2; width: 15%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center;
+.fly-back { inset: 0; z-index: 0; border-radius: 9px; background: linear-gradient(160deg, color-mix(in oklab, var(--brand) 55%, black), color-mix(in oklab, var(--brand) 75%, black)); }
+/* the letter inside: hidden in the pocket, slides up out of it when the envelope opens */
+.fly-paper { left: 7%; right: 7%; top: 8%; height: 86%; z-index: 1; border-radius: 6px; padding: 7px 7px 0; text-align: center;
+  background: linear-gradient(#fff, #eef3f0); box-shadow: 0 -4px 12px -4px rgb(0 0 0 / .25); }
+.fly-paper b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11.5px; font-weight: 900; line-height: 1.4;
+  color: color-mix(in oklab, var(--brand) 55%, black); }
+@media (max-width: 639px) { .fly-paper b { font-size: 10.5px; } }
+.fly-front { inset: 0; z-index: 2; border-radius: 9px; clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(168deg, color-mix(in oklab, var(--brand) 82%, white), var(--brand) 55%, color-mix(in oklab, var(--brand) 72%, black)); }
+.fly-flap { left: 0; right: 0; top: 0; height: 56%; z-index: 3; clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 62%, black), color-mix(in oklab, var(--brand) 92%, white)); }
+.fly-seal { left: 50%; top: 54%; z-index: 4; width: 17%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; display: grid; place-items: center;
   background: radial-gradient(circle at 35% 30%, var(--rb), var(--rb-d)); box-shadow: 0 2px 6px -1px rgb(0 0 0 / .4), inset 0 0 0 1.5px rgb(255 255 255 / .35); }
 .fly-seal svg { width: 58%; fill: color-mix(in oklab, var(--brand) 70%, black); }
+/* the opening, timed inside the flight: once it has arrived (about 17%), seal off, flap opens, letter up, celebration */
+.fly-seal { animation: fly-seal .3s ease-in calc(var(--fly) * .17 + var(--d)) both; }
+@keyframes fly-seal { 0% { transform: none; opacity: 1; } 40% { transform: scale(1.3); } 100% { transform: scale(0) rotate(120deg); opacity: 0; } }
+.fly-flap { animation: fly-flap .5s cubic-bezier(.4, 0, .2, 1) calc(var(--fly) * .17 + var(--d) + .15s) both; }
+@keyframes fly-flap { 0% { transform: perspective(500px) rotateX(0); z-index: 3; } 50% { z-index: 3; } 51% { z-index: 0; } 100% { transform: perspective(500px) rotateX(180deg); z-index: 0; } }
+.fly-paper { animation: fly-paper .55s cubic-bezier(.34, 1.56, .64, 1) calc(var(--fly) * .17 + var(--d) + .5s) both; }
+@keyframes fly-paper { from { transform: none; } to { transform: translateY(-62%); } }
+.fly-ring { left: 50%; top: 30%; z-index: 5; width: 60%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none; opacity: 0;
+  border: 3px solid var(--glow); box-shadow: 0 0 18px var(--glow); animation: fly-ring .7s ease-out calc(var(--fly) * .17 + var(--d) + .5s) both; }
+@keyframes fly-ring { 0% { opacity: .95; transform: scale(.2); } 100% { opacity: 0; transform: scale(2.4); } }
+.fly-burst { left: 50%; top: 20%; z-index: 5; width: 0; height: 0; pointer-events: none; }
+.fly-burst i { position: absolute; left: -4px; top: -5px; width: 7px; height: 10px; border-radius: 2px; opacity: 0;
+  animation: fly-conf 1.3s cubic-bezier(.15, .7, .3, 1) calc(var(--fly) * .17 + var(--d) + .55s) both; }
+.fly-burst i.s1 { width: 7px; height: 7px; border-radius: 50%; } .fly-burst i.s2 { width: 4px; height: 12px; }
+.fly-burst i.t0 { background: var(--brand); } .fly-burst i.t1 { background: var(--glow); } .fly-burst i.t2 { background: #fff; } .fly-burst i.t3 { background: color-mix(in oklab, var(--brand) 60%, black); }
+@keyframes fly-conf { 0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.4); } 40% { opacity: 1; transform: translate(var(--bx), var(--by)) rotate(calc(var(--br) * .4)) scale(1); } 100% { opacity: 0; transform: translate(calc(var(--bx) * 1.1), calc(var(--by) + 70px)) rotate(var(--br)); } }
 
 /* eye-catchers: a breathing halo behind the box, light rays when it opens, a shine and twinkles on each envelope */
 .dock-halo { position: absolute; left: 50%; top: 55%; width: 190%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: -1; pointer-events: none;
@@ -1043,7 +1060,7 @@ html.menu-open .dock { opacity: 0; pointer-events: none; }
   background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--glow) 60%, transparent) 0deg 6deg, transparent 6deg 20deg);
   -webkit-mask-image: radial-gradient(circle, #000 6%, transparent 55%); mask-image: radial-gradient(circle, #000 6%, transparent 55%); transition: opacity .5s, transform .8s cubic-bezier(.2, .8, .3, 1); }
 .dock-open .dock-rays { opacity: 1; transform: scale(1) rotate(30deg); }
-.fly-shine { inset: 0; z-index: 3; border-radius: 9px; overflow: hidden; pointer-events: none; }
+.fly-shine { inset: 0; z-index: 2; border-radius: 9px; overflow: hidden; pointer-events: none; }
 .fly-shine::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / .75) 50%, transparent 65%);
   transform: translateX(-120%); animation: fly-shine 2.4s ease-in-out infinite; mix-blend-mode: soft-light; }
 @keyframes fly-shine { 0%, 45% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }

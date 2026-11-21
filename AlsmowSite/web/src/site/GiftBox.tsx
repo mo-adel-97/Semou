@@ -16,7 +16,7 @@ import type { Program } from '../lib/types'
  */
 
 const OFF_KEY = 'alsmow.dock.off' // sessionStorage: the visitor closed it for this visit
-type Flyer = { key: number; p: Program; x: number[]; r: number; delay: number }
+type Flyer = { key: number; p: Program; px: number; py: number; dx: number; r: number; delay: number }
 
 const rnd = (i: number, n: number) => (Math.sin(i * 97.13 + n * 13.7) + 1) / 2
 
@@ -84,15 +84,19 @@ export default function GiftBox() {
     clear()
     if (document.hidden) { later(2000, wave); return }
     setOpen(true)
-    const span = Math.min(window.innerWidth - 60, LITE ? 220 : 420) // how far to the side they may drift
+    // the envelopes fan out, each in its own direction (the box is at the left edge, so: from straight up to across the page)
+    const vw = window.innerWidth, vh = window.innerHeight
+    const reach = Math.min(vh * 0.42, LITE ? 300 : 380)
+    const fw = LITE ? 128 : 156
     const batch: Flyer[] = Array.from({ length: count }, (_, i) => {
       const k = serial.current++
       const p = list[next.current++ % list.length]
-      // a gentle zig-zag, drifting into the page (the box is at the left edge)
-      // each envelope of the wave takes its own lane, so they spread over the page instead of flying in a clump
-      const lane = count > 1 ? i / (count - 1) - 0.5 : 0
-      const x = [0.22, 0.5, 0.32, 0.7].map((f, j) => Math.round(span * Math.max(0, Math.min(1, f + lane * (0.25 + j * 0.12) + (rnd(k, j + 1) - 0.5) * 0.2))))
-      return { key: k, p, x, r: (rnd(k, 9) - 0.5) * 16, delay: i * STAGGER }
+      const f = count > 1 ? i / (count - 1) : 0.5
+      const a = (82 - f * 66 + (rnd(k, 1) - 0.5) * 8) * (Math.PI / 180) // 82deg (up) ... 16deg (across)
+      const r = reach * (0.85 + rnd(k, 2) * 0.25)
+      const px = Math.round(Math.min(Math.cos(a) * r * (LITE ? 1.1 : 1.7), vw - fw - 36))
+      const py = Math.round(-Math.sin(a) * r - 40)
+      return { key: k, p, px: Math.max(0, px), py, dx: Math.round((rnd(k, 3) - 0.3) * 40), r: (rnd(k, 9) - 0.5) * 18, delay: i * STAGGER }
     })
     setFlyers((f) => [...f, ...batch])
     later(count * STAGGER + 500, () => setOpen(false))
@@ -113,6 +117,12 @@ export default function GiftBox() {
     setFlyers([])
   }
 
+  // the celebration each envelope bursts with when it opens
+  const burst = useMemo(() => Array.from({ length: LITE ? 10 : 14 }, (_, i) => {
+    const a = (i / (LITE ? 10 : 14)) * Math.PI * 2 + rnd(i, 7) * 0.4
+    const d = 46 + rnd(i, 8) * 46
+    return { x: Math.round(Math.cos(a) * d), y: Math.round(Math.sin(a) * d * 0.8 - 18), r: Math.round((rnd(i, 9) - 0.5) * 720), tone: i % 4, shape: i % 3 }
+  }), [])
   const pops = useMemo(() => Array.from({ length: 7 }, (_, i) => {
     const a = Math.PI * (0.15 + (i / 6) * 0.7)
     const d = 30 + rnd(i, 1) * 28
@@ -129,15 +139,18 @@ export default function GiftBox() {
           to={`/programs/${f.p.slug}`}
           className="dock-fly"
           onAnimationEnd={(e) => { if (e.target === e.currentTarget) setFlyers((all) => all.filter((x) => x.key !== f.key)) }}
-          style={{ '--x1': `${f.x[0]}px`, '--x2': `${f.x[1]}px`, '--x3': `${f.x[2]}px`, '--x4': `${f.x[3]}px`, '--rot': `${f.r}deg`, animationDelay: `${f.delay}ms` } as CSSProperties}
+          style={{ '--px': `${f.px}px`, '--py': `${f.py}px`, '--dx': `${f.dx}px`, '--rot': `${f.r}deg`, '--d': `${f.delay}ms` } as CSSProperties}
         >
-          <span className="fly-env" style={{ animationDelay: `${f.delay}ms` }}>
+          <span className="fly-env">
             <span className="fly-back" />
+            <span className="fly-paper"><b>{f.p.title}</b></span>
+            <span className="fly-front" />
             <span className="fly-flap" />
-            <span className="fly-label">{f.p.title}</span>
             <span className="fly-shine" />
-            <span className="fly-spark"><i /><i /><i /><i /></span>
             <span className="fly-seal"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.6 6.1 6.6.5-5 4.3 1.6 6.4L12 16.3l-5.8 3.5 1.6-6.4-5-4.3 6.6-.5z" /></svg></span>
+            <span className="fly-ring" />
+            <span className="fly-burst">{burst.map((c, j) => <i key={j} className={`t${c.tone} s${c.shape}`} style={{ '--bx': `${c.x}px`, '--by': `${c.y}px`, '--br': `${c.r}deg` } as CSSProperties} />)}</span>
+            <span className="fly-spark"><i /><i /><i /><i /></span>
           </span>
         </Link>
       ))}
