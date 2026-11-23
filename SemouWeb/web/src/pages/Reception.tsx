@@ -71,6 +71,7 @@ export function Reception({ group }: { group: string }) {
     }
   }
   const [statementOf, setStatementOf] = useState<{ account: string; name: string } | null>(null)
+  const [archiveStatementOf, setArchiveStatementOf] = useState<ArchiveRow | null>(null)
   const [paying, setPaying] = useState<PayTarget | null>(null)
 
   // Desktop behaviour: search fires by itself once the id / mobile reaches 10 digits.
@@ -210,6 +211,7 @@ export function Reception({ group }: { group: string }) {
                   <div className="who"><b>{r.name}</b><small dir="ltr">{r.nationalId} • {r.mobile}</small></div>
                   <span className="muted">{r.branchName}</span>
                   <span className={`badge ${r.balance > 0 ? 'warn' : r.balance < 0 ? 'ok' : 'muted'}`}>الرصيد: {money(r.balance)}</span>
+                  <button className="btn sm secondary" onClick={() => setArchiveStatementOf(r)}><FileSpreadsheet size={15} /> كشف حساب</button>
                   {r.accepted ? <span className="badge ok"><BadgeCheck size={12} /> تم قبوله</span>
                     : can('addstudent', 'add') && <button className="btn sm" onClick={() => setCard({ guid: null, archive: r })}><ClipboardPlus size={15} /> قبول من الأرشيف</button>}
                 </div>
@@ -227,6 +229,7 @@ export function Reception({ group }: { group: string }) {
         {discountFor && <DiscountForm target={discountFor} onClose={() => setDiscountFor(null)} />}
         {feeFor && <FeeForm target={feeFor} onClose={() => setFeeFor(null)} />}
         {statementOf && <StudentStatement account={statementOf.account} name={statementOf.name} onClose={() => setStatementOf(null)} />}
+        {archiveStatementOf && <ArchiveStatement row={archiveStatementOf} onClose={() => setArchiveStatementOf(null)} />}
         {registering && <RegistrationWizard key={registering.StudentGuid} student={registering} onClose={() => setRegistering(null)} />}
       </AnimatePresence>
       <AnimatePresence>
@@ -284,6 +287,64 @@ function useStudentActions(g: StudentGroup, h: Handlers) {
     ] },
   ]
   return { blocked, register, quick, menu }
+}
+
+/* ---------------- كشف حساب الأرشيف (OldStudentStatment) ---------------- */
+interface ArchivePay { date: string; docNo: string; maden: number; daen: number; notes: string; ref: string; bank: string }
+interface ArchiveReg { date: string; type: string; docNo: string; maden: number; daen: number; notes: string; seller: string }
+interface ArchiveStmt {
+  payments: ArchivePay[]; registrations: ArchiveReg[]; open: { maden: number; daen: number }
+  totals: { paymentsMaden: number; paymentsDaen: number; regMaden: number; regDaen: number; maden: number; daen: number; balance: number }
+}
+
+function ArchiveStatement({ row, onClose }: { row: ArchiveRow; onClose: () => void }) {
+  const q = useQuery({
+    queryKey: ['reception', 'archive-statement', row.custNo, row.oldBranchId], staleTime: 60_000,
+    queryFn: () => api<ArchiveStmt>(`/reception/archive/statement${qs({ custNo: row.custNo, oldBranchId: row.oldBranchId })}`),
+  })
+  const d = q.data
+  const amt = (n: number) => (n ? money(n) : '')
+  return (
+    <Drawer size="xl" onClose={onClose} icon={<Archive size={22} />} title={`كشف حساب الأرشيف - ${row.name}`}
+      subtitle={<>{row.branchName} • رقم العميل القديم <span dir="ltr">{row.custNo}</span></>}>
+      {q.isLoading && <div className="center-fill" style={{ minHeight: 160 }}><Spinner size={26} /><span className="muted">جارٍ تحميل كشف الحساب من الأرشيف...</span></div>}
+      {q.isError && <div className="empty"><b>تعذر تحميل كشف الحساب</b></div>}
+      {d && (
+        <>
+          <div className="stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 18 }}>
+            <div className="card" style={{ padding: 14 }}><small className="muted">رصيد افتتاحي</small><div><b>{money(d.open.maden)}</b> <span className="muted">مدين</span> • <b>{money(d.open.daen)}</b> <span className="muted">دائن</span></div></div>
+            <div className="card" style={{ padding: 14 }}><small className="muted">إجمالي المدين</small><div><b className="due">{money(d.totals.maden)}</b></div></div>
+            <div className="card" style={{ padding: 14 }}><small className="muted">إجمالي الدائن</small><div><b>{money(d.totals.daen)}</b></div></div>
+            <div className={`card ${balanceTone(d.totals.balance)}`} style={{ padding: 14 }}><small className="muted">الرصيد</small><div><b>{money(Math.abs(d.totals.balance))}</b> <span className="muted">{balanceText(d.totals.balance)}</span></div></div>
+          </div>
+
+          <h4 style={{ margin: '6px 0 10px' }}>استمارات التسجيل</h4>
+          <table className="dt ledger">
+            <thead><tr><th>التاريخ</th><th>نوع المستند</th><th>رقم المستند</th><th className="n">مدين</th><th className="n">دائن</th><th>البيان</th><th>مندوب البيع</th></tr></thead>
+            <tbody>
+              {d.registrations.length === 0 && <tr><td colSpan={7}><div className="empty"><b>لا توجد استمارات</b></div></td></tr>}
+              {d.registrations.map((r, i) => (
+                <tr key={`r${i}`}><td className="nowrap">{r.date}</td><td>{r.type}</td><td>{r.docNo}</td><td className="n due">{amt(r.maden)}</td><td className="n">{amt(r.daen)}</td><td className="notes">{r.notes}</td><td>{r.seller}</td></tr>
+              ))}
+              {d.registrations.length > 0 && <tr className="total-row"><td colSpan={3}><b>الإجمالي</b></td><td className="n due"><b>{money(d.totals.regMaden)}</b></td><td className="n"><b>{money(d.totals.regDaen)}</b></td><td colSpan={2} /></tr>}
+            </tbody>
+          </table>
+
+          <h4 style={{ margin: '22px 0 10px' }}>السندات</h4>
+          <table className="dt ledger">
+            <thead><tr><th>التاريخ</th><th>رقم المستند</th><th className="n">مدين</th><th className="n">دائن</th><th>البيان</th><th>المرجع</th><th>البنك</th></tr></thead>
+            <tbody>
+              {d.payments.length === 0 && <tr><td colSpan={7}><div className="empty"><b>لا توجد سندات</b></div></td></tr>}
+              {d.payments.map((p, i) => (
+                <tr key={`p${i}`}><td className="nowrap">{p.date}</td><td>{p.docNo}</td><td className="n due">{amt(p.maden)}</td><td className="n">{amt(p.daen)}</td><td className="notes">{p.notes}</td><td>{p.ref}</td><td>{p.bank}</td></tr>
+              ))}
+              {d.payments.length > 0 && <tr className="total-row"><td colSpan={2}><b>الإجمالي</b></td><td className="n due"><b>{money(d.totals.paymentsMaden)}</b></td><td className="n"><b>{money(d.totals.paymentsDaen)}</b></td><td colSpan={3} /></tr>}
+            </tbody>
+          </table>
+        </>
+      )}
+    </Drawer>
+  )
 }
 
 const balanceText = (b: number) => (b > 0 ? 'مستحق على الطالب' : b < 0 ? 'رصيد للطالب' : 'الحساب متزن')

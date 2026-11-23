@@ -33,6 +33,15 @@ public sealed class ReceptionController(ReceptionService reception, AcceptanceSe
         return Ok(await reception.ArchiveSearchAsync(q, by, ct));
     }
 
+    /// <summary>OldStudentStatment: the old system's statement (vouchers + registration forms + opening balance).</summary>
+    [HttpGet("archive/statement")]
+    [RequirePermission("resdesk", Perm.View)]
+    public async Task<IActionResult> ArchiveStatement([FromQuery] string custNo, [FromQuery] int oldBranchId, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(custNo)) throw new ApiException("رقم العميل في النظام القديم مطلوب");
+        return Ok(await reception.ArchiveStatementAsync(custNo.Trim(), oldBranchId, ct));
+    }
+
     [HttpGet("archive/preview")]
     [RequirePermission(ReceptionService.StudentForm, Perm.Add)]
     public async Task<IActionResult> ArchivePreview([FromQuery] string custNo, [FromQuery] int oldBranchId, [FromQuery] string nationalId, CancellationToken ct)

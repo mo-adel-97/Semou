@@ -115,6 +115,55 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
         });
     }
 
+    /// <summary>
+    /// OldStudentStatment form (desktop): the old customer's statement from the archive.
+    /// Vouchers (OldStudentStatment) + registration forms (OldStudentReg) + opening balance (GetOpenBalance);
+    /// totals and balance computed exactly like the desktop (maden - daen).
+    /// </summary>
+    public async Task<object> ArchiveStatementAsync(string custNo, int oldBranchId, CancellationToken ct)
+    {
+        if (!archive.Configured) throw new ApiException("قاعدة بيانات الأرشيف غير مضبوطة على الخادم");
+        await using var c = await archive.OpenAsync(ct);
+        var payments = (await c.QueryAsync(new CommandDefinition("dbo.OldStudentStatment", new { CustAcctCode = custNo, BranId = oldBranchId },
+            commandType: CommandType.StoredProcedure, cancellationToken: ct)))
+            .Select(r => (IDictionary<string, object?>)r)
+            .Select(r => new
+            {
+                Date = r["VOUDATE"]?.ToString(), DocNo = r["VOUNO"]?.ToString(),
+                Maden = Num(r["DEBIT"]), Daen = Num(r["CREDIT"]),
+                Notes = r["DESCRIPTION"]?.ToString(), Ref = r["REF"]?.ToString(), Bank = r["COSTNAME"]?.ToString(),
+            }).ToList();
+        var registrations = (await c.QueryAsync(new CommandDefinition("dbo.OldStudentReg", new { CustAcctCode = custNo, BrnId = oldBranchId },
+            commandType: CommandType.StoredProcedure, cancellationToken: ct)))
+            .Select(r => (IDictionary<string, object?>)r)
+            .Select(r => new
+            {
+                Date = r["VOUDATE"]?.ToString(), Type = r["TYPE1"]?.ToString(), DocNo = r["VOUNO"]?.ToString(),
+                Maden = Num(r["MADEN_"]), Daen = Num(r["DAEN"]),
+                Notes = r["VOUDESC"]?.ToString(), Seller = r["SELLERNAME"]?.ToString(),
+            }).ToList();
+        var open = (IDictionary<string, object?>?)await c.QueryFirstOrDefaultAsync(new CommandDefinition("dbo.GetOpenBalance",
+            new { CustAcctCode = custNo, BranId = oldBranchId }, commandType: CommandType.StoredProcedure, cancellationToken: ct));
+        var openMaden = open is null ? 0 : Num(open.Values.ElementAtOrDefault(0));
+        var openDaen = open is null ? 0 : Num(open.Values.ElementAtOrDefault(1));
+
+        var maden = payments.Sum(x => x.Maden) + registrations.Sum(x => x.Maden) + openMaden;
+        var daen = payments.Sum(x => x.Daen) + registrations.Sum(x => x.Daen) + openDaen;
+        return new
+        {
+            payments, registrations,
+            open = new { maden = openMaden, daen = openDaen },
+            totals = new
+            {
+                paymentsMaden = payments.Sum(x => x.Maden), paymentsDaen = payments.Sum(x => x.Daen),
+                regMaden = registrations.Sum(x => x.Maden), regDaen = registrations.Sum(x => x.Daen),
+                maden, daen, balance = Math.Round(maden - daen, 2),
+            },
+        };
+
+        static decimal Num(object? v) => v is null or DBNull ? 0 : Math.Round(Convert.ToDecimal(v), 2);
+    }
+
     /// <summary>CalcCustBAlance in the archive: debit/credit opening balance for an old customer.</summary>
     private async Task<(decimal Maden, decimal Daen)> ArchiveBalanceAsync(string custNo, int oldBranchId)
     {
