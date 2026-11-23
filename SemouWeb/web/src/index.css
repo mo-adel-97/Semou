@@ -635,7 +635,12 @@ table.dt { width: 100%; border-collapse: separate; border-spacing: 0; }
 .archive-row { display: grid; grid-template-columns: 40px minmax(180px, 1.4fr) 1fr auto auto; gap: 12px; align-items: center; padding: 10px 14px; border: 1px solid var(--line-2); border-radius: 14px; background: var(--surface); }
 .archive-row .who b { display: block; }
 .archive-row .who small { color: var(--muted); }
-@media (max-width: 800px) { .archive-row { grid-template-columns: 40px 1fr; } }
+.archive-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+.archive-actions .btn { white-space: nowrap; }
+@media (max-width: 800px) {
+  .archive-row { grid-template-columns: 40px 1fr; }
+  .archive-actions { grid-column: 1 / -1; flex-wrap: wrap; }
+}
 .archive-balance { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 16px; border-radius: var(--r-lg); background: var(--brand-50); color: var(--brand-ink); }
 .archive-balance small { display: block; font-size: 12px; font-weight: 700; opacity: .8; }
 .archive-balance b { font-size: 22px; }

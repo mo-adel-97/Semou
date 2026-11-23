@@ -211,9 +211,11 @@ export function Reception({ group }: { group: string }) {
                   <div className="who"><b>{r.name}</b><small dir="ltr">{r.nationalId} • {r.mobile}</small></div>
                   <span className="muted">{r.branchName}</span>
                   <span className={`badge ${r.balance > 0 ? 'warn' : r.balance < 0 ? 'ok' : 'muted'}`}>الرصيد: {money(r.balance)}</span>
-                  <button className="btn sm secondary" onClick={() => setArchiveStatementOf(r)}><FileSpreadsheet size={15} /> كشف حساب</button>
-                  {r.accepted ? <span className="badge ok"><BadgeCheck size={12} /> تم قبوله</span>
-                    : can('addstudent', 'add') && <button className="btn sm" onClick={() => setCard({ guid: null, archive: r })}><ClipboardPlus size={15} /> قبول من الأرشيف</button>}
+                  <div className="archive-actions">
+                    <button className="btn sm secondary" onClick={() => setArchiveStatementOf(r)}><FileSpreadsheet size={15} /> كشف حساب</button>
+                    {r.accepted ? <span className="badge ok"><BadgeCheck size={12} /> تم قبوله</span>
+                      : can('addstudent', 'add') && <button className="btn sm" onClick={() => setCard({ guid: null, archive: r })}><ClipboardPlus size={15} /> قبول من الأرشيف</button>}
+                  </div>
                 </div>
               ))}
             </div>
