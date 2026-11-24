@@ -84,13 +84,33 @@ function require_csrf_header(): void
     }
 }
 
+/** Removes zero-width and bidi control characters that phones/keyboards slip into typed text. */
+function strip_invisible(string $s): string
+{
+    return preg_replace('/[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}\x{00AD}]/u', '', $s) ?? $s;
+}
+
+/** @return string[] the password as typed, then cleaned-up variants (unique, as-typed first). */
+function password_variants(string $p): array
+{
+    $digits = ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+               '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9'];
+    $clean = strip_invisible($p);
+    return array_values(array_unique([$p, trim($p), $clean, trim($clean), strtr(trim($clean), $digits)]));
+}
+
 function login(string $email, string $password): array
 {
     rate_limit('login', 8, 15 * 60);
-    $u = DB::one('SELECT * FROM users WHERE email = ?', [mb_strtolower(trim($email))]);
+    $u = DB::one('SELECT * FROM users WHERE email = ?', [mb_strtolower(trim(strip_invisible($email)))]);
     // Always run password_verify so timing doesn't reveal which emails exist.
     $hash = $u['password_hash'] ?? password_hash(random_bytes(12), PASSWORD_DEFAULT);
-    $ok = password_verify($password, $hash);
+    $ok = false;
+    // As typed first; then the usual copy/paste and keyboard accidents (a trailing space from WhatsApp/notes,
+    // invisible RTL marks, Arabic-Indic digits «٢٠٣٠»). The stored hash still has to match exactly.
+    foreach (password_variants($password) as $p) {
+        if (password_verify($p, $hash)) { $ok = true; $password = $p; break; }
+    }
     if (!$u || !$ok) throw new HttpError(401, 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
     if (!(int) $u['is_active']) throw new HttpError(403, 'هذا الحساب موقوف، تواصل مع مدير الموقع');
 
