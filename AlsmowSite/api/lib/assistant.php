@@ -377,6 +377,9 @@ function as_find_programs(array $tokens): array
         if ($near !== null) $q[$near] = true;
     }
     $wantType = isset($q['#diploma']) ? 'diploma' : (isset($q['#course']) ? 'course' : null);
+    // the question's own title-like words: a program that contains ALL of them beats one that shares a common word
+    // («دبلوم إدارة المستشفيات» must not tie with «دبلوم الإدارة المكتبية» just because of «إدارة»)
+    $qWords = array_values(array_filter(array_keys($q), fn($x) => is_string($x) && $x !== '' && $x[0] !== '#' && isset($df[$x])));
     $scored = [];
     foreach ($progs as $p) {
         $score = 0.0;
@@ -392,14 +395,20 @@ function as_find_programs(array $tokens): array
         if ($wantType === 'course' && $p['type'] !== 'diploma') $ratio += 0.15;
         if ($wantType === 'diploma' && $p['type'] !== 'diploma') $ratio -= 0.2;
         if ($wantType === 'course' && $p['type'] === 'diploma') $ratio -= 0.2;
-        $scored[] = [$ratio, $p];
+        // ranking only (the 0.34 acceptance below still uses $ratio): bonus for covering the question's words
+        $rank = $ratio;
+        if ($qWords) {
+            $inTitle = array_flip($titleTok[$p['id']]);
+            $rank += 0.3 * (count(array_filter($qWords, fn($x) => isset($inTitle[$x]))) / count($qWords));
+        }
+        $scored[] = [$ratio, $p, $rank];
     }
-    usort($scored, fn($a, $b) => $b[0] <=> $a[0]);
     $scored = array_values(array_filter($scored, fn($x) => $x[0] >= 0.34));
     if (!$scored) return [];
-    $best = $scored[0][0];
+    usort($scored, fn($a, $b) => $b[2] <=> $a[2]);
+    $best = $scored[0][2];
     // several almost equally good → ambiguous: return them all
-    return array_map(fn($x) => $x[1], array_values(array_filter($scored, fn($x) => $x[0] >= $best - 0.08)));
+    return array_map(fn($x) => $x[1], array_values(array_filter($scored, fn($x) => $x[2] >= $best - 0.08)));
 }
 
 /** BM25 over all documents. */
