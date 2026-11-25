@@ -285,3 +285,54 @@ a.chat-row:hover { background: var(--surface); }
 .about-where-dots { display: inline-flex; gap: 3px; margin-inline-start: .3rem; }
 .about-where-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgb(0 0 0 / .18); transition: all .3s; }
 .about-where-dots i.on { width: 12px; border-radius: 3px; background: var(--brand); }
+
+/* =====================================================================
+   Hero layout v3: three areas (words · stage · accrediting bodies).
+   Phones: words → the stage right away → the logos on one compact row.
+   Laptops/desktops: everything is sized from the screen HEIGHT too, so the whole hero always fits.
+   ===================================================================== */
+.hero2 { padding: 8.4rem 0 3rem; }
+.hero2-layout { display: grid; gap: 2rem; grid-template-areas: "text" "stage" "accs"; }
+.hero2-text { grid-area: text; }
+.hero2-stage { grid-area: stage; }
+.hero2-accs { grid-area: accs; border-top: 1px solid var(--line); padding-top: 1.1rem; }
+.hero2-accs-label { margin-bottom: .85rem; font-size: 13px; font-weight: 700; color: var(--muted); }
+.hero2-title { margin-top: 1.1rem; font-size: clamp(2.1rem, 1.25rem + 4.4vw, 4.05rem); line-height: 1.17; }
+.hero2-sub { margin-top: 1rem; font-size: clamp(.98rem, .93rem + .3vw, 1.15rem); line-height: 1.85; }
+.hero2-cta { margin-top: 1.5rem; }
+.hero2 .hero-accs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; max-width: 34rem; }
+.hero2 .hero-accs img { width: 100%; height: 2rem; max-width: none; object-fit: contain; }
+
+@media (max-width: 639px) {
+  .hero2-sub { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .hero2 .demo-stage { aspect-ratio: 1 / 1.06; border-radius: 1.6rem; }
+  .hero2 .demo-photo { width: 56%; top: 5%; }
+  .hero2 .demo-chat-wrap { width: 76%; height: 70%; bottom: 5%; inset-inline-end: 4%; }
+  .hero2 .demo-chip-top { top: 5%; }
+  .hero2 .demo-toast { width: 50%; bottom: 14%; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hero2-stage { width: min(100%, 36rem); justify-self: center; }
+}
+@media (min-width: 1024px) {
+  .hero2 { --hh: calc(100svh - 10.5rem); display: flex; align-items: center; min-height: 100svh; padding: 8.25rem 0 2.25rem; }
+  .hero2-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); grid-template-areas: "text stage" "accs stage"; column-gap: 3rem; row-gap: 0; align-items: center; }
+  .hero2-text { align-self: end; }
+  .hero2-accs { align-self: start; margin-top: clamp(1.2rem, 3.4svh, 2.6rem); padding-top: clamp(.9rem, 2.2svh, 1.4rem); }
+  .hero2-title { margin-top: clamp(.8rem, 2.2svh, 1.4rem); font-size: min(clamp(2.4rem, 1.3rem + 3vw, 3.9rem), calc(var(--hh) * .088)); line-height: 1.14; }
+  .hero2-sub { margin-top: clamp(.7rem, 2svh, 1.4rem); font-size: min(1.15rem, calc(var(--hh) * .026)); }
+  .hero2-cta { margin-top: clamp(1rem, 2.8svh, 2rem); }
+  .hero2-stage { justify-self: end; width: min(100%, calc(var(--hh) * .96), 38rem); }
+  .hero2 .hero-accs img { height: min(2.4rem, calc(var(--hh) * .052)); }
+}
+@media (min-width: 1280px) { .hero2-layout { column-gap: 4.5rem; } }
+@media (max-width: 639px) {
+  .hero2 .demo-swatches { display: none; }
+  .hero2 .demo-toast { bottom: 4%; }
+  .hero2 .hero-accs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1.2rem; }
+  .hero2 .hero-accs img { height: 2.35rem; }
+}
+@media (min-width: 1024px) {
+  .hero2-sub { font-size: clamp(.97rem, calc(var(--hh) * .03), 1.15rem); }
+  .hero2 .hero-accs img { height: clamp(1.9rem, calc(var(--hh) * .052), 2.4rem); }
+}

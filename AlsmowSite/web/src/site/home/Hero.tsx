@@ -32,11 +32,11 @@ export default function Hero({ data }: { data: HomeData }) {
   const palette = usePalette()
   const accs = data.accreditations.filter((a) => a.logo)
   return (
-    <section className="hero2 relative isolate overflow-hidden pt-28 pb-16 sm:pt-32 lg:flex lg:min-h-[100svh] lg:items-center lg:pt-36 lg:pb-14">
+    <section className="hero2 relative isolate overflow-hidden">
       <div className="hero2-grid absolute inset-0 -z-10" aria-hidden />
       <Plexus colors={palette} className="hero2-web absolute inset-0 -z-10" />
-      <div className="container-x grid items-center gap-12 lg:grid-cols-[1fr_1.08fr] lg:gap-12 xl:gap-20">
-        <div>
+      <div className="hero2-layout container-x">
+        <div className="hero2-text">
           {h.eyebrow && (
             <motion.span initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }} className="kicker">
               <span className="relative flex h-2 w-2">
@@ -46,13 +46,13 @@ export default function Hero({ data }: { data: HomeData }) {
               {h.eyebrow}
             </motion.span>
           )}
-          <SplitText as="h1" immediate delay={0.08} text={title} accent={h.highlight} className="hero-title mt-6 text-[clamp(2.4rem,1.3rem+3.2vw,4.05rem)] leading-[1.14] font-black tracking-tight text-balance text-ink" />
+          <SplitText as="h1" immediate delay={0.08} text={title} accent={h.highlight} className="hero-title hero2-title font-black tracking-tight text-balance text-ink" />
           {h.subtitle && (
-            <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.35, ease: EASE }} className="mt-6 max-w-xl text-[clamp(1.02rem,0.95rem+0.3vw,1.18rem)] leading-[1.9] text-pretty text-muted">
+            <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.35, ease: EASE }} className="hero2-sub max-w-xl text-pretty text-muted">
               {h.subtitle}
             </motion.p>
           )}
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5, ease: EASE }} className="mt-8 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.5, ease: EASE }} className="hero2-cta grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
             <Magnetic>
               <SmartLink to={h.cta_link || '/register'} className="btn-primary group w-full !px-3 !py-3.5 sm:w-auto sm:!px-8 xl:!py-4 xl:text-base">
                 {h.cta_text} <ArrowLeft className="h-4 w-4 shrink-0 transition group-hover:-translate-x-1 sm:h-5 sm:w-5" />
@@ -62,19 +62,20 @@ export default function Hero({ data }: { data: HomeData }) {
               <SmartLink to={h.secondary_link || '/programs'} className="btn-ghost w-full !px-3 !py-3.5 sm:w-auto sm:!px-8 xl:!py-4 xl:text-base">{h.secondary_text}</SmartLink>
             )}
           </motion.div>
-          {accs.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="mt-12 border-t border-line pt-6">
-              <div className="text-[13px] font-bold text-muted">معتمدون من</div>
-              <div className="hero-accs mt-4">
-                {accs.map((a) => <img key={a.id} src={a.logo!} alt={a.name} title={a.name} loading="eager" decoding="async" />)}
-              </div>
-            </motion.div>
-          )}
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 30, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, delay: 0.15, ease: EASE }}>
+        <motion.div initial={{ opacity: 0, y: 30, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, delay: 0.15, ease: EASE }} className="hero2-stage">
           <Stage data={data} total={total} />
         </motion.div>
+        {accs.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="hero2-accs">
+            <div className="hero2-accs-label">معتمدون من</div>
+            <div className="hero-accs">
+              {accs.map((a) => <img key={a.id} src={a.logo!} alt={a.name} title={a.name} loading="eager" decoding="async" />)}
+            </div>
+          </motion.div>
+        )}
+
       </div>
     </section>
   )
