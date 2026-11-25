@@ -10,7 +10,10 @@
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
 /* ---------- Accents ---------- */
+/* fallbacks only (before the settings load): the real colours come from the dashboard and are set on <html>
+   as --brand (default colour / visitor's choice) and --sub (the dashboard's secondary colour) */
 :root, [data-accent="semou"] { --brand: #3f7a58; --glow: #9ee2b8; }
+:root { --sub: #c19446; }
 [data-accent="ocean"]    { --brand: #2563eb; --glow: #93c5fd; }
 [data-accent="royal"]    { --brand: #7c3aed; --glow: #c4b5fd; }
 [data-accent="teal"]     { --brand: #0e8a8c; --glow: #8ce3e0; }
@@ -66,6 +69,14 @@
   --sh-soft: 0 1px 2px rgb(0 0 0 / .3), 0 8px 24px -10px rgb(0 0 0 / .5);
   --sh-lift: 0 2px 6px rgb(0 0 0 / .3), 0 30px 60px -20px rgb(0 0 0 / .7);
 }
+/* dark mode: a very dark brand colour (e.g. navy) would vanish on the dark background. Keep its hue but never
+   let buttons go darker than a readable lightness: works for any colour set in the dashboard */
+@supports (color: oklch(from red l c h)) {
+  [data-mode="dark"] {
+    --primary: oklch(from var(--brand) max(l, 0.56) c h);
+    --primary-hover: oklch(from var(--brand) max(l, 0.64) c h);
+  }
+}
 
 @theme inline {
   --font-sans: "IBM Plex Sans Arabic", "Cairo", system-ui, sans-serif;
@@ -99,11 +110,12 @@
   --color-deep-900: color-mix(in oklab, var(--brand) 28%, var(--abyss));
   --color-deep-950: color-mix(in oklab, var(--brand) 16%, var(--abyss));
 
-  --color-gold-100: #f7eedb;
-  --color-gold-300: #e6cb92;
-  --color-gold-400: #d6ae62;
-  --color-gold-500: #c19446;
-  --color-gold-600: #9c742f;
+  /* «gold» = the dashboard's secondary colour (--sub); every shade derived from it */
+  --color-gold-100: color-mix(in oklab, var(--sub) 18%, white);
+  --color-gold-300: color-mix(in oklab, var(--sub) 58%, white);
+  --color-gold-400: color-mix(in oklab, var(--sub) 80%, white);
+  --color-gold-500: var(--sub);
+  --color-gold-600: color-mix(in oklab, var(--sub) 80%, black);
 
   --shadow-soft: var(--sh-soft);
   --shadow-lift: var(--sh-lift);
@@ -866,11 +878,10 @@ html.menu-open .site-shell main *, html.menu-open .bf-orbit-host *, html.menu-op
 .acc-item:hover { transform: translateY(-6px); box-shadow: 0 1px 0 rgb(255 255 255 / .9) inset, 0 26px 50px -22px color-mix(in oklab, var(--brand) 75%, black); }
 .acc-item:hover::before { width: 55%; }
 .acc-item:hover::after { transform: translateX(-110%); }
+/* the body's real logo in its own colours, on the white tile (readable in light and dark mode) */
 .acc-logo {
-  display: block; width: 100%; height: 4.4rem;
-  background: linear-gradient(135deg, color-mix(in oklab, var(--brand) 78%, black), var(--brand) 60%, color-mix(in oklab, var(--brand) 70%, var(--glow)));
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
-  -webkit-mask-size: contain; mask-size: contain; transition: transform .5s cubic-bezier(.22, 1, .36, 1);
+  display: block; width: 100%; height: 4.4rem; object-fit: contain;
+  transition: transform .5s cubic-bezier(.22, 1, .36, 1);
 }
 .acc-item:hover .acc-logo { transform: scale(1.05); }
 .acc-cert { position: absolute; bottom: .5rem; font-size: .7rem; font-weight: 700; color: var(--primary); }

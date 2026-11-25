@@ -2,7 +2,8 @@ import { Check, Monitor, Moon, Palette, Pipette, RotateCcw, Sun } from 'lucide-r
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react'
 import { cx } from '../lib/format'
-import { ACCENTS, accentColor, isPreset, useTheme, type Mode } from '../lib/theme'
+import { ACCENTS, accentColor, isPreset, useTheme, type Mode, type PaletteColor } from '../lib/theme'
+import { useSite } from '../lib/queries'
 import { track } from '../lib/track'
 
 /**
@@ -11,6 +12,19 @@ import { track } from '../lib/track'
  */
 export function ThemePicker({ align = 'left', up }: { align?: 'left' | 'right'; up?: boolean }) {
   const t = useTheme()
+  const site = useSite()
+  const gen = site.data?.settings.general
+  // identity colours from the dashboard: picking one sets that exact colour (a custom accent)
+  const fromDash = (list?: PaletteColor[]) =>
+    (Array.isArray(list) ? list : []).filter((c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c?.b ?? '')).map((c) => ({ id: c.b.toLowerCase(), label: c.a, color: c.b }))
+  const main = fromDash(gen?.theme_main)
+  const sub = fromDash(gen?.theme_sub)
+  const presets = ACCENTS.map((a) => ({ id: a.id as string, label: a.label as string, color: a.color as string }))
+  const groups = [
+    ...(main.length ? [{ key: 'main', title: 'ألوان الهوية الأساسية', items: main }] : []),
+    ...(sub.length ? [{ key: 'sub', title: 'ألوان الهوية الفرعية', items: sub }] : []),
+    { key: 'more', title: main.length || sub.length ? 'ألوان أخرى' : 'ألوان جاهزة', items: presets },
+  ]
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const custom = !isPreset(t.accent)
@@ -67,29 +81,37 @@ export function ThemePicker({ align = 'left', up }: { align?: 'left' | 'right'; 
               ))}
             </div>
 
-            <div className="mt-4 mb-2 flex items-center justify-between text-xs font-bold text-muted">
-              <span>ألوان جاهزة</span>
-              <button onClick={(e) => { t.resetAccent(at(e)); used() }} className="flex items-center gap-1 font-semibold hover:text-ink" title="العودة لألوان المعهد"><RotateCcw className="h-3 w-3" /> الافتراضي</button>
-            </div>
-            <div className="grid grid-cols-6 gap-2">
-              {ACCENTS.map((a, i) => (
-                <motion.button
-                  key={a.id}
-                  initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.015, type: 'spring', stiffness: 500, damping: 26 }}
-                  whileHover={{ scale: 1.15, rotate: -6 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={(e) => { t.setAccent(a.id, at(e)); setHue(hueOf(a.color)); used() }}
-                  className={cx('grid aspect-square place-items-center rounded-full ring-offset-2 ring-offset-surface', t.accent === a.id && 'ring-2')}
-                  style={{ background: `conic-gradient(from 220deg, ${a.color}, color-mix(in oklab, ${a.color} 55%, white), ${a.color})`, ['--tw-ring-color' as string]: a.color }}
-                  title={a.label}
-                  aria-label={a.label}
-                >
-                  {t.accent === a.id && <Check className="h-3.5 w-3.5 text-white drop-shadow" />}
-                </motion.button>
-              ))}
-            </div>
+            {/* the identity palette (main + sub) comes from the dashboard; the presets follow as «ألوان أخرى» */}
+            {groups.map((g, gi) => (
+              <div key={g.key}>
+                <div className={cx('mb-2 flex items-center justify-between text-xs font-bold text-muted', gi === 0 ? 'mt-4' : 'mt-3')}>
+                  <span>{g.title}</span>
+                  {gi === 0 && <button onClick={(e) => { t.resetAccent(at(e)); used() }} className="flex items-center gap-1 font-semibold hover:text-ink" title="العودة لألوان المعهد"><RotateCcw className="h-3 w-3" /> الافتراضي</button>}
+                </div>
+                <div className="grid grid-cols-6 gap-2">
+                  {g.items.map((a, i) => {
+                    const on = t.accent.toLowerCase() === a.id.toLowerCase()
+                    return (
+                      <motion.button
+                        key={a.id}
+                        initial={{ opacity: 0, scale: 0.6 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.015, type: 'spring', stiffness: 500, damping: 26 }}
+                        whileHover={{ scale: 1.15, rotate: -6 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={(e) => { t.setAccent(a.id, at(e)); setHue(hueOf(a.color)); used() }}
+                        className={cx('grid aspect-square place-items-center rounded-full ring-offset-2 ring-offset-surface', on && 'ring-2')}
+                        style={{ background: `conic-gradient(from 220deg, ${a.color}, color-mix(in oklab, ${a.color} 55%, white), ${a.color})`, ['--tw-ring-color' as string]: a.color }}
+                        title={a.label}
+                        aria-label={a.label}
+                      >
+                        {on && <Check className="h-3.5 w-3.5 text-white drop-shadow" />}
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
 
             <div className="mt-4 mb-2 flex items-center justify-between text-xs font-bold text-muted">
               <span>لونك الخاص</span>

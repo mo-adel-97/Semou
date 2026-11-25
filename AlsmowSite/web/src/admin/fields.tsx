@@ -338,7 +338,16 @@ function PairsField({ f, value, onChange }: { f: FieldSpec; value: TextPair[]; o
           </label>
           <label className="block">
             <span className="mb-1 block text-xs font-semibold text-muted">{f.labelB}</span>
-            <textarea className="input min-h-[2.75rem] resize-y" rows={1} value={p.b ?? ''} onChange={(e) => set(i, { b: e.target.value })} placeholder={f.placeholderB} dir="auto" />
+            {f.bColor ? (
+              <span className="flex items-center gap-2">
+                <label className="relative h-11 w-11 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-line" style={{ background: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(p.b ?? '') ? p.b! : 'transparent' }} title="اختيار اللون">
+                  <input type="color" className="absolute inset-0 h-full w-full cursor-pointer opacity-0" value={/^#[0-9a-f]{6}$/i.test(p.b ?? '') ? p.b! : '#000000'} onChange={(e) => set(i, { b: e.target.value })} />
+                </label>
+                <input className="input font-mono uppercase" dir="ltr" maxLength={7} value={p.b ?? ''} onChange={(e) => set(i, { b: e.target.value })} placeholder={f.placeholderB} />
+              </span>
+            ) : (
+              <textarea className="input min-h-[2.75rem] resize-y" rows={1} value={p.b ?? ''} onChange={(e) => set(i, { b: e.target.value })} placeholder={f.placeholderB} dir="auto" />
+            )}
           </label>
           <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="self-end rounded-lg p-2 text-muted hover:bg-red-500/10 hover:text-red-600 sm:mt-6" aria-label="حذف"><Trash2 className="h-4 w-4" /></button>
         </div>

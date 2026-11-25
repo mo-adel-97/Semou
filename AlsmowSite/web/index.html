@@ -17,6 +17,8 @@
           document.documentElement.dataset.accent = s.accent || d.accent || 'semou';
           // any colour the visitor picked (also presets): the exact brand colour of the last visit, before first paint
           var c = localStorage.getItem('alsmow-theme-color');
+          var sub = localStorage.getItem('alsmow-theme-sub'); // the dashboard secondary colour (last visit)
+          if (sub) document.documentElement.style.setProperty('--sub', sub);
           if (c) { document.documentElement.style.setProperty('--brand', c); document.documentElement.style.setProperty('--glow', 'color-mix(in oklab, ' + c + ' 45%, white)'); }
         } catch (e) {
           document.documentElement.dataset.mode = 'light';

@@ -383,7 +383,7 @@ function Accreditations({ items }: { items: Accreditation[] }) {
                   title={a.name}
                 >
                   {/* the logo already carries the body's name: shown once, the name stays for screen readers / tooltip */}
-                  <span className="acc-logo" style={{ WebkitMaskImage: `url(${a.logo})`, maskImage: `url(${a.logo})` }} role="img" aria-label={a.name} />
+                  <img className="acc-logo" src={a.logo ?? undefined} alt={a.name} loading="lazy" decoding="async" />
                   {a.certificate && <span className="acc-cert">عرض الشهادة</span>}
                 </motion.button>
               ))}
@@ -750,10 +750,12 @@ function Partners({ data }: { data: HomeData }) {
     <section className="py-16">
       <div className="container-x"><h2 className="mb-10 text-center font-display text-2xl font-extrabold">شركاء النجاح</h2></div>
       <div className="relative overflow-hidden [mask-image:linear-gradient(to_left,transparent,black_10%,black_90%,transparent)]">
-        <div className="flex w-max animate-marquee gap-16 hover:[animation-play-state:paused]">
+        <div className="flex w-max animate-marquee gap-6 py-2 hover:[animation-play-state:paused]">
           {[...loop, ...loop].map((p, i) => {
-            const img = <img src={p.logo!} alt={p.name} title={p.name} className="h-14 w-auto max-w-[10rem] object-contain opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0" loading="lazy" />
-            return p.url ? <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="shrink-0">{img}</a> : <div key={i} className="shrink-0">{img}</div>
+            // each partner in its own colours, on a white card so dark logos stay readable in dark mode
+            const img = <img src={p.logo!} alt={p.name} title={p.name} className="h-12 w-auto max-w-[9rem] object-contain" loading="lazy" decoding="async" />
+            const card = 'grid h-20 min-w-[9.5rem] shrink-0 place-items-center rounded-2xl border border-line bg-white px-6 shadow-soft transition hover:-translate-y-1 hover:shadow-lift'
+            return p.url ? <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className={card}>{img}</a> : <div key={i} className={card}>{img}</div>
           })}
         </div>
       </div>

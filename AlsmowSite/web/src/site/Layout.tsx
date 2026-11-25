@@ -9,7 +9,7 @@ import { SocialLinks, WhatsAppIcon } from '../components/BrandIcons'
 import { LITE, Magnetic, ScrollProgress, SmoothScroll, useLenis } from '../components/ui'
 import { cx, waNumber } from '../lib/format'
 import { useSite } from '../lib/queries'
-import { useTheme } from '../lib/theme'
+import { useTheme, applySecondary } from '../lib/theme'
 import { PROGRAM_TYPES, type ProgramType } from '../lib/types'
 
 import IntroBirds from './IntroBirds'
@@ -435,6 +435,8 @@ export default function Layout() {
   const { data } = useSite()
   const { setDefaults } = useTheme()
   useEffect(() => { setDefaults(data?.settings.general.theme_color || data?.settings.general.theme_accent, data?.settings.general.theme_mode) }, [data, setDefaults])
+  // the dashboard's secondary colour (headings' highlights, ornaments) for every theme
+  useEffect(() => { if (data) applySecondary(data.settings.general.theme_secondary) }, [data])
   useEffect(() => { startTracking() }, [])
   useEffect(() => { trackView(pathname) }, [pathname])
   // the butterflies' scenes: everything (on/off, words, links, timing) comes from the dashboard

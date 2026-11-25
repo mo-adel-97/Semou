@@ -33,6 +33,15 @@ function settings_schema(): array
                 'theme_color' => ['type' => 'color', 'label' => 'كود لون الموقع (اختياري)', 'placeholder' => '#8b1538',
                     'help' => 'اكتب كود اللون (مثل ‎#8B1538‎) أو اختره من المربع؛ يحل محل «لون الموقع الافتراضي». اتركه فارغًا لاستخدام اللون المختار من القائمة'],
                 'theme_mode' => ['type' => 'enum', 'label' => 'المظهر الافتراضي', 'options' => ['auto' => 'تلقائي (حسب الجهاز)', 'light' => 'فاتح', 'dark' => 'داكن']],
+                // the brand guide's palette: shown first in the visitor's colour picker (main row, then sub row)
+                'theme_main' => ['type' => 'pairs', 'label' => 'ألوان الهوية الأساسية', 'maxItems' => 8, 'bColor' => true, 'maxA' => 40,
+                    'labelA' => 'اسم اللون', 'labelB' => 'كود اللون', 'placeholderA' => 'كحلي', 'placeholderB' => '#1f396c',
+                    'help' => 'تظهر أول صف في زر الألوان بالموقع. لجعل أحدها لون الموقع الافتراضي اكتب كوده في «كود لون الموقع»'],
+                'theme_sub' => ['type' => 'pairs', 'label' => 'ألوان الهوية الفرعية', 'maxItems' => 12, 'bColor' => true, 'maxA' => 40,
+                    'labelA' => 'اسم اللون', 'labelB' => 'كود اللون', 'placeholderA' => 'أخضر', 'placeholderB' => '#70b446',
+                    'help' => 'تظهر صفًا ثانيًا في زر الألوان، وبعدها باقي الألوان الجاهزة'],
+                'theme_secondary' => ['type' => 'color', 'label' => 'اللون الفرعي للموقع', 'placeholder' => '#70b446',
+                    'help' => 'لون العناوين المميزة والزخارف والعلامات (كان ذهبيًا). اتركه فارغًا للون الافتراضي'],
             ],
         ],
         'hero' => [
@@ -325,7 +334,10 @@ function save_settings_group(string $group, array $input): array
                     $a = plain_text($item['a'] ?? null, $f['maxA'] ?? 300);
                     $b = plain_text($item['b'] ?? null, $f['maxB'] ?? 500);
                     if ($a === null) continue;
-                    if (!empty($f['bLink'])) {
+                    if (!empty($f['bColor'])) { // the second value is a hex colour code
+                        $b = $b === null ? null : strtolower(trim($b));
+                        if ($b === null || !preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/', $b)) { $errors[$key] = "كود اللون غير صحيح في «{$a}»، مثال: #1f396c"; continue; }
+                    } elseif (!empty($f['bLink'])) {
                         if ($b !== null && !str_starts_with($b, '/') && safe_url($b) === null) $b = null;
                     } elseif ($b === null) {
                         continue;

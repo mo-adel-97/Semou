@@ -9,6 +9,23 @@ import { flushSync } from 'react-dom'
  */
 
 export type Mode = 'light' | 'dark' | 'auto'
+/**
+ * The institute's identity colours (main + sub), the default colour and the secondary («gold») colour all come
+ * from the dashboard (settings → general: theme_main / theme_sub / theme_color / theme_secondary).
+ * These presets are only the extra «ألوان أخرى»; 'semou' is a fallback used before the settings load.
+ */
+export const DEFAULT_ACCENT = 'semou'
+/** A dashboard colour list row: a = name, b = #hex. */
+export type PaletteColor = { a: string; b: string }
+
+/** The dashboard's secondary colour («gold» highlights). Remembered so the next visit paints it at once. */
+export function applySecondary(color?: string | null) {
+  const el = document.documentElement
+  const ok = !!color && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)
+  if (ok) el.style.setProperty('--sub', color!)
+  else el.style.removeProperty('--sub')
+  try { if (ok) localStorage.setItem('alsmow-theme-sub', color!); else localStorage.removeItem('alsmow-theme-sub') } catch { /* */ }
+}
 export const ACCENTS = [
   { id: 'semou', label: 'السمو', color: '#3f7a58' },
   { id: 'emerald', label: 'زمردي', color: '#0f9d6c' },
@@ -101,7 +118,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const saved = read()
   const defs = read(DEFAULTS_KEY)
   const [mode, setModeState] = useState<Mode>(saved.mode ?? defs.mode ?? 'light')
-  const [accent, setAccentState] = useState<Accent>(saved.accent ?? defs.accent ?? 'semou')
+  const [accent, setAccentState] = useState<Accent>(saved.accent ?? defs.accent ?? DEFAULT_ACCENT)
   const [resolved, setResolved] = useState<'light' | 'dark'>(() => (document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light'))
 
   useEffect(() => {
@@ -125,7 +142,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     write({ ...read(), accent: a })
   }, [mode])
   const resetAccent = useCallback((at?: At) => {
-    const def = read(DEFAULTS_KEY).accent ?? 'semou'
+    const def = read(DEFAULTS_KEY).accent ?? DEFAULT_ACCENT
     reveal(() => { setAccentState(def); apply(read().mode ?? mode, def) }, at)
     const s = read()
     delete s.accent
