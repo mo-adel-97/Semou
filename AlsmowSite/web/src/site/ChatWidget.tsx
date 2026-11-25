@@ -1,7 +1,7 @@
 import { ArrowUp, RotateCcw, Sparkles, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import ChatRich from './ChatRich'
 import { LITE } from '../components/ui'
 import { cx } from '../lib/format'
 import { useSite } from '../lib/queries'
@@ -21,61 +21,8 @@ function load(): Msg[] {
   }
 }
 
-/** Tiny safe markdown: **bold**, links, "- " bullets, line breaks. Produces React nodes, never HTML. */
-function Rich({ text }: { text: string }) {
-  const inline = (s: string, k: string): ReactNode[] =>
-    s.split(/(\*\*[^*]+\*\*|https?:\/\/[^\s)]+)/g).map((part, i) => {
-      if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={k + i} className="font-bold text-ink">{part.slice(2, -2)}</strong>
-      if (/^https?:\/\//.test(part)) {
-        let internal: string | null = null
-        let label = 'فتح الرابط ←'
-        try {
-          const u = new URL(part)
-          if (u.host === location.host) internal = u.pathname + u.search
-          if (u.host === 'wa.me') label = 'مراسلتنا على واتساب ←'
-        } catch { /* not a URL */ }
-        return internal ? (
-          <Link key={k + i} to={internal} className="font-semibold text-brand-700 underline underline-offset-2">فتح الصفحة ←</Link>
-        ) : (
-          <a key={k + i} href={part} target="_blank" rel="noopener noreferrer" className="font-semibold break-all text-brand-700 underline underline-offset-2">{label}</a>
-        )
-      }
-      return <Fragment key={k + i}>{part}</Fragment>
-    })
-  return (
-    <div className="space-y-1.5">
-      {text.split('\n').map((l, i) => {
-        const t = l.trim()
-        if (!t) return null
-        if (/^[-•*]\s+/.test(t)) return <div key={i} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" /><span>{inline(t.replace(/^[-•*]\s+/, ''), `l${i}`)}</span></div>
-        return <p key={i}>{inline(t, `p${i}`)}</p>
-      })}
-    </div>
-  )
-}
-
-/** Reveals an answer word by word (feels like a conversation, costs nothing). */
-function useTypewriter(full: string, active: boolean, onDone: () => void) {
-  const [n, setN] = useState(active ? 0 : full.length)
-  useEffect(() => {
-    if (!active) { setN(full.length); return }
-    setN(0)
-    let i = 0
-    const words = full.split(/(\s+)/)
-    const t = setInterval(() => {
-      i += 2
-      const shown = words.slice(0, i).join('')
-      setN(shown.length)
-      if (i >= words.length) { clearInterval(t); onDone() }
-    }, 28)
-    return () => clearInterval(t)
-  }, [full, active]) // eslint-disable-line react-hooks/exhaustive-deps
-  return full.slice(0, n)
-}
-
 function Answer({ m, typing, onTyped }: { m: Msg; typing: boolean; onTyped: () => void }) {
-  const text = useTypewriter(m.content, typing, onTyped)
-  return <Rich text={text} />
+  return <ChatRich text={m.content} reveal={typing} onDone={onTyped} />
 }
 
 export default function ChatWidget() {
@@ -250,7 +197,7 @@ export default function ChatWidget() {
               )}
               {msgs.map((m, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cx('flex', m.role === 'user' ? 'justify-start' : 'justify-end')}>
-                  <div className={cx('max-w-[88%] rounded-3xl px-4 py-3 text-[15px] leading-relaxed', m.role === 'user' ? 'rounded-tr-md bg-primary text-white' : 'rounded-tl-md border border-line bg-surface text-ink-2 shadow-soft')}>
+                  <div className={cx('rounded-3xl text-[15px] leading-relaxed', m.role === 'user' ? 'max-w-[85%] rounded-tr-md bg-primary px-4 py-3 text-white' : 'chat-answer w-[92%] rounded-tl-md border border-line bg-surface p-3 text-ink-2 shadow-soft')}>
                     {m.role === 'assistant' && !m.content ? (
                       <span className="flex gap-1 py-1.5" aria-label="تكتب الآن">
                         {[0, 1, 2].map((d) => (

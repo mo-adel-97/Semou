@@ -50,10 +50,10 @@ function Logo({ light, compact, flutter }: { light?: boolean; compact?: boolean;
       {flutter ? (
         // home page: two small butterflies circle the logo
         <ButterflyOrbit className="shrink-0" rings={[{ r: '165%', t: '8s', s: 22 }, { r: '210%', t: '12s', s: 17, reverse: true }]}>
-          <BrandLogo src={g?.logo} className="h-12 w-12 shrink-0 md:h-14 md:w-14" />
+          <BrandLogo src={g?.logo} className="h-[3.25rem] w-[3.25rem] shrink-0 md:h-[3.75rem] md:w-[3.75rem]" />
         </ButterflyOrbit>
       ) : (
-        <BrandLogo src={g?.logo} className={compact ? 'h-12 w-12 shrink-0 md:h-14 md:w-14' : 'h-14 w-14 shrink-0 md:h-16 md:w-16'} />
+        <BrandLogo src={g?.logo} className={compact ? 'h-[3.25rem] w-[3.25rem] shrink-0 md:h-[3.75rem] md:w-[3.75rem]' : 'h-14 w-14 shrink-0 md:h-16 md:w-16'} />
       )}
       {/* header: name only, on one line (hidden at lg where the menu needs the room); the tagline lives in the footer / mobile menu.
           Full size (mobile menu, footer): the name may wrap and a long tagline is cut at two lines, never past the edge */}

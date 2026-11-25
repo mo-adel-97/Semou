@@ -25,14 +25,15 @@
 /* ---------- Light ---------- */
 :root, [data-mode="light"] {
   color-scheme: light;
-  --bg: #faf8f4;
-  --bg-2: #f3efe7;
+  /* neutrals are tinted by the brand colour itself (cool with navy, warm with gold…): never a fixed cast */
+  --bg: color-mix(in oklab, var(--brand) 3%, #fcfcfd);
+  --bg-2: color-mix(in oklab, var(--brand) 6%, #f6f7f9);
   --surface: #ffffff;
-  --ink: #141c18;
-  --ink-2: #3a4640;
-  --muted: #6b7770;
-  --line: #e9e3d8;
-  --abyss: #0a110e;
+  --ink: color-mix(in oklab, var(--brand) 30%, #070a10);
+  --ink-2: color-mix(in oklab, var(--brand) 22%, #343a46);
+  --muted: color-mix(in oklab, var(--brand) 14%, #6b7280);
+  --line: color-mix(in oklab, var(--brand) 9%, #e7e9ee);
+  --abyss: color-mix(in oklab, var(--brand) 8%, #04060a);
   --b-50: color-mix(in oklab, var(--brand) 7%, var(--surface));
   --b-100: color-mix(in oklab, var(--brand) 14%, var(--surface));
   --b-200: color-mix(in oklab, var(--brand) 28%, var(--surface));
@@ -49,14 +50,14 @@
 /* ---------- Dark ---------- */
 [data-mode="dark"] {
   color-scheme: dark;
-  --bg: #0b100e;
-  --bg-2: #101815;
-  --surface: #141c19;
-  --ink: #e9efeb;
-  --ink-2: #bdc9c2;
-  --muted: #869489;
-  --line: #233029;
-  --abyss: #050807;
+  --bg: color-mix(in oklab, var(--brand) 14%, #06080c);
+  --bg-2: color-mix(in oklab, var(--brand) 17%, #0a0d13);
+  --surface: color-mix(in oklab, var(--brand) 18%, #0e1219);
+  --ink: color-mix(in oklab, var(--brand) 6%, #eef1f6);
+  --ink-2: color-mix(in oklab, var(--brand) 10%, #c3c9d4);
+  --muted: color-mix(in oklab, var(--brand) 12%, #8a93a3);
+  --line: color-mix(in oklab, var(--brand) 22%, #1d2330);
+  --abyss: color-mix(in oklab, var(--brand) 8%, #020306);
   --b-50: color-mix(in oklab, var(--brand) 12%, var(--surface));
   --b-100: color-mix(in oklab, var(--brand) 20%, var(--surface));
   --b-200: color-mix(in oklab, var(--brand) 32%, var(--surface));
@@ -957,17 +958,20 @@ html.menu-open .sec-live * { animation-play-state: paused !important; }
 /* the round logo badge (components/BrandLogo.tsx): white disc, brand→gold ring, the whole logo inside */
 @property --bl-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .brand-logo {
-  position: relative; display: inline-grid; place-items: center; flex-shrink: 0; aspect-ratio: 1; border-radius: 50%; padding: 2.5px;
+  position: relative; display: inline-grid; place-items: center; flex-shrink: 0; aspect-ratio: 1; border-radius: 30%; padding: 2px;
   background: conic-gradient(from var(--bl-a), var(--brand), var(--color-gold-400), color-mix(in oklab, var(--brand) 55%, white), var(--brand));
   box-shadow: 0 8px 18px -10px color-mix(in oklab, var(--brand) 70%, black);
   transition: --bl-a 1.2s cubic-bezier(.22, 1, .36, 1);
 }
 a:hover .brand-logo, .brand-logo:hover { --bl-a: 360deg; }
-.brand-logo-disc { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: #fff; overflow: hidden; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04); }
+.brand-logo-disc { position: relative; display: grid; place-items: center; width: 100%; height: 100%; border-radius: calc(30% - 1px); background: #fff; overflow: hidden; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .04); }
 .brand-logo-disc img { width: 88%; height: 88%; object-fit: contain; user-select: none; } /* largest size that still keeps the name under the wings inside the circle */
+/* the drawing measured and fitted (BrandLogo.tsx): a frame with a little breathing room, the image placed inside */
+.brand-logo-fit { position: absolute; inset: 11%; }
+.brand-logo-fit img { position: absolute; max-width: none; height: auto; user-select: none; }
 .pl-logo { width: clamp(44px, 12vw, 60px); height: clamp(44px, 12vw, 60px); }
 /* the old square-logo rules of the curtain / intro plaque must not touch the round badge */
-.rc-logo { border-radius: 50%; background: transparent; }
+.rc-logo { border-radius: 30%; background: transparent; }
 .pl-brand .brand-logo-disc img { width: 88%; height: 88%; border-radius: 0; box-shadow: none; object-fit: contain; background: none; }
 
 /* ================= صندوق البرامج (site/GiftBox.tsx) — a small box in the floating column; pure CSS art, theme colours only ================= */

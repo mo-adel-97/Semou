@@ -5,6 +5,7 @@ import App from './App'
 import { ApiError } from './lib/api'
 import { ThemeProvider } from './lib/theme'
 import './index.css'
+import './home2.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
