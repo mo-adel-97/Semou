@@ -744,6 +744,24 @@ public sealed class RequestsService(Db db, CurrentUser me, RegistrationService r
         };
     }
 
+    /// <summary>طلباتي: every request the signed-in user sent (both kinds). Waiting ones always, reviewed ones within the period.</summary>
+    public async Task<object> ListMineAsync(DateTime? from, DateTime? to, string? q, CancellationToken ct)
+    {
+        var f = (from ?? Clock.Now.AddDays(-30)).Date; var t = (to ?? Clock.Now).Date.AddDays(1);
+        q = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
+        var args = new { f, t, q, me = me.UserGuid };
+        await using var c = await db.OpenAsync(ct);
+        var regs = await c.QueryAsync<OrderListRow>(new CommandDefinition(RegListSql + """
+             WHERE O.UserGuid = @me AND (O.Status IN (0,3) OR (O.OrderDate >= @f AND O.OrderDate < @t))
+               AND (@q IS NULL OR S.StudentName LIKE '%' + @q + '%' OR S.NationalId LIKE @q + '%' OR S.StudentTel LIKE '%' + @q + '%' OR CAST(O.Code AS nvarchar(20)) = @q)
+            """, args, cancellationToken: ct));
+        var pays = await c.QueryAsync<OrderListRow>(new CommandDefinition(PayListSql + """
+             WHERE O.UserGuid = @me AND (O.Status = 0 OR (O.OrderDate >= @f AND O.OrderDate < @t))
+               AND (@q IS NULL OR S.StudentName LIKE '%' + @q + '%' OR S.NationalId LIKE @q + '%' OR O.PayRef LIKE '%' + @q + '%' OR CAST(O.Code AS nvarchar(20)) = @q)
+            """, args, cancellationToken: ct));
+        return new { reg = regs, pay = pays };
+    }
+
     /// <summary>A student's requests (shown on the reception card so nothing is sent twice).</summary>
     public async Task<object> OfStudentAsync(Guid account, CancellationToken ct)
     {

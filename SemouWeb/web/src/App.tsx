@@ -26,6 +26,7 @@ const IncomeStatement = lazy(() => import('./pages/AccountReports').then(m => ({
 const CashHistory = lazy(() => import('./pages/AccountReports').then(m => ({ default: m.CashHistory })))
 const StudyRequests = lazy(() => import('./pages/StudyRequests').then(m => ({ default: m.StudyRequests })))
 const AdmissionRequests = lazy(() => import('./pages/Requests').then(m => ({ default: m.AdmissionRequests })))
+const MyRequests = lazy(() => import('./pages/Requests').then(m => ({ default: m.MyRequests })))
 const PaymentRequests = lazy(() => import('./pages/Requests').then(m => ({ default: m.PaymentRequests })))
 const RegistrationsReport = lazy(() => import('./pages/SalesReports').then(m => ({ default: m.RegistrationsReport })))
 const SalesInvoicesReport = lazy(() => import('./pages/SalesReports').then(m => ({ default: m.SalesInvoicesReport })))
@@ -99,6 +100,7 @@ function Screen() {
   if (key === 'opening-balances') return <Suspense fallback={<PageLoader />}><OpeningBalances group={g} /></Suspense>
   if (key === 'study-requests') return <Suspense fallback={<PageLoader />}><StudyRequests group={g} /></Suspense>
   if (key === 'admission-requests') return <Suspense fallback={<PageLoader />}><AdmissionRequests group={g} /></Suspense>
+  if (key === 'my-requests') return <Suspense fallback={<PageLoader />}><MyRequests group={g} /></Suspense>
   if (key === 'payment-requests') return <Suspense fallback={<PageLoader />}><PaymentRequests group={g} /></Suspense>
   if (key === 'registrations-report') return <Suspense fallback={<PageLoader />}><RegistrationsReport group={g} /></Suspense>
   if (key === 'sales-report') return <Suspense fallback={<PageLoader />}><SalesInvoicesReport group={g} /></Suspense>

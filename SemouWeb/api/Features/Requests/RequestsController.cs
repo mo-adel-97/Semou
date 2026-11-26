@@ -84,6 +84,11 @@ public sealed class RequestsController(RequestsService requests, PermissionServi
         return File(data, type, name, enableRangeProcessing: false);
     }
 
+    /// <summary>طلباتي: the requests the signed-in user sent and where each one stands.</summary>
+    [HttpGet("mine")]
+    public async Task<IActionResult> Mine([FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] string? q, CancellationToken ct)
+    { await Need(WebForms.MyOrders, Perm.View); return Ok(await requests.ListMineAsync(from, to, q, ct)); }
+
     [HttpGet("counts")]
     public async Task<IActionResult> Counts(CancellationToken ct) =>
         Ok(await requests.CountsAsync(await Has(WebForms.RegOrders, Perm.View), await Has(WebForms.PayOrders, Perm.View), ct));

@@ -138,6 +138,66 @@ function RequestsPage({ kind, group }: { kind: Kind; group: string }) {
   )
 }
 
+/* =============================== طلباتي =============================== */
+
+type MyRow = Row & { type: Kind }
+/** What a request means for whoever sent it: still waiting, done, or turned down. */
+const stageOf = (r: MyRow) => (r.status === 0 || (r.type === 'reg' && r.status === 3) ? 'wait' : r.status === 1 ? 'done' : 'no')
+
+/** طلباتي: the enrollment and payment requests the signed-in user sent, and where each one stands. */
+export function MyRequests({ group }: { group: string }) {
+  const [type, setType] = useState<'all' | Kind>('all')
+  const [stage, setStage] = useState<'all' | 'wait' | 'done' | 'no'>('all')
+  const [from, setFrom] = useState(daysAgo(30)); const [to, setTo] = useState(today())
+  const [q, setQ] = useState('')
+  const params = { from, to, q: q.trim() || null }
+  const list = useQuery({
+    queryKey: ['requests', 'mine', params], placeholderData: keepPreviousData, refetchInterval: 30_000,
+    queryFn: () => api<{ reg: Row[]; pay: Row[] }>(`/requests/mine${qs(params)}`),
+  })
+  const all = useMemo<MyRow[]>(() => [
+    ...(list.data?.reg ?? []).map(r => ({ ...r, type: 'reg' as Kind })),
+    ...(list.data?.pay ?? []).map(r => ({ ...r, type: 'pay' as Kind })),
+  ].sort((a, b) => +new Date(b.orderDate) - +new Date(a.orderDate)), [list.data])
+  const ofType = all.filter(r => type === 'all' || r.type === type)
+  const rows = ofType.filter(r => stage === 'all' || stageOf(r) === stage)
+  const n = (s: string) => ofType.filter(r => stageOf(r) === s).length.toLocaleString('ar-EG')
+
+  const cols: RCol<MyRow>[] = [
+    { key: 'type', label: 'نوع الطلب', width: 105, value: r => (r.type === 'reg' ? 'طلب التحاق' : 'طلب سداد'),
+      render: r => <span className="rq-ref">{r.type === 'reg' ? <FileText size={14} /> : <Wallet size={14} />} {r.type === 'reg' ? 'طلب التحاق' : 'طلب سداد'}</span> },
+    { key: 'code', label: 'رقم الطلب', width: 80, render: r => <b className="code-chip">{r.code}</b> },
+    { key: 'orderDate', label: 'تاريخ الطلب', width: 120, value: r => dt(r.orderDate), render: r => <span className="rq-date">{dt(r.orderDate)}{stageOf(r) === 'wait' && <small>{waited(r.orderDate)}</small>}</span> },
+    { key: 'studentName', label: 'الطالب', width: 200, render: r => <span className="rq-stu"><b>{r.studentName}</b><small dir="ltr">{r.nationalId}</small></span> },
+    { key: 'programs', label: 'البرنامج / البند', width: 190 },
+    { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok', value: r => (r.type === 'reg' ? r.subTotal : r.payAmount) },
+    { key: 'status', label: 'الحالة', width: 140, value: r => statusOf(r.type, r.status).label, render: r => <Status k={r.type} s={r.status} /> },
+    { key: 'reviewedBy', label: 'راجعه', width: 120 },
+    { key: 'reviewDate', label: 'تاريخ المراجعة', width: 120, value: r => dt(r.reviewDate) },
+    { key: 'reviewNotes', label: 'ملاحظات المراجعة', width: 220 },
+    { key: 'docCode', label: 'الاستمارة / الفاتورة', width: 110, value: r => (r.type === 'pay' ? r.taxNo ?? r.docCode : r.docCode) },
+    { key: 'branch', label: 'الفرع', width: 140, hidden: true },
+  ]
+  return (
+    <>
+      <PageHead title="طلباتي" subtitle="طلبات الالتحاق والسداد التي أرسلتها، وحالة كل طلب أولاً بأول" group={group} />
+      <div className="rb">
+        <F label="نوع الطلب"><Segmented value={type} onChange={v => setType(v as typeof type)} options={[{ value: 'all', label: 'الكل' }, { value: 'reg', label: 'طلبات الالتحاق' }, { value: 'pay', label: 'طلبات السداد' }]} /></F>
+        <F label="الحالة"><Segmented value={stage} onChange={v => setStage(v as typeof stage)} options={[
+          { value: 'all', label: 'الكل' }, { value: 'wait', label: `قيد المراجعة (${n('wait')})` }, { value: 'done', label: `المقبولة (${n('done')})` }, { value: 'no', label: `المرفوضة والملغاة (${n('no')})` },
+        ]} /></F>
+        <Dates from={from} to={to} setFrom={setFrom} setTo={setTo} />
+        <F label="بحث" w={220}><input className="input" placeholder="الاسم أو الهوية أو رقم الطلب" value={q} onChange={e => setQ(e.target.value)} /></F>
+        <button className="btn ghost rb-run" onClick={() => list.refetch()} disabled={list.isFetching} title="تحديث">{list.isFetching ? <Spinner /> : <><RefreshCw size={16} /> تحديث</>}</button>
+      </div>
+      {!list.data ? <div className="center-fill" style={{ minHeight: 260 }}><Spinner size={28} /></div>
+        : <ReportGrid columns={cols} rows={rows} rowKey={r => r.type + r.guid} footLabel={`${rows.length.toLocaleString('ar-EG')} طلب`}
+            rowClass={r => (stageOf(r) === 'no' ? 'dim' : '')}
+            emptyText="لا توجد طلبات أرسلتها في هذه الفترة" />}
+    </>
+  )
+}
+
 /* =============================== Shared pieces =============================== */
 
 /** A file of the request, fetched with the user's token (img/src cannot send it). */

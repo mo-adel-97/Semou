@@ -50,7 +50,7 @@ export const MENU: MenuGroup[] = [
   {
     key: 'file', title: 'ملف', icon: Building2, menus: ['file'],
     items: [
-      { key: 'company-info', title: 'إعدادات النظام', perm: null, form: 'EncodingCompanyInfo' },
+      { key: 'company-info', title: 'إعدادات النظام', perm: 'companyinfo', form: 'EncodingCompanyInfo' },
       { key: 'branches', title: 'الفروع', perm: 'addbranch', form: 'EncodingBranch', ported: true },
       { key: 'users', title: 'المستخدمين والصلاحيات', perm: 'adduser', form: 'EncodingUser', ported: true },
       { key: 'trainers', title: 'المدربين', perm: 'addtrainer', form: 'EncodingTrainer', ported: true, engine: 'trainers' },
@@ -62,6 +62,7 @@ export const MENU: MenuGroup[] = [
       { key: 'offers', title: 'العروض', perm: 'pricesale', form: 'EncodingPriceSale' },
       { key: 'reg-settings', title: 'إعدادات التسجيل', perm: 'regsetting', form: 'EncodingRegSetting', ported: true },
       { key: 'reception', title: 'مكتب الاستقبال', perm: 'resdesk', form: 'MainFindStudent', ported: true },
+      { key: 'my-requests', title: 'طلباتي', perm: 'webmyorders', form: '', ported: true, web: true },
       { key: 'offer-price', title: 'عرض سعر', perm: 'offerprice', form: 'EncodingOfferPrice' },
       { key: 'batch-seats', title: 'عداد الدفعات', perm: 'batchcount', form: 'BatchSeatsHome' },
       { key: 'discount-basket', title: 'سلة الخصومات', perm: 'discountcar', form: 'DisCountHome' },

@@ -11,6 +11,7 @@ public static class WebForms
     public const string PayOrders = "webpayorder";
     public const string Settings = "websettings";
     public const string StudyRequests = "webstudyrequest";
+    public const string MyOrders = "webmyorders";
 
     public sealed record Def(string Key, string Name, string Group, IReadOnlyDictionary<string, string> Rights);
 
@@ -30,6 +31,10 @@ public static class WebForms
             ["edit"] = "تصحيح بيانات الحوالة قبل التأكيد",
             ["delete"] = "إلغاء الطلب أو تعليمه مكرراً",
             ["print"] = "طباعة الفاتورة بعد التأكيد",
+        }),
+        new(MyOrders, "طلباتي", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة ومتابعة طلبات الالتحاق والسداد التي أرسلها المستخدم وحالة كل طلب",
         }),
         new(StudyRequests, "طلبات الدراسة (الموقع)", "المبيعات", new Dictionary<string, string>
         {
