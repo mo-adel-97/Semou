@@ -78,28 +78,28 @@ function RequestsPage({ kind, group }: { kind: Kind; group: string }) {
     : [{ value: '0', label: `بانتظار المراجعة (${(c.pending ?? 0).toLocaleString('ar-EG')})` }, { value: '1', label: `المؤكدة (${(c.confirmed ?? 0).toLocaleString('ar-EG')})` }, { value: '2', label: `المكررة (${(c.duplicate ?? 0).toLocaleString('ar-EG')})` }, { value: '3', label: `الملغاة (${(c.cancelled ?? 0).toLocaleString('ar-EG')})` }, { value: 'all', label: 'الكل' }]
 
   const cols: RCol<Row>[] = [
-    { key: 'code', label: 'الطلب', width: 72, render: r => <b className="code-chip">{r.code}</b> },
+    { key: 'code', label: 'الطلب', width: 80, render: r => <b className="code-chip">{r.code}</b> },
     { key: 'orderDate', label: 'تاريخ الطلب', width: 120, value: r => dt(r.orderDate), render: r => <span className="rq-date">{dt(r.orderDate)}{r.status === 0 && <small>{waited(r.orderDate)}</small>}</span> },
-    { key: 'studentName', label: 'الطالب', width: 200, render: r => <span className="rq-stu"><b>{r.studentName}</b><small dir="ltr">{r.nationalId}</small></span> },
+    { key: 'studentName', label: 'الطالب', width: 200, priority: 2, cardTitle: true, render: r => <span className="rq-stu"><b>{r.studentName}</b><small dir="ltr">{r.nationalId}</small></span> },
     ...(kind === 'reg'
       ? [
         { key: 'regType', label: 'النوع', width: 78, value: (r: Row) => (r.regType === 1 ? 'دورة' : 'دبلوم') },
         { key: 'programs', label: 'البرنامج', width: 180 },
         { key: 'batch', label: 'الدفعة', width: 100 },
         { key: 'seller', label: 'المسوق', width: 115 },
-        { key: 'subTotal', label: 'الاستمارة', width: 105, num: true },
+        { key: 'subTotal', label: 'الاستمارة', width: 105, num: true, priority: 3 },
         { key: 'payAmount', label: 'المقدَّم', width: 100, num: true, blankZero: true, tone: 'ok' },
       ] as RCol<Row>[]
       : [
         { key: 'programs', label: 'البند', width: 190, render: (r: Row) => r.kind === 0 ? <span className="rq-ref"><span className="badge warn">دفعة مقدمة</span>{r.programs?.replace(/^دفعة مقدمة — /, '')}</span> : r.programs },
-        { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok' },
+        { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok', priority: 3 },
         { key: 'cash', label: 'الخزينة / البنك', width: 120 },
         { key: 'payRef', label: 'رقم المرجع', width: 110, render: r => <span className="rq-ref">{r.payRef}{r.duplicates > 0 && r.status === 0 && <span className="rq-dup" title="رقم المرجع مستخدم في فاتورة أو طلب آخر"><Copy size={12} /> مكرر؟</span>}</span> },
         { key: 'payDate', label: 'الحوالة', width: 95, value: (r: Row) => d(r.payDate) },
       ] as RCol<Row>[]),
     { key: 'branch', label: 'الفرع', width: 140, hidden: true },
     { key: 'createdBy', label: 'أرسله', width: 115 },
-    { key: 'status', label: 'الحالة', width: 120, value: r => statusOf(kind, r.status).label, render: r => <Status k={kind} s={r.status} /> },
+    { key: 'status', label: 'الحالة', width: 120, priority: 1, cardBadge: true, value: r => statusOf(kind, r.status).label, render: r => <Status k={kind} s={r.status} /> },
     { key: 'reviewedBy', label: 'راجعه', width: 120, hidden: status === '0' },
     { key: 'docCode', label: kind === 'reg' ? 'رقم الاستمارة' : 'رقم الفاتورة', width: 95, hidden: status === '0', value: r => (kind === 'pay' ? r.taxNo ?? r.docCode : r.docCode) },
     { key: 'files', label: 'مرفقات', width: 80, num: true, int: true, blankZero: true, foot: false, hidden: true },
@@ -164,14 +164,14 @@ export function MyRequests({ group }: { group: string }) {
   const n = (s: string) => ofType.filter(r => stageOf(r) === s).length.toLocaleString('ar-EG')
 
   const cols: RCol<MyRow>[] = [
-    { key: 'type', label: 'نوع الطلب', width: 105, value: r => (r.type === 'reg' ? 'طلب التحاق' : 'طلب سداد'),
+    { key: 'type', label: 'نوع الطلب', width: 105, priority: 2, value: r => (r.type === 'reg' ? 'طلب التحاق' : 'طلب سداد'),
       render: r => <span className="rq-ref">{r.type === 'reg' ? <FileText size={14} /> : <Wallet size={14} />} {r.type === 'reg' ? 'طلب التحاق' : 'طلب سداد'}</span> },
     { key: 'code', label: 'رقم الطلب', width: 80, render: r => <b className="code-chip">{r.code}</b> },
     { key: 'orderDate', label: 'تاريخ الطلب', width: 120, value: r => dt(r.orderDate), render: r => <span className="rq-date">{dt(r.orderDate)}{stageOf(r) === 'wait' && <small>{waited(r.orderDate)}</small>}</span> },
-    { key: 'studentName', label: 'الطالب', width: 200, render: r => <span className="rq-stu"><b>{r.studentName}</b><small dir="ltr">{r.nationalId}</small></span> },
+    { key: 'studentName', label: 'الطالب', width: 200, priority: 2, cardTitle: true, render: r => <span className="rq-stu"><b>{r.studentName}</b><small dir="ltr">{r.nationalId}</small></span> },
     { key: 'programs', label: 'البرنامج / البند', width: 190 },
-    { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok', value: r => (r.type === 'reg' ? r.subTotal : r.payAmount) },
-    { key: 'status', label: 'الحالة', width: 140, value: r => statusOf(r.type, r.status).label, render: r => <Status k={r.type} s={r.status} /> },
+    { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok', priority: 3, value: r => (r.type === 'reg' ? r.subTotal : r.payAmount) },
+    { key: 'status', label: 'الحالة', width: 140, priority: 1, cardBadge: true, value: r => statusOf(r.type, r.status).label, render: r => <Status k={r.type} s={r.status} /> },
     { key: 'reviewedBy', label: 'راجعه', width: 120 },
     { key: 'reviewDate', label: 'تاريخ المراجعة', width: 120, value: r => dt(r.reviewDate) },
     { key: 'reviewNotes', label: 'ملاحظات المراجعة', width: 220 },

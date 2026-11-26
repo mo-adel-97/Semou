@@ -111,19 +111,20 @@ export function DataTable<T extends RowData>({ data, columns, loading, getRowId,
   const rows = table.getRowModel().rows
   const pageCount = table.getPageCount()
 
-  /* small screens: each column keeps a readable width and the table scrolls sideways instead of squeezing */
-  const needW = columns.reduce((s, c) => { const w = c.meta?.width; return s + (typeof w === 'number' ? w : 130) }, 0)
+  /* phone: every row becomes a card; otherwise the table fits the width */
   const scrollBox = useRef<HTMLDivElement>(null)
-  const [narrow, setNarrow] = useState(false)
+  const [boxW, setBoxW] = useState(0)
   useLayoutEffect(() => {
     const el = scrollBox.current
     if (!el) return
-    const check = () => setNarrow(el.clientWidth + 1 < needW)
-    check()
-    const ro = new ResizeObserver(check)
+    const f = () => setBoxW(el.clientWidth)
+    f()
+    const ro = new ResizeObserver(f)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [needW])
+  }, [])
+  const cards = boxW > 0 && boxW < 560
+  const headOf = (h: unknown) => (typeof h === "string" ? h : "")
 
   return (
     <div className="card">
@@ -137,8 +138,28 @@ export function DataTable<T extends RowData>({ data, columns, loading, getRowId,
         {activeFilters > 0 && <button className="btn ghost sm" onClick={() => setColFilters({})}><FilterX size={15} /> مسح فلاتر الأعمدة ({activeFilters})</button>}
       </div>
 
-      <div ref={scrollBox} className={`dt-scroll ${narrow ? 'dt-x' : ''}`}>
-        <table className="dt" style={narrow ? { minWidth: needW } : undefined}>
+      <div ref={scrollBox} className="dt-scroll">
+        {cards ? (
+          <div className="rg-cards">
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="rg-card"><div className="sk" style={{ height: 70 }} /></div>)
+              : rows.map(row => {
+                  const [head, ...rest] = row.getAllCells()
+                  return (
+                    <div key={row.id} className={`rg-card ${onRowClick ? "tap" : ""}`} onClick={onRowClick ? () => onRowClick(row.original) : undefined}>
+                      {head && <div className="rg-card-head"><div className="rg-card-title"><table.FlexRender cell={head} /></div></div>}
+                      <dl className="rg-card-dl">
+                        {rest.map(cell => {
+                          const label = headOf(cell.column.columnDef.header)
+                          return <div key={cell.id} className={label ? "" : "rg-card-full"}>{label && <dt>{label}</dt>}<dd><table.FlexRender cell={cell} /></dd></div>
+                        })}
+                      </dl>
+                    </div>
+                  )
+                })}
+          </div>
+        ) : (
+        <table className="dt">
           <thead>
             {table.getHeaderGroups().map(g => (
               <tr key={g.id}>
@@ -180,6 +201,7 @@ export function DataTable<T extends RowData>({ data, columns, loading, getRowId,
                 ))}
           </tbody>
         </table>
+        )}
         {!loading && rows.length === 0 && (
           <div className="empty">
             <div className="ic"><Inbox size={30} /></div>

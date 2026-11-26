@@ -27,6 +27,13 @@ export interface RCol<T> {
   hidden?: boolean
   /** No column filter (e.g. action buttons). */
   noFilter?: boolean
+  /** When the screen is too narrow for every column, the ones with the biggest number step aside first
+   *  (still available from «الأعمدة»). Default: the column's position. */
+  priority?: number
+  /** Phone cards: this column is the card title (default: the first column). */
+  cardTitle?: boolean
+  /** Phone cards: shown as a badge in the card head (e.g. the status). */
+  cardBadge?: boolean
 }
 
 const money = (n: number) => n.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -72,7 +79,33 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
   const [size, setSize] = useState<number>(initialSize)
   const [page, setPage] = useState(0)
 
-  const cols = columns.filter(c => !hidden[c.key])
+  /* ---- fit the width: no sideways scrolling. Less important columns step aside on narrower screens,
+          and on a phone every row becomes a card. hidden[key]: true = hidden by the user, false = shown by the user. ---- */
+  const rgRef = useRef<HTMLDivElement>(null)
+  const [boxW, setBoxW] = useState(0)
+  useLayoutEffect(() => {
+    const el = rgRef.current
+    if (!el) return
+    const f = () => setBoxW(el.clientWidth)
+    f()
+    const ro = new ResizeObserver(f)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const chosen = columns.filter(c => hidden[c.key] !== true)
+  const MIN = 0.95 // a column may shrink to 85% of its width before another one steps aside
+  const room = boxW - (selection ? 40 : 0) - 2
+  const autoOff = new Set<string>()
+  if (boxW) {
+    let need = chosen.reduce((s, c) => s + c.width * MIN, 0)
+    const order = chosen.map((c, i) => ({ c, p: c.priority ?? i + 10 })).filter(x => hidden[x.c.key] !== false).sort((a, b) => b.p - a.p)
+    for (const x of order) {
+      if (need <= room || chosen.length - autoOff.size <= 2) break
+      autoOff.add(x.c.key); need -= x.c.width * MIN
+    }
+  }
+  const cols = chosen.filter(c => !autoOff.has(c.key))
+  const cards = boxW > 0 && boxW < 560
   const val = (c: RCol<T>, r: T) => (c.value ? c.value(r) : (r as Record<string, unknown>)[c.key] as string | number | null | undefined)
   /** Text used by search and column filters (what the user sees). */
   const text = (c: RCol<T>, r: T) => {
@@ -102,35 +135,16 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, q, sort, filters, columns])
 
-  const totals = useMemo(() => Object.fromEntries(cols.filter(c => c.num && c.foot !== false).map(c => [c.key, filtered.reduce((s, r) => s + (Number(val(c, r)) || 0), 0)])), [filtered, cols]) // eslint-disable-line react-hooks/exhaustive-deps
+  const totals = useMemo(() => Object.fromEntries(chosen.filter(c => c.num && c.foot !== false).map(c => [c.key, filtered.reduce((s, r) => s + (Number(val(c, r)) || 0), 0)])), [filtered, chosen]) // eslint-disable-line react-hooks/exhaustive-deps
   const pages = size ? Math.max(1, Math.ceil(filtered.length / size)) : 1
   const cur = Math.min(page, pages - 1)
   const view = size ? filtered.slice(cur * size, cur * size + size) : filtered
   const weight = cols.reduce((s, c) => s + c.width, 0)
   const activeFilters = Object.keys(filters).length
 
-  /* ---- small screens: the columns keep a readable width and the table scrolls sideways instead of being cut ---- */
-  const needW = Math.round(weight) + (selection ? 40 : 0)
-  const bodyBox = useRef<HTMLDivElement>(null)
-  const [narrow, setNarrow] = useState(false)
-  // which sides still hide columns (RTL: scrollLeft runs from 0 to negative)
-  const [edges, setEdges] = useState({ start: false, end: false })
-  const readEdges = () => {
-    const el = bodyBox.current
-    if (!el) return
-    const moved = Math.abs(el.scrollLeft), rest = el.scrollWidth - el.clientWidth - moved
-    setEdges(e => (e.start === moved > 2 && e.end === rest > 2 ? e : { start: moved > 2, end: rest > 2 }))
-  }
-  useLayoutEffect(() => { readEdges() }, [narrow, view.length]) // eslint-disable-line react-hooks/exhaustive-deps
-  useLayoutEffect(() => {
-    const el = bodyBox.current
-    if (!el) return
-    const check = () => { setNarrow(el.clientWidth + 1 < needW); readEdges() }
-    check()
-    const ro = new ResizeObserver(check)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [needW])
+  // only when the user forces more columns than the screen can hold does the table scroll sideways (the last resort)
+  const needW = Math.round(weight * MIN)
+  const narrow = !cards && boxW > 0 && needW > room
 
   const groups: { label: string; span: number }[] = []
   for (const c of cols) {
@@ -146,7 +160,7 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
   const bodyRef = useRef<HTMLTableSectionElement>(null)
   const [scroller, setScroller] = useState<{ el: HTMLElement | null; margin: number }>({ el: null, margin: 0 })
   useLayoutEffect(() => {
-    if (!big) return
+    if (!big || !bodyRef.current) return
     const el = scrollParent(bodyRef.current)
     const top = bodyRef.current!.getBoundingClientRect().top
     const margin = el ? top - el.getBoundingClientRect().top + el.scrollTop : top + window.scrollY
@@ -185,7 +199,7 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
   }, [menuCol, rows, filters, columns])
 
   return (
-    <div className={`rg ${full ? 'rg-full' : ''} rg-${density}`}>
+    <div ref={rgRef} className={`rg ${full ? 'rg-full' : ''} rg-${density} ${cards ? 'rg-as-cards' : ''}`}>
       <div className="rg-bar">
         <div className="input-wrap rg-search"><Search size={15} /><input className="input" placeholder="بحث في الجدول..." value={q} onChange={e => { setQ(e.target.value); setPage(0) }} />
           {q && <button className="btn ghost sm icon trail" onClick={() => setQ('')} aria-label="مسح"><X size={14} /></button>}</div>
@@ -194,12 +208,14 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
         <div className="rg-tools">
           {toolbar}
           <div className="pop-anchor">
-            <button className="btn ghost sm" onClick={() => setChooser(v => !v)} title="إظهار / إخفاء الأعمدة"><Columns3 size={16} /> الأعمدة</button>
+            <button className="btn ghost sm" onClick={() => setChooser(v => !v)} title={autoOff.size && !cards ? `${autoOff.size} أعمدة مخفية لضيق المساحة، اضغط لإظهارها` : 'إظهار / إخفاء الأعمدة'}>
+              <Columns3 size={16} /> الأعمدة{autoOff.size > 0 && !cards && <span className="rg-more">+{autoOff.size.toLocaleString('ar-EG')}</span>}
+            </button>
             {chooser && <>
               <div className="click-away" onClick={() => setChooser(false)} />
               <div className="menu-pop rg-chooser">
                 {columns.map(c => (
-                  <label key={c.key} className="sm-chk"><input type="checkbox" checked={!hidden[c.key]} onChange={e => setHidden(h => ({ ...h, [c.key]: !e.target.checked }))} /> {c.group ? `${c.group} - ` : ''}{c.label}</label>
+                  <label key={c.key} className="sm-chk"><input type="checkbox" checked={hidden[c.key] !== true && (cards || !autoOff.has(c.key))} onChange={e => setHidden(h => ({ ...h, [c.key]: !e.target.checked }))} /> {c.group ? `${c.group} - ` : ''}{c.label}</label>
                 ))}
               </div>
             </>}
@@ -208,8 +224,49 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
           <button className="btn ghost sm icon" title={full ? 'تصغير' : 'ملء الشاشة'} onClick={() => setFull(f => !f)}>{full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
         </div>
       </div>
+      {cards ? (
+        <div className="rg-cards">
+          {view.length === 0 && <div className="rg-empty rg-card-empty">{rows.length ? 'لا توجد نتائج مطابقة للفلاتر' : emptyText}</div>}
+          {view.map((r, i) => {
+            const k = rowKey(r, cur * size + i)
+            const head = chosen.find(c => c.cardTitle) ?? chosen[0]
+            const badge = chosen.find(c => c.cardBadge && c !== head)
+            const lead = chosen[0] !== head && chosen[0] !== badge ? chosen[0] : undefined
+            const rest = chosen.filter(c => c !== head && c !== badge && c !== lead)
+            return (
+              <div key={k} className={`rg-card ${rowClass?.(r) ?? ''} ${onRowClick ? 'tap' : ''} ${selection?.keys.has(k) ? 'checked' : ''}`} onClick={() => { setSelected(k); onRowClick?.(r) }}>
+                <div className="rg-card-head">
+                  {selection && <input type="checkbox" checked={selection.keys.has(k)} onClick={e => e.stopPropagation()}
+                    onChange={() => { const n = new Set(selection.keys); if (n.has(k)) n.delete(k); else n.add(k); selection.onChange(n) }} />}
+                  {lead && <span className="rg-card-lead">{cell(lead, r)}</span>}
+                  {head && <div className="rg-card-title">{cell(head, r)}</div>}
+                  {badge && <span className="rg-card-badge">{cell(badge, r)}</span>}
+                  {onRowClick && <ChevronLeft size={16} className="rg-card-go" />}
+                </div>
+                <dl className="rg-card-dl">
+                  {rest.map(c => {
+                    const v = cell(c, r)
+                    if (v === '' || v == null) return null
+                    return <div key={c.key} className={c.num ? 'n' : ''}><dt>{c.label}</dt><dd className={tone(c, r)}>{v}</dd></div>
+                  })}
+                </dl>
+              </div>
+            )
+          })}
+          {view.length > 0 && chosen.some(c => c.num && c.foot !== false) && (
+            <div className="rg-card rg-card-total">
+              <div className="rg-card-head"><div className="rg-card-title">{footLabel}</div></div>
+              <dl className="rg-card-dl">
+                {chosen.filter(c => c.num && c.foot !== false).map(c => (
+                  <div key={c.key} className="n"><dt>{c.label}</dt><dd>{c.foot !== undefined ? c.foot : c.int ? (totals[c.key] ?? 0).toLocaleString('ar-EG') : money(totals[c.key] ?? 0)}</dd></div>
+                ))}
+              </dl>
+            </div>
+          )}
+        </div>
+      ) : (
       <div className="rg-bodywrap">
-      <div ref={bodyBox} className={`rg-body ${narrow ? 'rg-x' : ''}`} onScroll={narrow ? readEdges : undefined}>
+      <div className={`rg-body ${narrow ? 'rg-x' : ''}`}>
         <table className="rg-table" style={narrow ? { minWidth: needW } : undefined}>
           <colgroup>{selection && <col style={{ width: 40 }} />}{cols.map(c => <col key={c.key} style={{ width: `${(c.width / weight) * 100}%` }} />)}</colgroup>
           <thead>
@@ -261,8 +318,8 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
           </tfoot>
         </table>
       </div>
-      {narrow && <><i className={`rg-edge start ${edges.start ? 'on' : ''}`} /><i className={`rg-edge end ${edges.end ? 'on' : ''}`} /></>}
       </div>
+      )}
       <div className="rg-pager">
         <span>عدد السطور في الصفحة</span>
         <select className="input" value={size} onChange={e => { setSize(Number(e.target.value)); setPage(0) }}>
