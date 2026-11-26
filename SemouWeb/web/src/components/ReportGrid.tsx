@@ -109,6 +109,29 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
   const weight = cols.reduce((s, c) => s + c.width, 0)
   const activeFilters = Object.keys(filters).length
 
+  /* ---- small screens: the columns keep a readable width and the table scrolls sideways instead of being cut ---- */
+  const needW = Math.round(weight) + (selection ? 40 : 0)
+  const bodyBox = useRef<HTMLDivElement>(null)
+  const [narrow, setNarrow] = useState(false)
+  // which sides still hide columns (RTL: scrollLeft runs from 0 to negative)
+  const [edges, setEdges] = useState({ start: false, end: false })
+  const readEdges = () => {
+    const el = bodyBox.current
+    if (!el) return
+    const moved = Math.abs(el.scrollLeft), rest = el.scrollWidth - el.clientWidth - moved
+    setEdges(e => (e.start === moved > 2 && e.end === rest > 2 ? e : { start: moved > 2, end: rest > 2 }))
+  }
+  useLayoutEffect(() => { readEdges() }, [narrow, view.length]) // eslint-disable-line react-hooks/exhaustive-deps
+  useLayoutEffect(() => {
+    const el = bodyBox.current
+    if (!el) return
+    const check = () => { setNarrow(el.clientWidth + 1 < needW); readEdges() }
+    check()
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [needW])
+
   const groups: { label: string; span: number }[] = []
   for (const c of cols) {
     const g = c.group ?? ''
@@ -185,8 +208,9 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
           <button className="btn ghost sm icon" title={full ? 'تصغير' : 'ملء الشاشة'} onClick={() => setFull(f => !f)}>{full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
         </div>
       </div>
-      <div className="rg-body">
-        <table className="rg-table">
+      <div className="rg-bodywrap">
+      <div ref={bodyBox} className={`rg-body ${narrow ? 'rg-x' : ''}`} onScroll={narrow ? readEdges : undefined}>
+        <table className="rg-table" style={narrow ? { minWidth: needW } : undefined}>
           <colgroup>{selection && <col style={{ width: 40 }} />}{cols.map(c => <col key={c.key} style={{ width: `${(c.width / weight) * 100}%` }} />)}</colgroup>
           <thead>
             {hasGroups && <tr className="rg-groups">{selection && <th />}{groups.map((g, i) => <th key={i} colSpan={g.span} className={g.label ? 'grp' : ''}>{g.label}</th>)}</tr>}
@@ -236,6 +260,8 @@ export function ReportGrid<T>({ columns, rows, rowKey, rowClass, footLabel = 'ا
             </tr>
           </tfoot>
         </table>
+      </div>
+      {narrow && <><i className={`rg-edge start ${edges.start ? 'on' : ''}`} /><i className={`rg-edge end ${edges.end ? 'on' : ''}`} /></>}
       </div>
       <div className="rg-pager">
         <span>عدد السطور في الصفحة</span>

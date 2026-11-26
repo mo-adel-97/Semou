@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 import {
   columnFilteringFeature,
@@ -111,6 +111,20 @@ export function DataTable<T extends RowData>({ data, columns, loading, getRowId,
   const rows = table.getRowModel().rows
   const pageCount = table.getPageCount()
 
+  /* small screens: each column keeps a readable width and the table scrolls sideways instead of squeezing */
+  const needW = columns.reduce((s, c) => { const w = c.meta?.width; return s + (typeof w === 'number' ? w : 130) }, 0)
+  const scrollBox = useRef<HTMLDivElement>(null)
+  const [narrow, setNarrow] = useState(false)
+  useLayoutEffect(() => {
+    const el = scrollBox.current
+    if (!el) return
+    const check = () => setNarrow(el.clientWidth + 1 < needW)
+    check()
+    const ro = new ResizeObserver(check)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [needW])
+
   return (
     <div className="card">
       <div className="dt-toolbar">
@@ -123,8 +137,8 @@ export function DataTable<T extends RowData>({ data, columns, loading, getRowId,
         {activeFilters > 0 && <button className="btn ghost sm" onClick={() => setColFilters({})}><FilterX size={15} /> مسح فلاتر الأعمدة ({activeFilters})</button>}
       </div>
 
-      <div className="dt-scroll">
-        <table className="dt">
+      <div ref={scrollBox} className={`dt-scroll ${narrow ? 'dt-x' : ''}`}>
+        <table className="dt" style={narrow ? { minWidth: needW } : undefined}>
           <thead>
             {table.getHeaderGroups().map(g => (
               <tr key={g.id}>
