@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, Bell, Briefcase, CalendarDays, GraduationCap, Quote, ShieldCheck, Sparkles, Wallet, X } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, Bell, CalendarDays, GraduationCap, Quote, ShieldCheck, Wallet, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -11,11 +11,10 @@ import ProgramsShowcase from '../home/Programs'
 import Hero from '../home/Hero'
 import Story, { Screen } from '../home/Story'
 import About from '../home/About'
-import { DarkStage, Headline, IsoCube, at, usePalette } from '../home/kit'
+import { DarkStage, Headline, at, usePalette } from '../home/kit'
 import PathScene from '../home/paths'
 import { PostCard } from './Blog'
 
-const TYPE_ICON: Record<ProgramType, typeof GraduationCap> = { diploma: GraduationCap, qualifying: Briefcase, development: Sparkles }
 
 export default function Home() {
   const { data, isLoading } = useHome()
