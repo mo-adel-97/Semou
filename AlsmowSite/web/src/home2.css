@@ -187,10 +187,51 @@
 .iso-face svg { width: 100%; height: 100%; stroke-width: 1.7; }
 .path-card { display: block; height: 100%; }
 .path-scene {
-  position: relative; display: grid; place-items: center; height: 15rem; overflow: hidden;
-  background-image: repeating-linear-gradient(30deg, var(--line) 0 1px, transparent 1px 30px), repeating-linear-gradient(150deg, var(--line) 0 1px, transparent 1px 30px);
-  mask-image: linear-gradient(black 70%, transparent);
+  position: relative; isolation: isolate; display: grid; place-items: center; height: 15.5rem; overflow: hidden; margin: .6rem .6rem 0;
+  border-radius: 1.35rem; background-color: var(--stage); font-size: 14px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08);
 }
+.path-scene .ps-card { transition: translate .6s cubic-bezier(.22, 1, .36, 1), box-shadow .6s; }
+.path-card:hover .ps-card { translate: 0 -6px; box-shadow: 0 34px 60px -26px rgb(0 0 0 / .55); }
+.ps-card { position: relative; width: min(82%, 17.5rem); padding: 1.05em 1.15em; border-radius: 1.1em; background: var(--surface); color: var(--ink); box-shadow: 0 26px 50px -26px rgb(0 0 0 / .5); }
+.ps-ic { display: grid; place-items: center; width: 2.4em; height: 2.4em; flex: none; border-radius: .8em; color: var(--stage); background: color-mix(in oklab, var(--stage) 14%, var(--surface)); }
+.ps-ic svg { width: 1.3em; height: 1.3em; }
+.ps-card b { font-family: var(--font-display); font-weight: 800; }
+.ps-card small { display: block; font-size: .78em; font-weight: 600; color: var(--muted); }
+/* certificate */
+.ps-cert { border: 1px solid color-mix(in oklab, var(--stage) 30%, var(--line)); outline: .3em solid var(--surface); }
+.ps-cert::before { content: ''; position: absolute; inset: .35em; border-radius: .8em; border: 1px dashed color-mix(in oklab, var(--stage) 40%, transparent); pointer-events: none; }
+.ps-cert-head { display: flex; align-items: center; gap: .7em; margin-bottom: .85em; }
+.ps-cert-head b { display: block; font-size: 1.05em; }
+.ps-line { display: block; height: .45em; margin-top: .45em; border-radius: 99px; background: color-mix(in oklab, var(--ink) 9%, transparent); }
+.ps-cert-foot { display: flex; align-items: end; justify-content: space-between; margin-top: .7em; }
+.ps-sign { width: 5.4em; height: 1.6em; fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; }
+.ps-stamp { display: inline-flex; align-items: center; gap: .3em; padding: .35em .7em; border-radius: .6em; border: 2px solid var(--stage); color: var(--stage); font-family: var(--font-display); font-weight: 900; font-size: .85em; }
+.ps-stamp svg { width: 1.05em; height: 1.05em; }
+/* guided steps */
+.ps-steps { display: grid; gap: .8em; padding-inline-start: 1.15em; }
+.ps-steps-rail { position: absolute; inset-block: 1.9em; inset-inline-start: 1.15em; width: 2.2em; display: flex; justify-content: center; }
+.ps-steps-rail::before, .ps-steps-rail i { content: ''; position: absolute; inset-block: 0; width: 2px; border-radius: 2px; background: var(--line); }
+.ps-steps-rail i { background: var(--stage); transform-origin: top; }
+.ps-step { position: relative; display: grid; grid-template-columns: 2.2em 1fr; column-gap: .7em; align-items: center; }
+.ps-step b, .ps-step small { grid-column: 2; }
+.ps-step b { font-size: .95em; line-height: 1.3; }
+.ps-dot { grid-row: span 2; display: grid; place-items: center; width: 2.2em; height: 2.2em; border-radius: 50%; color: #fff; background: var(--stage); box-shadow: 0 0 0 .3em var(--surface); }
+.ps-dot svg { width: 1.1em; height: 1.1em; stroke-width: 3; }
+.ps-step.now .ps-dot { background: var(--surface); border: 2px solid var(--stage); }
+.ps-step.now .ps-dot i { width: .7em; height: .7em; border-radius: 50%; background: var(--stage); animation: sc-pulse 1.6s ease-in-out infinite; }
+.ps-step.now small { color: var(--stage); font-weight: 800; }
+/* grown skills */
+.ps-growth-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6em; }
+.ps-up { display: inline-flex; align-items: center; gap: .3em; padding: .25em .6em; border-radius: 99px; font-size: .78em; font-weight: 800; color: #0f8a4b; background: color-mix(in oklab, #16a34a 14%, var(--surface)); }
+.ps-up svg { width: 1.1em; height: 1.1em; }
+.ps-skill { display: grid; grid-template-columns: 6.2em 1fr; align-items: center; gap: .6em; margin-top: .55em; font-size: .85em; font-weight: 700; color: var(--ink-2); }
+.ps-bar { position: relative; height: .6em; border-radius: 99px; background: color-mix(in oklab, var(--ink) 7%, transparent); overflow: hidden; }
+.ps-bar i { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: inherit; }
+.ps-bar-was { background: color-mix(in oklab, var(--stage) 28%, transparent); }
+.ps-bar-now { background: var(--stage); }
+.ps-new { position: absolute; bottom: -1em; inset-inline-end: -.9em; display: inline-flex; align-items: center; gap: .35em; padding: .45em .8em; border-radius: 99px; background: var(--ink); color: var(--surface); font-family: var(--font-display); font-size: .8em; font-weight: 800; box-shadow: 0 14px 28px -12px rgb(0 0 0 / .5); }
+.ps-new svg { width: 1.05em; height: 1.05em; color: #facc15; }
 .path-cube { width: 8.6rem; animation: cube-bob 6s ease-in-out infinite; }
 .pgrid-cell:nth-child(2) .path-cube { animation-delay: -2s; } .pgrid-cell:nth-child(3) .path-cube { animation-delay: -4s; }
 @keyframes cube-bob { 50% { transform: translateY(-8px); } }
@@ -232,7 +273,7 @@
 @media (max-width: 639px) {
   .demo-chat-wrap { width: 72%; height: 74%; inset-inline-end: 4%; bottom: 4.5%; }
   .demo-row:nth-of-type(3) { display: none; }
-  .path-scene { height: 11.5rem; }
+  .path-scene { height: 14rem; font-size: 13px; }
   .path-cube { width: 7rem; }
 }
 
@@ -361,7 +402,7 @@ a.chat-row:hover { background: var(--surface); }
   .pshow-stage-wrap { order: 0; }
 }
 
-.pshow-list { display: flex; flex-direction: column; gap: .3rem; }
+.pshow-list { display: flex; flex-direction: column; gap: .3rem; align-self: start; padding-top: .5rem; }
 .pshow-row { position: relative; display: flex; align-items: center; gap: .95rem; padding: .85rem 1rem; border-radius: 1.25rem; text-align: start; overflow: hidden; transition: background-color .3s; }
 .pshow-row:not(.on):hover { background: color-mix(in oklab, var(--c) 6%, transparent); }
 .pshow-row-bg { position: absolute; inset: 0; border-radius: 1.25rem; background: var(--surface); border: 1px solid color-mix(in oklab, var(--c) 22%, var(--line)); box-shadow: 0 18px 40px -22px color-mix(in oklab, var(--c) 55%, transparent); }
@@ -569,7 +610,7 @@ a.chat-row:hover { background: var(--surface); }
 /* ---------- the programmes showcase pins while scrolling: one scroll step = one programme ---------- */
 .pshow-track { padding-bottom: 5rem; }
 .pshow-sticky { padding-top: 2rem; }
-.pshow-track.pinned { height: calc(100svh + var(--n) * 60svh); padding-bottom: 0; }
+.pshow-track.pinned { height: calc(100svh + (var(--n) - 1) * 42svh); padding-bottom: 0; }
 .pshow-track.pinned .pshow-sticky { position: sticky; top: 0; height: 100svh; display: flex; align-items: center; padding: 5.75rem 0 1.5rem; }
 .pshow-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
 .pshow-pager { display: inline-flex; align-items: center; gap: .55rem; font-family: var(--font-display); color: var(--muted); }

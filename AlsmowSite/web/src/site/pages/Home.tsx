@@ -12,6 +12,7 @@ import Hero from '../home/Hero'
 import Story, { Screen } from '../home/Story'
 import About from '../home/About'
 import { DarkStage, Headline, IsoCube, at, usePalette } from '../home/kit'
+import PathScene from '../home/paths'
 import { PostCard } from './Blog'
 
 const TYPE_ICON: Record<ProgramType, typeof GraduationCap> = { diploma: GraduationCap, qualifying: Briefcase, development: Sparkles }
@@ -107,7 +108,10 @@ function Accreditations({ items }: { items: Accreditation[] }) {
   )
 }
 
-/* ================= Paths: three cubes in the identity colours ================= */
+/* ================= Paths: each told by what it gives (a certificate, a guided path, grown skills) ================= */
+
+/** Arabic number agreement: برنامج واحد · برنامجان · ٣–١٠ برامج · ١١+ برنامجاً */
+const countLabel = (k: number) => (k === 1 ? 'برنامج واحد' : k === 2 ? 'برنامجان' : k >= 3 && k <= 10 ? `${k} برامج` : `${k} برنامجاً`)
 
 function Paths({ data }: { data: HomeData }) {
   const palette = usePalette()
@@ -118,13 +122,10 @@ function Paths({ data }: { data: HomeData }) {
         <Headline eyebrow="اختر مسارك" title="ثلاثة مسارات لمستقبل مهني أقوى." rest="اختر ما يناسب طموحك." />
         <motion.div variants={stagger.container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="pgrid mt-14 grid md:grid-cols-3" style={{ ['--cols' as string]: 3 }}>
           {types.map((t, i) => {
-            const Icon = TYPE_ICON[t]
             return (
               <motion.div key={t} variants={stagger.item} className="pgrid-cell !block !h-auto !p-0">
                 <Link to={`/programs/type/${t}`} className="path-card group">
-                  <div className="path-scene">
-                    <IsoCube color={at(palette, i)} className="path-cube"><Icon /></IsoCube>
-                  </div>
+                  <PathScene type={t} color={at(palette, i)} />
                   <div className="p-6 pt-5 md:p-7 md:pt-6">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="font-display text-xl font-extrabold text-ink md:text-[1.35rem]">{PROGRAM_TYPES[t].plural}</h3>
@@ -132,7 +133,7 @@ function Paths({ data }: { data: HomeData }) {
                     </div>
                     <p className="mt-2 leading-relaxed text-muted">{PROGRAM_TYPES[t].blurb}</p>
                     <span className="mt-4 inline-flex items-center gap-2 font-display text-sm font-bold" style={{ color: `color-mix(in oklab, ${at(palette, i)} 80%, var(--ink))` }}>
-                      <i className="h-2 w-2 rounded-full" style={{ background: at(palette, i) }} /> {data.counts[t]} برامج
+                      <i className="h-2 w-2 rounded-full" style={{ background: at(palette, i) }} /> {countLabel(data.counts[t])}
                     </span>
                   </div>
                 </Link>

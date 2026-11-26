@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect, type ReactNode } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useSite } from './lib/queries'
 import Layout from './site/Layout'
+import { tabIcon } from './lib/tabIcon'
 import Home from './site/pages/Home'
 
 // Inner pages are separate downloads (the home page only ships what it shows), fetched quietly once the page is idle
@@ -79,12 +80,14 @@ function SiteIcon() {
   useEffect(() => {
     if (!logo) return
     // after the page has settled, so the icon never competes with what the visitor sees first
-    const set = () => {
-      for (const rel of ['icon', 'apple-touch-icon']) {
-        let l = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
-        if (!l) { l = document.createElement('link'); l.rel = rel; document.head.appendChild(l) }
-        l.removeAttribute('type')
-        l.href = logo
+    const set = async () => {
+      for (const [rel, size, rounded] of [['icon', 64, true], ['apple-touch-icon', 180, false]] as const) {
+        let href: string
+        try { href = await tabIcon(logo, size, rounded) } catch { continue } // keep the built-in icon when the logo cannot be read
+        document.head.querySelectorAll(`link[rel="${rel}"]`).forEach((x) => x.remove())
+        const l = document.createElement('link')
+        l.rel = rel; l.type = 'image/png'; l.href = href
+        document.head.appendChild(l)
       }
     }
     const t = window.setTimeout(set, 4000)
