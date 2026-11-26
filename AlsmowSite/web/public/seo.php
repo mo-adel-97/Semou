@@ -86,10 +86,12 @@ try {
         'knowsAbout' => $keywords ?: null,
         'slogan' => $g['tagline'] ?? null,
     ], fn($v) => $v !== null && $v !== '' && $v !== []);
-    $ld = [$org, [
+    $ld = [$org, array_filter([
         '@type' => 'WebSite', '@id' => $site . '/#website', 'url' => $site . '/', 'name' => $name,
         'alternateName' => $alt ?: null, 'inLanguage' => 'ar-SA', 'publisher' => ['@id' => $orgId],
-    ]];
+    ], fn($v) => $v !== null)];
+    // where the institute teaches, said once and reused: «حضوريًا في حفر الباطن وعن بُعد في كل المملكة»
+    $where = 'حضوريًا في ' . (trim((string) ($c['city'] ?? '')) ?: 'حفر الباطن') . ' وعن بُعد في كل المملكة';
     $crumbs = [['الرئيسية', $site . '/']];
 
     $course = function (array $p) use ($site, $orgId, $abs, $clip, $types, $modes): array {
@@ -144,7 +146,7 @@ try {
         $crumbs[] = [$title, $site . '/programs'];
     } elseif ($seg[0] === 'programs' && ($seg[1] ?? '') === 'type' && isset($seg[2], $types[$seg[2]]) && count($seg) === 3) {
         [, $plural, $blurb] = $types[$seg[2]];
-        $title = $plural; $h1 = $plural; $desc = $blurb;
+        $title = $plural; $h1 = $plural; $desc = $blurb . ' في ' . $name . '، ' . $where . '.';
         $body = '<p>' . $e($blurb) . '</p>' . $links(array_values(array_filter($programs, fn($p) => $p['type'] === $seg[2])));
         $crumbs[] = ['البرامج', $site . '/programs'];
         $crumbs[] = [$plural, $site . '/programs/type/' . $seg[2]];
@@ -153,6 +155,8 @@ try {
         if ($p) {
             $title = $p['title']; $h1 = $p['title'];
             $desc = $clip($p['summary'] ?: ($p['body'] ?? '')) ?: $siteDesc;
+            // a short summary gets what people search with: the kind of programme, the institute, where
+            if (mb_strlen($desc) < 110) $desc = $clip(rtrim($desc, '.') . ' — ' . ($types[$p['type']][0] ?? 'برنامج') . ' معتمد في ' . $name . '، ' . $where . '.');
             $image = $abs($p['image']) ?: $image;
             $facts = array_filter([
                 'نوع البرنامج' => $types[$p['type']][0] ?? null,

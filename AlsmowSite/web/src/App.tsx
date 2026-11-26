@@ -78,10 +78,11 @@ const router = createBrowserRouter([
 function SiteIcon() {
   const logo = useSite().data?.settings.general.logo
   useEffect(() => {
-    if (!logo) return
+    // crawlers keep the static icon files (Google only accepts a real URL for the icon shown next to results)
+    if (!logo || /bot|crawl|spider|lighthouse/i.test(navigator.userAgent)) return
     // after the page has settled, so the icon never competes with what the visitor sees first
     const set = async () => {
-      for (const [rel, size, rounded] of [['icon', 64, true], ['apple-touch-icon', 180, false]] as const) {
+      for (const [rel, size, rounded] of [['icon', 96, true], ['apple-touch-icon', 180, false]] as const) {
         let href: string
         try { href = await tabIcon(logo, size, rounded) } catch { continue } // keep the built-in icon when the logo cannot be read
         document.head.querySelectorAll(`link[rel="${rel}"]`).forEach((x) => x.remove())
