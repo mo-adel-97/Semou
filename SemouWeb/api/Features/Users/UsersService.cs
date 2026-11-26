@@ -48,6 +48,9 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
                                   bool? ChkAmount, bool? ChkOtherFess, Guid? SellerGuid);
     private sealed record PermDb(Guid FormGuid, bool? Add_, bool? Edit, bool? Del, bool? Print_, bool? Find_, bool? View_);
     private sealed record MenuDb(Guid MenuGuid, bool? View_);
+    /// <summary>Typed (not dynamic) so the JSON keys come out camelCase like the rest of the card.</summary>
+    private sealed record ProfileDb(string? NationalId, Guid? JobTitleGuid, Guid? EmploymentTypeGuid, Guid? SpecializationGuid, string? PersonalMobile, string? WorkMobile,
+                                    string? Email, string? Iban, Guid? BankGuid, string? HireDate, string? BirthDate, string? Notes);
 
     /// <summary>SHOWUSERINFO + SHOWUSERMAINMENU + SHOWUSERFORM + SHOWUSERBRANCH (without the password).</summary>
     public async Task<object> GetAsync(Guid guid, CancellationToken ct)
@@ -60,7 +63,7 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var menus = await c.QueryAsync<MenuDb>(new CommandDefinition("SELECT MenuGuid, View_ FROM dbo.UserMenu WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var forms = await c.QueryAsync<PermDb>(new CommandDefinition("SELECT FormGuid, Add_, Edit, Del, Print_, Find_, View_ FROM dbo.User_Premision WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var branches = await c.QueryAsync<Guid>(new CommandDefinition("SELECT BranchGuid FROM dbo.UserBranch WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
-        var profile = await c.QueryFirstOrDefaultAsync(new CommandDefinition("""
+        var profile = await c.QueryFirstOrDefaultAsync<ProfileDb>(new CommandDefinition("""
             SELECT NationalId, JobTitleGuid, EmploymentTypeGuid, SpecializationGuid, PersonalMobile, WorkMobile, Email, Iban, BankGuid,
                    CONVERT(char(10), HireDate, 23) AS HireDate, CONVERT(char(10), BirthDate, 23) AS BirthDate, Notes
             FROM dbo.UserProfile WHERE UserGuid = @guid
