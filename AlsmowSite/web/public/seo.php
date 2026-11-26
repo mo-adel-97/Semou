@@ -315,6 +315,9 @@ function seo_norm(string $s): string
  */
 function seo_old_url(array $seg, array $programs): ?string
 {
+    // programmes whose address changed (old slug → new slug)
+    $moved = ['دبلوم-ادارة-الأعمال' => 'دبلوم-إدارة-التمريض'];
+    if (($seg[0] ?? '') === 'programs' && isset($seg[1], $moved[$seg[1]])) return '/programs/' . rawurlencode($moved[$seg[1]]);
     while ($seg && in_array(strtolower(end($seg)), ['feed', 'amp', 'embed', 'comments'], true)) array_pop($seg);
     if (count($seg) >= 2 && $seg[count($seg) - 2] === 'page') { array_pop($seg); array_pop($seg); }
     if (!$seg) return '/';
