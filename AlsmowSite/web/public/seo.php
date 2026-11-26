@@ -78,6 +78,7 @@ try {
             'streetAddress' => $c['address'] ?? null,
             'addressLocality' => 'حفر الباطن',
             'addressRegion' => 'المنطقة الشرقية',
+            'postalCode' => $c['postal_code'] ?? null,
             'addressCountry' => 'SA',
         ],
         'areaServed' => ['@type' => 'Country', 'name' => 'المملكة العربية السعودية'],
@@ -214,6 +215,12 @@ try {
         $status = 404;
     }
 
+    // a link from the old WordPress site (Google and old shares still have them): send it for good to the page that replaced it
+    if ($status === 404 && ($to = seo_old_url($seg, $programs))) {
+        header('Location: ' . $site . $to, true, 301);
+        header('Cache-Control: public, max-age=86400');
+        exit;
+    }
     if ($status === 404) { $title = 'الصفحة غير موجودة'; $h1 = $title; $body = ''; }
     // contact + places on every page: the strongest local signal, and real text for the crawler
     $contactHtml = '<h2>' . $e($name) . '</h2><ul>'
@@ -290,4 +297,59 @@ function seo_sitemap(string $site): never
     }
     echo '</urlset>';
     exit;
+}
+
+/** Arabic/Latin text reduced to its letters, for matching old URLs to new pages (hamza forms, ta marbuta, alef maqsura). */
+function seo_norm(string $s): string
+{
+    $s = mb_strtolower(rawurldecode($s));
+    $s = strtr($s, ['أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ة' => 'ه', 'ى' => 'ي', 'ؤ' => 'و', 'ئ' => 'ي']);
+    $s = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $s) ?? $s;
+    $s = preg_replace('/(^| )ال/u', '$1', $s) ?? $s;   // «الإدارة» = «إدارة»
+    return trim(preg_replace('/\s+/u', ' ', $s) ?? $s);
+}
+
+/**
+ * Where an old WordPress URL lives now (/product/دبلوم-…/, /معلومات-التواصل/, /الدورات-التأهيلية/, …/feed/),
+ * or null when nothing fits (it stays a 404).
+ */
+function seo_old_url(array $seg, array $programs): ?string
+{
+    while ($seg && in_array(strtolower(end($seg)), ['feed', 'amp', 'embed', 'comments'], true)) array_pop($seg);
+    if (count($seg) >= 2 && $seg[count($seg) - 2] === 'page') { array_pop($seg); array_pop($seg); }
+    if (!$seg) return '/';
+    $last = seo_norm((string) end($seg));
+    // a programme, by its name or slug (exact first, then one containing the other)
+    foreach ([true, false] as $exact) {
+        foreach ($programs as $p) {
+            foreach ([seo_norm((string) $p['title']), seo_norm((string) $p['slug'])] as $n) {
+                if ($n === '' || $last === '') continue;
+                if ($exact ? $n === $last : (mb_strlen($last) >= 8 && (str_contains($n, $last) || str_contains($last, $n)))) {
+                    return '/programs/' . rawurlencode((string) $p['slug']);
+                }
+            }
+        }
+    }
+    // a page of the dashboard (policies …)
+    foreach (DB::all('SELECT title, slug FROM pages WHERE is_published = 1') as $p) {
+        $n = seo_norm((string) $p['title']);
+        if ($n !== '' && ($n === $last || seo_norm((string) $p['slug']) === $last || (mb_strlen($last) >= 8 && (str_contains($n, $last) || str_contains($last, $n))))) {
+            return '/p/' . rawurlencode((string) $p['slug']);
+        }
+    }
+    $all = ' ' . seo_norm(implode(' ', $seg)) . ' ';
+    $rules = [
+        '/contact' => ['تواصل', 'اتصل', 'اتصال', 'contact'],
+        '/about' => ['من نحن', 'عن معهد', 'عن المعهد', 'نبذه', 'about'],
+        '/register' => ['تسجيل', 'سجل', 'register', 'apply'],
+        '/programs/type/qualifying' => ['تاهيليه', 'تاهيلي'],
+        '/programs/type/development' => ['تطويريه', 'تطويري'],
+        '/programs/type/diploma' => ['دبلوم', 'دبلومات', 'diploma'],
+        '/blog' => ['blog', 'اخبار', 'مقالات', 'مدونه', 'news'],
+        '/programs' => ['product', 'shop', 'course', 'دورات', 'دوره', 'برامج', 'برنامج', 'متجر'],
+    ];
+    foreach ($rules as $to => $words) {
+        foreach ($words as $w) if (str_contains($all, $w)) return $to;
+    }
+    return null;
 }

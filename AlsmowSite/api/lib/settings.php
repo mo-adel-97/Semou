@@ -165,6 +165,7 @@ function settings_schema(): array
                 'whatsapp' => ['type' => 'string', 'label' => 'واتساب (بالصيغة الدولية)', 'max' => 30, 'placeholder' => '9665XXXXXXXX'],
                 'email' => ['type' => 'string', 'label' => 'البريد الإلكتروني', 'max' => 190],
                 'address' => ['type' => 'string', 'label' => 'العنوان', 'max' => 250],
+                'postal_code' => ['type' => 'string', 'label' => 'الرمز البريدي', 'max' => 12, 'placeholder' => '39921', 'help' => 'يظهر لجوجل في بيانات المعهد (العنوان)'],
                 'hours' => ['type' => 'string', 'label' => 'أوقات العمل', 'max' => 120],
                 'branches' => ['type' => 'list', 'label' => 'الفروع وطرق الدراسة', 'max' => 160, 'maxItems' => 8,
                     'placeholder' => 'مثال: حضوري: حفر الباطن', 'help' => 'تظهر في صفحة «تواصل معنا» ويرد بها المساعد الذكي على «أين يقع المعهد؟»'],
