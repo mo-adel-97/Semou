@@ -1,13 +1,13 @@
 import { ArrowLeft, BadgeCheck, Bell, Briefcase, CalendarDays, GraduationCap, Quote, ShieldCheck, Sparkles, Wallet, X } from 'lucide-react'
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Counter, Img, Magnetic, Reveal, SectionHeading, Seo, Skeleton, Stars, stagger } from '../../components/ui'
 import { cx, fmtDate } from '../../lib/format'
 import { Sections } from '../../lib/layout'
 import { useHome } from '../../lib/queries'
 import { PROGRAM_TYPES, type Accreditation, type HomeData, type ProgramType } from '../../lib/types'
-import ProgramCard from '../ProgramCard'
+import ProgramsShowcase from '../home/Programs'
 import Hero from '../home/Hero'
 import Story, { Screen } from '../home/Story'
 import About from '../home/About'
@@ -30,7 +30,7 @@ export default function Home() {
         ticker: <Ticker data={data} />,
         accreditations: <Accreditations items={data.accreditations} />,
         paths: <Paths data={data} />,
-        programs: <Programs data={data} />,
+        programs: <ProgramsShowcase data={data} />,
         about: <About data={data} />,
         stats: <Stats data={data} />,
         journey: <Story data={data} />,
@@ -147,45 +147,6 @@ function Paths({ data }: { data: HomeData }) {
               <p className="mt-1 text-white/75">سجّل اهتمامك وسيساعدك فريق القبول في اختيار البرنامج الأنسب لك.</p>
             </div>
             <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-deep-950 transition group-hover:scale-110 group-hover:-rotate-12"><ArrowLeft className="h-5 w-5" /></span>
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-/* ================= Programs (tabbed) ================= */
-
-function Programs({ data }: { data: HomeData }) {
-  const types = (Object.keys(PROGRAM_TYPES) as ProgramType[]).filter((t) => data.programs.some((p) => p.type === t))
-  const [tab, setTab] = useState<ProgramType | null>(null)
-  const active = tab ?? types[0]
-  const list = useMemo(() => data.programs.filter((p) => p.type === active).slice(0, 6), [data.programs, active])
-  if (!types.length) return null
-  return (
-    <section className="relative bg-sand/70 py-20 md:py-28" id="programs">
-      <div className="container-x">
-        <div className="mb-12 flex flex-col items-start gap-6 md:flex-row md:items-end md:justify-between">
-          <Headline eyebrow="برامجنا التدريبية" title="برامج معتمدة" rest="تفتح لك أبواب المستقبل." />
-          <LayoutGroup>
-            <div className="inline-flex shrink-0 flex-wrap gap-1 rounded-full border border-line bg-surface p-1.5 shadow-soft">
-              {types.map((t) => (
-                <button key={t} onClick={() => setTab(t)} className={cx('relative rounded-full px-5 py-2.5 font-display text-[15px] font-bold transition-colors', active === t ? 'text-white' : 'text-ink-2 hover:text-ink')}>
-                  {active === t && <motion.span layoutId="prog-tab" className="absolute inset-0 rounded-full bg-primary" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
-                  <span className="relative">{PROGRAM_TYPES[t].plural}</span>
-                </button>
-              ))}
-            </div>
-          </LayoutGroup>
-        </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={active} initial="hidden" animate="show" exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }} variants={stagger.container} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((p) => <motion.div key={p.id} variants={stagger.item}><ProgramCard p={p} /></motion.div>)}
-          </motion.div>
-        </AnimatePresence>
-        <Reveal className="mt-12 flex justify-center">
-          <Link to={`/programs/type/${active}`} className="btn-ghost group">
-            عرض كل {PROGRAM_TYPES[active].plural} <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-1" />
           </Link>
         </Reveal>
       </div>

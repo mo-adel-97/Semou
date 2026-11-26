@@ -12,6 +12,10 @@ export const PROGRAM_MODES: Record<ProgramMode, string> = { onsite: 'حضوري'
 export interface Program {
   id: number
   type: ProgramType
+  /** مجال البرنامج (dashboard): picks its live scene; null on old rows → guessed from the name */
+  category?: string | null
+  /** مجالات العمل بعد التخرج (dashboard, optional) */
+  careers?: string | null
   title: string
   slug: string
   summary: string | null

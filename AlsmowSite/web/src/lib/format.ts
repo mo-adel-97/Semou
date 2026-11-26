@@ -31,3 +31,46 @@ export function waNumber(n?: string | null) {
 }
 
 export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ')
+
+/* ---------- Kashida (تطويل): stretch an Arabic word the calligraphic way, e.g. الاصطناعي → الاصطناعـــي ---------- */
+
+// letters that join the next one (the only places a kashida can go after)
+const JOINS_NEXT = new Set('بتثجحخسشصضطظعغفقكلمنهيئـ')
+const LETTER = /[ء-ي]/
+const MARK = /[ً-ْٰ]/ // harakat stay on their letter
+
+/** Puts `n` tatweel characters before the last letter that can take one (never inside لا). Non-Arabic words come back unchanged. */
+export function kashida(word: string, n = 3): string {
+  const chars = [...word]
+  for (let i = chars.length - 1; i > 0; i--) {
+    if (!LETTER.test(chars[i])) continue
+    let j = i - 1
+    while (j >= 0 && MARK.test(chars[j])) j--
+    if (j < 0) break
+    const prev = chars[j]
+    if (!JOINS_NEXT.has(prev)) continue
+    if (prev === 'ل' && 'اأإآ'.includes(chars[i])) continue
+    return [...chars.slice(0, i), 'ـ'.repeat(n), ...chars.slice(i)].join('')
+  }
+  return word
+}
+
+/** The word of a sentence that reads best stretched: the longest Arabic one (ties → the last). Returns its index or -1. */
+export function kashidaWord(words: string[]): number {
+  let best = -1
+  words.forEach((w, i) => { const len = w.replace(/[^ء-ي]/g, '').length; if (len >= 3 && kashida(w) !== w && (best < 0 || len >= words[best].replace(/[^ء-ي]/g, '').length)) best = i })
+  return best
+}
+
+/** Stretches a word but keeps trailing punctuation outside the stretch (موثوقة. → موثوقـــة.). */
+export function kashidaKeepPunct(word: string, n = 3) {
+  const m = word.match(/^(.*?)([.,،:!؟?]*)$/)
+  return m ? kashida(m[1], n) + m[2] : kashida(word, n)
+}
+
+/** A short label in the stretched display style: its longest word gets the kashida («دورة تأهيلية» → «دورة تأهيـلية»). */
+export function stretchLabel(label: string, n = 2) {
+  const w = label.split(' ')
+  const k = kashidaWord(w)
+  return k < 0 ? label : w.map((x, i) => (i === k ? kashidaKeepPunct(x, n) : x)).join(' ')
+}

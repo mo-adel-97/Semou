@@ -46,7 +46,7 @@ export default function Hero({ data }: { data: HomeData }) {
               {h.eyebrow}
             </motion.span>
           )}
-          <SplitText as="h1" immediate delay={0.08} text={title} accent={h.highlight} className="hero-title hero2-title font-black tracking-tight text-balance text-ink" />
+          <SplitText as="h1" immediate stretch delay={0.08} text={title} accent={h.highlight} className="hero-title hero2-title font-black tracking-tight text-balance text-ink" />
           {h.subtitle && (
             <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.35, ease: EASE }} className="hero2-sub max-w-xl text-pretty text-muted">
               {h.subtitle}

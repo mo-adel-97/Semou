@@ -10,6 +10,12 @@ declare(strict_types=1);
 
 const PROGRAM_TYPES = ['diploma' => 'دبلوم', 'qualifying' => 'دورة تأهيلية', 'development' => 'دورة تطويرية'];
 const PROGRAM_MODES = ['onsite' => 'حضوري', 'online' => 'عن بعد', 'hybrid' => 'مدمج'];
+/** مجال البرنامج: each one has its own live scene on the site (web/src/site/home/scenes.tsx). */
+const PROGRAM_FIELDS = [
+    'hr' => 'الموارد البشرية', 'nursing' => 'التمريض', 'health' => 'الإدارة الصحية والمستشفيات', 'ai' => 'الذكاء الاصطناعي والتقنية',
+    'law' => 'القانون', 'office' => 'الإدارة المكتبية والسكرتارية', 'computer' => 'الحاسب الآلي وبرامج الأوفيس', 'data' => 'إدخال البيانات',
+    'language' => 'اللغات', 'accounting' => 'المحاسبة والمالية', 'marketing' => 'التسويق والمبيعات', 'business' => 'إدارة الأعمال',
+];
 
 function resources(): array
 {
@@ -20,10 +26,12 @@ function resources(): array
         'programs' => [
             'label' => 'البرامج', 'singular' => 'برنامج', 'icon' => 'graduation-cap',
             'table' => 'programs', 'title' => 'title', 'order' => 'sort ASC, id DESC',
-            'search' => ['title', 'summary'], 'filters' => ['type'],
+            'search' => ['title', 'summary'], 'filters' => ['type', 'category'],
             'fields' => [
                 'type' => ['type' => 'enum', 'label' => 'نوع البرنامج', 'required' => true, 'options' => PROGRAM_TYPES, 'column' => true],
                 'title' => ['type' => 'string', 'label' => 'اسم البرنامج', 'required' => true, 'max' => 200, 'column' => true],
+                'category' => ['type' => 'enum', 'label' => 'مجال البرنامج', 'options' => PROGRAM_FIELDS, 'column' => true, 'help' => 'يحدد المشهد الحي الذي يُعرض للبرنامج في الموقع (مثل شاشة متابعة المريض للتمريض)'],
+                'careers' => ['type' => 'string', 'label' => 'مجالات العمل بعد التخرج', 'max' => 200, 'placeholder' => 'مثال: أخصائي موارد بشرية · مسؤول توظيف', 'help' => 'تظهر مع البرنامج في الرئيسية؛ اتركها فارغة لاستخدام مجالات المجال الافتراضية'],
                 'slug' => ['type' => 'slug', 'label' => 'الرابط المختصر', 'from' => 'title', 'help' => 'يُنشأ تلقائيًا من الاسم إذا تُرك فارغًا'],
                 'summary' => ['type' => 'text', 'label' => 'نبذة قصيرة', 'max' => 600, 'help' => 'تظهر على كارت البرنامج'],
                 'image' => ['type' => 'image', 'label' => 'صورة البرنامج', 'column' => true],

@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, type MotionValue } from 'motion/react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { LITE, Reveal } from '../../components/ui'
-import { cx } from '../../lib/format'
+import { cx, kashidaKeepPunct, kashidaWord } from '../../lib/format'
 import { useSite } from '../../lib/queries'
 
 /* =====================================================================
@@ -80,13 +80,17 @@ export function useTyping(text: string, go: boolean, speed = 55) {
 export function Headline({ eyebrow, title, rest, align = 'start', className, light }: {
   eyebrow?: ReactNode; title: string; rest?: string | null; align?: 'start' | 'center'; className?: string; light?: boolean
 }) {
+  // Arabic display style: the longest word of the title is stretched with a kashida (برامج معتمـــدة)
+  const words = title.split(/\s+/)
+  const k = kashidaWord(words.map((w) => w.replace(/[.,،:!؟?]+$/, '')))
+  const shown = k < 0 ? title : words.map((w, i) => (i === k ? kashidaKeepPunct(w, 2) : w)).join(' ')
   return (
     <div className={cx('flex flex-col gap-5', align === 'center' && 'items-center text-center', className)}>
       {eyebrow && <Reveal><span className={cx('kicker', light && 'kicker-light')}>{eyebrow}</span></Reveal>}
       <Reveal delay={0.05}>
-        <h2 className={cx('max-w-3xl text-[clamp(1.7rem,1.15rem+1.75vw,2.7rem)] leading-[1.3] font-extrabold tracking-tight text-balance', light ? 'text-white' : 'text-ink')}>
-          {title}
-          {rest && <> <span className={light ? 'text-white/45' : 'text-muted/80'}>{rest}</span></>}
+        <h2 className={cx('max-w-3xl text-[clamp(1.7rem,1.15rem+1.75vw,2.7rem)] leading-[1.3] font-extrabold tracking-tight text-balance', light ? 'text-white' : 'text-ink')} aria-label={rest ? `${title} ${rest}` : title}>
+          {shown}
+          {rest && <> <span className={light ? 'hl-rest-light' : 'hl-rest'}>{rest}</span></>}
         </h2>
       </Reveal>
     </div>

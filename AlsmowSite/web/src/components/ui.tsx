@@ -4,7 +4,7 @@ import {
   type MotionValue,
 } from 'motion/react'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
-import { cx } from '../lib/format'
+import { cx, kashidaKeepPunct, kashidaWord } from '../lib/format'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -65,12 +65,16 @@ export const stagger = {
 }
 
 /** Word-by-word headline reveal. Words in `accent` get the gradient. */
-export function SplitText({ text, accent, className, delay = 0, as = 'h2', immediate }: {
+export function SplitText({ text, accent, className, delay = 0, as = 'h2', immediate, stretch }: {
   text: string; accent?: string; className?: string; delay?: number; as?: 'h1' | 'h2' | 'h3' | 'p'; immediate?: boolean
+  /** Arabic display style: the accent words and the longest other word get a kashida (the plain text stays in aria-label). */
+  stretch?: boolean
 }) {
   const Tag = motion[as]
   const accentWords = new Set((accent ?? '').split(/\s+/).filter(Boolean))
   const words = text.split(/\s+/)
+  const plainIdx = stretch ? kashidaWord(words.map((w) => (accentWords.has(w) ? '' : w))) : -1
+  const show = (w: string, i: number) => (stretch && (accentWords.has(w) || i === plainIdx) ? kashidaKeepPunct(w, accentWords.has(w) ? 3 : 2) : w)
   const anim = immediate ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-60px' } }
   return (
     <Tag className={className} initial="hidden" {...anim} variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: delay } } }} aria-label={text}>
@@ -80,7 +84,7 @@ export function SplitText({ text, accent, className, delay = 0, as = 'h2', immed
             className={cx('inline-block', accentWords.has(w) && 'text-gradient')}
             variants={{ hidden: { y: '110%', rotate: 4 }, show: { y: '0%', rotate: 0, transition: { duration: 0.85, ease: EASE } } }}
           >
-            {w}
+            {show(w, i)}
           </motion.span>
           {i < words.length - 1 && ' '}
         </span>
@@ -168,7 +172,7 @@ export function SectionHeading({ eyebrow, title, accent, text, align = 'center',
             </span>
           </Reveal>
         )}
-        <SplitText text={title} accent={accent} className={cx('max-w-3xl text-[clamp(1.8rem,1.1rem+2.4vw,3rem)] leading-[1.25] font-black tracking-tight', light ? 'text-white' : 'text-ink')} />
+        <SplitText stretch text={title} accent={accent} className={cx('max-w-3xl text-[clamp(1.8rem,1.1rem+2.4vw,3rem)] leading-[1.25] font-black tracking-tight', light ? 'text-white' : 'text-ink')} />
         {text && (
           <Reveal delay={0.15}>
             <p className={cx('max-w-2xl text-lg leading-relaxed text-pretty', light ? 'text-white/70' : 'text-muted')}>{text}</p>
@@ -265,7 +269,7 @@ export function PageHero({ title, accent, text, crumbs, children }: { title: str
             {crumbs}
           </motion.nav>
         )}
-        <SplitText as="h1" immediate text={title} accent={accent} className="max-w-4xl text-[clamp(2rem,1.2rem+2.8vw,3.5rem)] leading-[1.2] font-black tracking-tight text-ink" />
+        <SplitText as="h1" immediate stretch text={title} accent={accent} className="max-w-4xl text-[clamp(2rem,1.2rem+2.8vw,3.5rem)] leading-[1.2] font-black tracking-tight text-ink" />
         {text && (
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3, ease: EASE }} className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted md:text-xl">
             {text}

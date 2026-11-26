@@ -7,6 +7,13 @@
    color-mix, separately for light and dark mode.
    ===================================================================== */
 
+/* Thmanyah Sans: the same typeface as the Semou ERP (self-hosted, no third-party font requests) */
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Light.woff2) format('woff2');font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Regular.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Medium.woff2) format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Bold.woff2) format('woff2');font-weight:600 800;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Black.woff2) format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
 /* ---------- Accents ---------- */
@@ -80,8 +87,8 @@
 }
 
 @theme inline {
-  --font-sans: "IBM Plex Sans Arabic", "Cairo", system-ui, sans-serif;
-  --font-display: "Cairo", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-sans: "Thmanyah Sans", system-ui, sans-serif;
+  --font-display: "Thmanyah Sans", system-ui, sans-serif;
 
   --color-bg: var(--bg);
   --color-cream: var(--bg);
