@@ -21,14 +21,15 @@ interface UserRow {
   code: number; guid: string; userName: string; fullName: string; staut_: boolean; sellerName: string | null; screens: number
   jobTitle: string | null; employmentType: string | null; workMobile: string | null; personalMobile: string | null
 }
-interface Suggest { jobs: string[]; types: string[]; specs: string[]; banks: string[]; bankCodes: { code: string; name: string }[] }
+interface HrItem { guid: string; name: string; isUse: boolean; ibanCode: string | null }
+interface HrLists { jobs: HrItem[]; types: HrItem[]; specs: HrItem[]; banks: HrItem[] }
 interface Profile {
-  nationalId: string | null; jobTitle: string | null; employmentType: string | null; specialization: string | null; personalMobile: string | null; workMobile: string | null
-  email: string | null; iban: string | null; bankName: string | null; hireDate: string | null; birthDate: string | null; notes: string | null
+  nationalId: string | null; jobTitleGuid: string | null; employmentTypeGuid: string | null; specializationGuid: string | null; personalMobile: string | null; workMobile: string | null
+  email: string | null; iban: string | null; bankGuid: string | null; hireDate: string | null; birthDate: string | null; notes: string | null
 }
 interface FormItem { guid: string; name: string; unqName: string; code: number }
 interface MenuItemDb { guid: string; menuName: string; unqName: string }
-interface Catalog { forms: FormItem[]; menus: MenuItemDb[]; sellers: { guid: string; name: string; isUse: boolean | null }[]; users: UserRow[]; suggest: Suggest }
+interface Catalog { forms: FormItem[]; menus: MenuItemDb[]; sellers: { guid: string; name: string; isUse: boolean | null }[]; users: UserRow[]; hr: HrLists }
 type PermKey = 'add' | 'edit' | 'delete' | 'print' | 'find' | 'view'
 type PermRow = Record<PermKey, boolean>
 type Perms = Record<string, PermRow>
@@ -136,14 +137,14 @@ const baseSchema = z.object({
   sellerGuid: z.string().min(1, 'يرجى اختيار مندوب البيع'),
   /* بيانات الموظف (all optional; checked only when typed) */
   nationalId: z.string().refine(v => !v || /^[12]\d{9}$/.test(v), 'رقم الهوية 10 أرقام ويبدأ بـ 1 أو 2'),
-  jobTitle: z.string().max(100, 'الوظيفة طويلة جداً'),
-  employmentType: z.string().max(50, 'الحالة الوظيفية طويلة جداً'),
-  specialization: z.string().max(150, 'التخصص طويل جداً'),
+  jobTitleGuid: z.string(),
+  employmentTypeGuid: z.string(),
+  specializationGuid: z.string(),
   personalMobile: z.string().refine(v => !v || /^05\d{8}$/.test(v), 'رقم الجوال 10 أرقام ويبدأ بـ 05'),
   workMobile: z.string().refine(v => !v || /^05\d{8}$/.test(v), 'رقم الجوال 10 أرقام ويبدأ بـ 05'),
   email: z.string().trim().max(150, 'البريد الإلكتروني طويل جداً').refine(v => !v || /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v), 'البريد الإلكتروني غير صحيح'),
   iban: z.string().refine(v => !v || ibanOk(v), 'رقم الآيبان غير صحيح'),
-  bankName: z.string().max(100, 'اسم البنك طويل جداً'),
+  bankGuid: z.string(),
   hireDate: z.string(),
   birthDate: z.string(),
   notes: z.string().max(500, 'الملاحظات طويلة جداً'),
@@ -163,12 +164,12 @@ function ibanOk(raw: string) {
 }
 const ibanGroups = (v: string) => v.replace(/(.{4})/g, '$1 ').trim()
 const digitsOnly = (v: string, max: number) => v.replace(/\D/g, '').slice(0, max)
-const PROFILE_KEYS = ['nationalId', 'jobTitle', 'employmentType', 'specialization', 'personalMobile', 'workMobile', 'email', 'iban', 'bankName', 'hireDate', 'birthDate', 'notes'] as const
+const PROFILE_KEYS = ['nationalId', 'jobTitleGuid', 'employmentTypeGuid', 'specializationGuid', 'personalMobile', 'workMobile', 'email', 'iban', 'bankGuid', 'hireDate', 'birthDate', 'notes'] as const
 const INFO_KEYS = ['fullName', 'userName', 'password', 'sellerGuid', 'branchGuid']
 type Info = z.infer<typeof baseSchema>
 const EMPTY: Info = {
   fullName: '', userName: '', password: '', staut_: true, chkBranch: false, branchGuid: '', chkAmount: false, chkOtherFess: false, sellerGuid: '',
-  nationalId: '', jobTitle: '', employmentType: '', specialization: '', personalMobile: '', workMobile: '', email: '', iban: '', bankName: '', hireDate: '', birthDate: '', notes: '',
+  nationalId: '', jobTitleGuid: '', employmentTypeGuid: '', specializationGuid: '', personalMobile: '', workMobile: '', email: '', iban: '', bankGuid: '', hireDate: '', birthDate: '', notes: '',
 }
 type Tab = 'info' | 'profile' | 'perms' | 'menus' | 'branches'
 
@@ -194,9 +195,11 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
   const chkBranch = useWatch({ control, name: 'chkBranch' })
   const iban = useWatch({ control, name: 'iban' })
   const ibanValid = !!iban && ibanOk(iban)
-  // A Saudi IBAN carries the bank code (characters 5-6): reuse the bank name already typed for that code.
-  const knownBank = iban?.startsWith('SA') && iban.length >= 6 ? catalog.data?.suggest.bankCodes.find(b => b.code === iban.slice(4, 6))?.name : undefined
-  useEffect(() => { if (knownBank && !getValues('bankName')) setValue('bankName', knownBank, { shouldDirty: true }) }, [knownBank, getValues, setValue])
+  // A Saudi IBAN carries the bank code (characters 5-6): pick the bank that has that code (شاشة البنوك).
+  const ibanCode = iban?.startsWith('SA') && iban.length >= 6 ? iban.slice(4, 6) : null
+  const knownBank = ibanCode ? catalog.data?.hr.banks.find(b => b.isUse && b.ibanCode === ibanCode)?.guid : undefined
+  useEffect(() => { if (knownBank && !getValues('bankGuid')) setValue('bankGuid', knownBank, { shouldDirty: true }) }, [knownBank, getValues, setValue])
+  const reloadCatalog = async () => { await catalog.refetch() }
 
   // Access state (grids) lives outside RHF.
   const [perms, setPerms] = useState<Perms>({})
@@ -372,20 +375,18 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
 
           {/* -------- Employee data (dbo.UserProfile) -------- */}
           <div className="grid cols-2" hidden={tab !== 'profile'}>
-            <datalist id="u-jobs">{catalog.data?.suggest.jobs.map(x => <option key={x} value={x} />)}</datalist>
-            <datalist id="u-types">{catalog.data?.suggest.types.map(x => <option key={x} value={x} />)}</datalist>
-            <datalist id="u-specs">{catalog.data?.suggest.specs.map(x => <option key={x} value={x} />)}</datalist>
-            <datalist id="u-banks">{catalog.data?.suggest.banks.map(x => <option key={x} value={x} />)}</datalist>
-
             <div className="section-label span-all"><Briefcase size={15} /> البيانات الوظيفية</div>
-            <Field label="الوظيفة" error={errors.jobTitle?.message}>
-              <input className="input" list="u-jobs" readOnly={ro} placeholder="مثال: مدربة، إداري، تسويق" {...register('jobTitle')} />
+            <Field label="المسمى الوظيفي">
+              <Controller control={control} name="jobTitleGuid" render={({ field }) => (
+                <HrSelect items={catalog.data?.hr.jobs} value={field.value} onChange={field.onChange} disabled={ro} screen="job-titles" form="webjobtitle" noun="مسمى وظيفي" onAdded={reloadCatalog} />)} />
             </Field>
-            <Field label="الحالة الوظيفية" error={errors.employmentType?.message}>
-              <input className="input" list="u-types" readOnly={ro} placeholder="مثال: أساسي، متعاون، جزئي" {...register('employmentType')} />
+            <Field label="الحالة الوظيفية">
+              <Controller control={control} name="employmentTypeGuid" render={({ field }) => (
+                <HrSelect items={catalog.data?.hr.types} value={field.value} onChange={field.onChange} disabled={ro} screen="employment-types" form="webemptype" noun="حالة وظيفية" onAdded={reloadCatalog} />)} />
             </Field>
-            <Field label="التخصص / المؤهل" error={errors.specialization?.message} className="span-2">
-              <input className="input" list="u-specs" readOnly={ro} {...register('specialization')} />
+            <Field label="التخصص / المؤهل" className="span-2">
+              <Controller control={control} name="specializationGuid" render={({ field }) => (
+                <HrSelect items={catalog.data?.hr.specs} value={field.value} onChange={field.onChange} disabled={ro} screen="specializations" form="webspecial" noun="تخصص" onAdded={reloadCatalog} />)} />
             </Field>
             <Field label="تاريخ المباشرة"><input className="input" type="date" readOnly={ro} {...register('hireDate')} /></Field>
             <Field label="تاريخ الميلاد"><input className="input" type="date" readOnly={ro} {...register('birthDate')} /></Field>
@@ -421,8 +422,10 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
                   placeholder="SA00 0000 0000 0000 0000 0000" readOnly={ro} value={ibanGroups(field.value)} onBlur={field.onBlur}
                   onChange={e => field.onChange(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 34))} />)} />
             </Field>
-            <Field label="اسم البنك" error={errors.bankName?.message} className="span-2">
-              <input className="input" list="u-banks" readOnly={ro} {...register('bankName')} />
+            <Field label="البنك" className="span-2" hint={knownBank ? 'تم تحديد البنك تلقائياً من رقم الآيبان' : undefined}>
+              <Controller control={control} name="bankGuid" render={({ field }) => (
+                <HrSelect items={catalog.data?.hr.banks} value={field.value} onChange={field.onChange} disabled={ro} screen="banks" form="webbank" noun="بنك" onAdded={reloadCatalog}
+                  extra={ibanCode ? { IbanCode: ibanCode } : undefined} />)} />
             </Field>
 
             <Field label="ملاحظات" error={errors.notes?.message} className="span-2">
@@ -478,6 +481,44 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
         </>
       )}
     </Drawer>
+  )
+}
+
+/* ============================== HR list select (+ quick add) ============================== */
+function HrSelect({ items, value, onChange, disabled, screen, form, noun, onAdded, extra }: {
+  items: HrItem[] | undefined; value: string; onChange: (v: string) => void; disabled: boolean
+  /** screens engine key and its permission key */
+  screen: string; form: string; noun: string; onAdded: () => Promise<void>; extra?: Record<string, unknown>
+}) {
+  const { can } = useAuth()
+  const [busy, setBusy] = useState(false)
+  const options = (items ?? []).filter(i => i.isUse || i.guid === value)
+  const add = async () => {
+    const { default: Swal } = await import('sweetalert2')
+    const r = await Swal.fire({
+      title: `إضافة ${noun}`, input: 'text', inputPlaceholder: 'الاسم', showCancelButton: true, confirmButtonText: 'إضافة', cancelButtonText: 'إلغاء', buttonsStyling: false,
+      customClass: { popup: 'sm-popup', title: 'sm-title', confirmButton: 'btn', cancelButton: 'btn ghost', actions: 'sm-actions', input: 'input' },
+      inputValidator: v => (!v.trim() ? 'يرجى إدخال الاسم' : v.trim().length > 150 ? 'الاسم طويل جداً' : (items ?? []).some(i => i.name === v.trim()) ? 'الاسم موجود مسبقاً في القائمة' : undefined),
+    })
+    if (!r.isConfirmed || !r.value) return
+    setBusy(true)
+    try {
+      const saved = await api<{ guid: string }>(`/screens/${screen}`, { method: 'POST', json: { values: { Name: String(r.value).trim(), Notes: null, IsUse: true, ...extra } } })
+      await onAdded()
+      onChange(saved.guid)
+      notify.success(`تمت إضافة ${noun}`)
+    } catch (e) { alerts.error((e as Error).message) } finally { setBusy(false) }
+  }
+  return (
+    <div className="hr-select">
+      <select className="input" disabled={disabled} value={value} onChange={e => onChange(e.target.value)}>
+        <option value="">اختر...</option>
+        {options.map(i => <option key={i.guid} value={i.guid}>{i.name}{i.isUse ? '' : ' (موقوف)'}</option>)}
+      </select>
+      {!disabled && can(form, 'add') && (
+        <button type="button" className="btn secondary icon" onClick={add} disabled={busy} title={`إضافة ${noun} جديد`} aria-label={`إضافة ${noun}`}>{busy ? <Spinner /> : <Plus size={17} />}</button>
+      )}
+    </div>
   )
 }
 

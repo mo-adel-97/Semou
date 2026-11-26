@@ -12,6 +12,10 @@ public static class WebForms
     public const string Settings = "websettings";
     public const string StudyRequests = "webstudyrequest";
     public const string MyOrders = "webmyorders";
+    public const string JobTitles = "webjobtitle";
+    public const string EmploymentTypes = "webemptype";
+    public const string Specializations = "webspecial";
+    public const string Banks = "webbank";
 
     public sealed record Def(string Key, string Name, string Group, IReadOnlyDictionary<string, string> Rights);
 
@@ -40,6 +44,34 @@ public static class WebForms
         {
             ["view"] = "فتح الشاشة ومتابعة طلبات الدراسة الواردة من الموقع (حضوري / عن بعد)",
             ["edit"] = "تغيير حالة الطلب وكتابة ملاحظات المتابعة",
+        }),
+        new(JobTitles, "المسميات الوظيفية", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة",
+            ["find"] = "استعراض المسميات الوظيفية",
+            ["add"] = "إضافة مسمى وظيفي جديد (من الشاشة أو من بطاقة المستخدم)",
+            ["edit"] = "تعديل الاسم أو إيقاف العنصر",
+        }),
+        new(EmploymentTypes, "الحالات الوظيفية", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة",
+            ["find"] = "استعراض الحالات الوظيفية",
+            ["add"] = "إضافة حالة وظيفية جديدة (من الشاشة أو من بطاقة المستخدم)",
+            ["edit"] = "تعديل الاسم أو إيقاف العنصر",
+        }),
+        new(Specializations, "التخصصات والمؤهلات", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة",
+            ["find"] = "استعراض التخصصات",
+            ["add"] = "إضافة تخصص جديد (من الشاشة أو من بطاقة المستخدم)",
+            ["edit"] = "تعديل الاسم أو إيقاف العنصر",
+        }),
+        new(Banks, "البنوك", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة",
+            ["find"] = "استعراض البنوك",
+            ["add"] = "إضافة بنك جديد (من الشاشة أو من بطاقة المستخدم)",
+            ["edit"] = "تعديل الاسم أو إيقاف العنصر",
         }),
         new(Settings, "الإعدادات العامة", "ملف", new Dictionary<string, string>
         {

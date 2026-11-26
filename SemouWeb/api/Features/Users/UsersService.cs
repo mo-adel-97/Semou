@@ -16,8 +16,9 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
     private const string ListSql = """
         SELECT U.Code, U.Guid, U.UserName, U.FullName, U.Staut_, S.ManFullName AS SellerName,
                (SELECT COUNT(*) FROM dbo.User_Premision P WHERE P.UserGuid = U.Guid AND P.View_ = 1) AS Screens,
-               PR.JobTitle, PR.EmploymentType, PR.WorkMobile, PR.PersonalMobile
+               J.Name AS JobTitle, ET.Name AS EmploymentType, PR.WorkMobile, PR.PersonalMobile
         FROM dbo.User_Info U LEFT JOIN dbo.SalesMan S ON S.Guid = U.SellerGuid LEFT JOIN dbo.UserProfile PR ON PR.UserGuid = U.Guid
+             LEFT JOIN dbo.HrJobTitle J ON J.Guid = PR.JobTitleGuid LEFT JOIN dbo.HrEmploymentType ET ON ET.Guid = PR.EmploymentTypeGuid
         """;
 
     public async Task<IEnumerable<UserListItem>> ListAsync(bool? isUse, CancellationToken ct)
@@ -37,16 +38,10 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var menus = await c.QueryAsync<MenuItem>(new CommandDefinition("SELECT Guid, MenuName, UnqName FROM dbo.MainMenu WHERE IsUse = 1 ORDER BY Code", cancellationToken: ct));
         var sellers = await c.QueryAsync<SellerItem>(new CommandDefinition("SELECT Guid, ManFullName AS Name, IsUse FROM dbo.SalesMan ORDER BY TRY_CONVERT(int, Code)", cancellationToken: ct));
         var users = await c.QueryAsync<UserListItem>(new CommandDefinition(ListSql + " ORDER BY U.Code", cancellationToken: ct));
-        async Task<IEnumerable<string>> distinct(string col) => await c.QueryAsync<string>(new CommandDefinition(
-            $"SELECT {col} FROM dbo.UserProfile WHERE NULLIF(LTRIM({col}), '') IS NOT NULL GROUP BY {col} ORDER BY COUNT(*) DESC, {col}", cancellationToken: ct));
-        var suggest = new ProfileSuggest(await distinct("JobTitle"), await distinct("EmploymentType"), await distinct("Specialization"), await distinct("BankName"),
-            await c.QueryAsync<BankCode>(new CommandDefinition("""
-                SELECT X.Code, X.Name FROM (
-                    SELECT SUBSTRING(Iban, 5, 2) AS Code, BankName AS Name, ROW_NUMBER() OVER (PARTITION BY SUBSTRING(Iban, 5, 2) ORDER BY UpdatedAt DESC) AS N
-                    FROM dbo.UserProfile WHERE Iban LIKE 'SA%' AND NULLIF(LTRIM(BankName), '') IS NOT NULL) X
-                WHERE X.N = 1
-                """, cancellationToken: ct)));
-        return new UserCatalog(forms, menus, sellers, users, suggest);
+        async Task<IEnumerable<HrItem>> list(string table, string iban = "CAST(NULL AS nvarchar(2))") => await c.QueryAsync<HrItem>(new CommandDefinition(
+            $"SELECT Guid, Name, IsUse, {iban} AS IbanCode FROM dbo.[{table}] ORDER BY ID", cancellationToken: ct));
+        var hr = new HrLists(await list("HrJobTitle"), await list("HrEmploymentType"), await list("HrSpecialization"), await list("HrBank", "IbanCode"));
+        return new UserCatalog(forms, menus, sellers, users, hr);
     }
 
     private sealed record InfoRow(int? Code, Guid Guid, string? UserName, string? FullName, bool? Staut_, bool? ChkBranch, Guid? BranchGuid,
@@ -66,7 +61,7 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var forms = await c.QueryAsync<PermDb>(new CommandDefinition("SELECT FormGuid, Add_, Edit, Del, Print_, Find_, View_ FROM dbo.User_Premision WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var branches = await c.QueryAsync<Guid>(new CommandDefinition("SELECT BranchGuid FROM dbo.UserBranch WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var profile = await c.QueryFirstOrDefaultAsync(new CommandDefinition("""
-            SELECT NationalId, JobTitle, EmploymentType, Specialization, PersonalMobile, WorkMobile, Email, Iban, BankName,
+            SELECT NationalId, JobTitleGuid, EmploymentTypeGuid, SpecializationGuid, PersonalMobile, WorkMobile, Email, Iban, BankGuid,
                    CONVERT(char(10), HireDate, 23) AS HireDate, CONVERT(char(10), BirthDate, 23) AS BirthDate, Notes
             FROM dbo.UserProfile WHERE UserGuid = @guid
             """, new { guid }, cancellationToken: ct));
@@ -122,6 +117,15 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
                     """, new { nid, self }, tx);
                 if (other != null) throw new ApiException($"رقم الهوية مسجل مسبقاً للمستخدم: {other}");
             }
+            async Task mustExist(Guid? g, string table, string message)
+            {
+                if (g is null) return;
+                if (await c.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM dbo.[{table}] WHERE Guid = @g", new { g }, tx) == 0) throw new ApiException(message);
+            }
+            await mustExist(p.JobTitleGuid, "HrJobTitle", "المسمى الوظيفي غير موجود");
+            await mustExist(p.EmploymentTypeGuid, "HrEmploymentType", "الحالة الوظيفية غير موجودة");
+            await mustExist(p.SpecializationGuid, "HrSpecialization", "التخصص غير موجود");
+            await mustExist(p.BankGuid, "HrBank", "البنك غير موجود");
         }
     }
 
@@ -148,10 +152,9 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
             return d;
         }
 
-        p.JobTitle = clean(p.JobTitle, 100, "الوظيفة طويلة جداً");
-        p.EmploymentType = clean(p.EmploymentType, 50, "الحالة الوظيفية طويلة جداً");
-        p.Specialization = clean(p.Specialization, 150, "التخصص طويل جداً");
-        p.BankName = clean(p.BankName, 100, "اسم البنك طويل جداً");
+        static Guid? orNull(Guid? g) => g == Guid.Empty ? null : g;
+        p.JobTitleGuid = orNull(p.JobTitleGuid); p.EmploymentTypeGuid = orNull(p.EmploymentTypeGuid);
+        p.SpecializationGuid = orNull(p.SpecializationGuid); p.BankGuid = orNull(p.BankGuid);
         p.Notes = string.IsNullOrWhiteSpace(p.Notes) ? null : p.Notes.Trim();
         if (p.Notes?.Length > 500) throw new ApiException("الملاحظات طويلة جداً (الحد الأقصى 500 حرف)");
 
@@ -199,12 +202,12 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         if (p is null) return; // older clients: leave the employee data as it is
         await c.ExecuteAsync("""
             MERGE dbo.UserProfile AS T USING (SELECT @userGuid AS UserGuid) AS S ON T.UserGuid = S.UserGuid
-            WHEN MATCHED THEN UPDATE SET NationalId = @NationalId, JobTitle = @JobTitle, EmploymentType = @EmploymentType, Specialization = @Specialization,
-                 PersonalMobile = @PersonalMobile, WorkMobile = @WorkMobile, Email = @Email, Iban = @Iban, BankName = @BankName,
+            WHEN MATCHED THEN UPDATE SET NationalId = @NationalId, JobTitleGuid = @JobTitleGuid, EmploymentTypeGuid = @EmploymentTypeGuid, SpecializationGuid = @SpecializationGuid,
+                 PersonalMobile = @PersonalMobile, WorkMobile = @WorkMobile, Email = @Email, Iban = @Iban, BankGuid = @BankGuid,
                  HireDate = @HireDate, BirthDate = @BirthDate, Notes = @Notes, UpdatedAt = GETDATE()
-            WHEN NOT MATCHED THEN INSERT (UserGuid, NationalId, JobTitle, EmploymentType, Specialization, PersonalMobile, WorkMobile, Email, Iban, BankName, HireDate, BirthDate, Notes)
-                 VALUES (@userGuid, @NationalId, @JobTitle, @EmploymentType, @Specialization, @PersonalMobile, @WorkMobile, @Email, @Iban, @BankName, @HireDate, @BirthDate, @Notes);
-            """, new { userGuid, p.NationalId, p.JobTitle, p.EmploymentType, p.Specialization, p.PersonalMobile, p.WorkMobile, p.Email, p.Iban, p.BankName, p.HireDate, p.BirthDate, p.Notes }, tx);
+            WHEN NOT MATCHED THEN INSERT (UserGuid, NationalId, JobTitleGuid, EmploymentTypeGuid, SpecializationGuid, PersonalMobile, WorkMobile, Email, Iban, BankGuid, HireDate, BirthDate, Notes)
+                 VALUES (@userGuid, @NationalId, @JobTitleGuid, @EmploymentTypeGuid, @SpecializationGuid, @PersonalMobile, @WorkMobile, @Email, @Iban, @BankGuid, @HireDate, @BirthDate, @Notes);
+            """, new { userGuid, p.NationalId, p.JobTitleGuid, p.EmploymentTypeGuid, p.SpecializationGuid, p.PersonalMobile, p.WorkMobile, p.Email, p.Iban, p.BankGuid, p.HireDate, p.BirthDate, p.Notes }, tx);
     }
 
     private static object InfoParams(UserInput u, string password) => new

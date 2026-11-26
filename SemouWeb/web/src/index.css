@@ -1619,3 +1619,6 @@ div.tx-text { margin: 4px 0; }
 /* users list: job + employment type */
 .emp-job { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .iban-input { font-family: Consolas, ui-monospace, monospace; letter-spacing: .5px; }
+.hr-select { display: flex; gap: 8px; align-items: stretch; }
+.hr-select .input { flex: 1; min-width: 0; }
+.hr-select .btn { flex: none; }

@@ -159,6 +159,37 @@ public static class ScreenRegistry
             Columns = [Code, new("FessName", "اسم الرسوم"), Status],
         },
 
+        // ---------------- بيانات الموظفين (web-only lists) ----------------
+        new()
+        {
+            Key = "job-titles", Form = Semou.Api.Security.WebForms.JobTitles, Title = "المسميات الوظيفية", Singular = "مسمى وظيفي", Table = "HrJobTitle", NameField = "Name",
+            AddProc = "AddHrJobTitle", UpdateProc = "UpdateHrJobTitle",
+            Fields = [new("Name", "المسمى الوظيفي", FieldType.Text) { Required = "يرجى إدخال المسمى الوظيفي", MaxLength = 150, Span = 2, Section = "البيانات الأساسية" }, Notes(), IsUse()],
+            Columns = [Code, new("Name", "المسمى الوظيفي"), new("Notes", "ملاحظات"), Status],
+        },
+        new()
+        {
+            Key = "employment-types", Form = Semou.Api.Security.WebForms.EmploymentTypes, Title = "الحالات الوظيفية", Singular = "حالة وظيفية", Table = "HrEmploymentType", NameField = "Name",
+            AddProc = "AddHrEmploymentType", UpdateProc = "UpdateHrEmploymentType",
+            Fields = [new("Name", "الحالة الوظيفية", FieldType.Text) { Required = "يرجى إدخال الحالة الوظيفية", MaxLength = 150, Span = 2, Section = "البيانات الأساسية" }, Notes(), IsUse()],
+            Columns = [Code, new("Name", "الحالة الوظيفية"), new("Notes", "ملاحظات"), Status],
+        },
+        new()
+        {
+            Key = "specializations", Form = Semou.Api.Security.WebForms.Specializations, Title = "التخصصات والمؤهلات", Singular = "تخصص", Table = "HrSpecialization", NameField = "Name",
+            AddProc = "AddHrSpecialization", UpdateProc = "UpdateHrSpecialization",
+            Fields = [new("Name", "التخصص / المؤهل", FieldType.Text) { Required = "يرجى إدخال التخصص / المؤهل", MaxLength = 150, Span = 2, Section = "البيانات الأساسية" }, Notes(), IsUse()],
+            Columns = [Code, new("Name", "التخصص / المؤهل"), new("Notes", "ملاحظات"), Status],
+        },
+        new()
+        {
+            Key = "banks", Form = Semou.Api.Security.WebForms.Banks, Title = "البنوك", Singular = "بنك", Table = "HrBank", NameField = "Name",
+            AddProc = "AddHrBank", UpdateProc = "UpdateHrBank",
+            Fields = [new("Name", "اسم البنك", FieldType.Text) { Required = "يرجى إدخال اسم البنك", MaxLength = 150, Span = 2, Section = "البيانات الأساسية" },
+                new("IbanCode", "رمز البنك في الآيبان", FieldType.Text) { MaxLength = 2, Ltr = true, Hint = "الخانتان 5 و6 من الآيبان السعودي (مثال: SA80... ← 80)، ليُختار البنك تلقائياً" }, Notes(), IsUse()],
+            Columns = [Code, new("Name", "اسم البنك"), new("IbanCode", "رمز الآيبان"), new("Notes", "ملاحظات"), Status],
+        },
+
         // ---------------- إدارة الفرع ----------------
         new()
         {
