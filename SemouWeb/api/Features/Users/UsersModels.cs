@@ -2,12 +2,34 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Semou.Api.Features.Users;
 
-public sealed record UserListItem(int? Code, Guid Guid, string? UserName, string? FullName, bool? Staut_, string? SellerName, int Screens);
+public sealed record UserListItem(int? Code, Guid Guid, string? UserName, string? FullName, bool? Staut_, string? SellerName, int Screens,
+                                  string? JobTitle, string? EmploymentType, string? WorkMobile, string? PersonalMobile);
 
 public sealed record FormItem(Guid Guid, string? Name, string? UnqName, int? Code);
 public sealed record MenuItem(Guid Guid, string? MenuName, string? UnqName);
 public sealed record SellerItem(Guid Guid, string? Name, bool? IsUse);
-public sealed record UserCatalog(IEnumerable<FormItem> Forms, IEnumerable<MenuItem> Menus, IEnumerable<SellerItem> Sellers, IEnumerable<UserListItem> Users);
+/// <summary>Suggestions for the free-text employee fields, learned from what was already saved (no fixed lists in code).</summary>
+public sealed record ProfileSuggest(IEnumerable<string> Jobs, IEnumerable<string> Types, IEnumerable<string> Specs, IEnumerable<string> Banks, IEnumerable<BankCode> BankCodes);
+/// <summary>IBAN bank code (characters 5-6 of a Saudi IBAN) → the bank name typed for it before.</summary>
+public sealed record BankCode(string Code, string Name);
+public sealed record UserCatalog(IEnumerable<FormItem> Forms, IEnumerable<MenuItem> Menus, IEnumerable<SellerItem> Sellers, IEnumerable<UserListItem> Users, ProfileSuggest Suggest);
+
+/// <summary>بيانات الموظف (dbo.UserProfile). Every field is optional; the ones given are validated.</summary>
+public sealed class UserProfileInput
+{
+    public string? NationalId { get; set; }
+    public string? JobTitle { get; set; }
+    public string? EmploymentType { get; set; }
+    public string? Specialization { get; set; }
+    public string? PersonalMobile { get; set; }
+    public string? WorkMobile { get; set; }
+    public string? Email { get; set; }
+    public string? Iban { get; set; }
+    public string? BankName { get; set; }
+    public DateTime? HireDate { get; set; }
+    public DateTime? BirthDate { get; set; }
+    public string? Notes { get; set; }
+}
 
 public sealed class PermRow
 {
@@ -46,6 +68,7 @@ public sealed class UserInput
     /// <summary>إضافة رسوم للطالب في عدم وجود ملف تدريبي.</summary>
     public bool ChkOtherFess { get; set; }
     public Guid? SellerGuid { get; set; }
+    public UserProfileInput? Profile { get; set; }
 
     public List<MenuRow> Menus { get; set; } = [];
     public List<PermRow> Perms { get; set; } = [];

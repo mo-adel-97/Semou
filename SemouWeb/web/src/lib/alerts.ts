@@ -4,7 +4,7 @@ import Swal, { type SweetAlertIcon } from 'sweetalert2'
  * Every message in the app goes through SweetAlert2 (replacing the desktop MessageBox):
  *  - alerts.*  : centered dialogs (success / error / warning / confirm / reason / loading)
  *  - notify.*  : small toasts in the corner for quick feedback
- * The look is themed in index.css (.swal2-*): brand green, Cairo font, RTL.
+ * The look is themed in index.css (.swal2-*): brand green, Thmanyah Sans font, RTL.
  */
 const base = Swal.mixin({
   customClass: {

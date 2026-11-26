@@ -269,8 +269,7 @@ async function printJournal(guid: string, title: string, code: string, date: str
   const w = window.open('', '_blank', 'width=900,height=700')
   if (!w) { alerts.error('المتصفح منع فتح نافذة الطباعة، اسمح بالنوافذ المنبثقة'); return }
   w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${title} ${esc(code)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>${PRINT_BASE_CSS}*{box-sizing:border-box}body{font-family:Cairo,sans-serif;padding:28px;color:#111}.top{display:flex;align-items:center;gap:16px;border-bottom:3px solid ${brand};padding-bottom:14px}
+  <style>${PRINT_BASE_CSS}*{box-sizing:border-box}body{font-family:'Thmanyah Sans',sans-serif;padding:28px;color:#111}.top{display:flex;align-items:center;gap:16px;border-bottom:3px solid ${brand};padding-bottom:14px}
   .top img{height:66px}.top h1{margin:0;font-size:19px}.t{margin-inline-start:auto;border:2px solid ${brand};border-radius:12px;padding:6px 18px;text-align:center}.t b{display:block;font-size:20px;color:${brand}}
   p{margin:16px 0}table{width:100%;border-collapse:collapse;font-size:13px}th{background:${brand};color:#fff;padding:8px;text-align:start}td{border-bottom:1px solid #ddd;padding:8px}
   .n{text-align:left;direction:ltr;font-weight:700}tfoot td{font-weight:800;background:#f4f4ef}.sign{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:60px;text-align:center}.sign div{border-top:1px solid #999;padding-top:6px}</style></head><body>

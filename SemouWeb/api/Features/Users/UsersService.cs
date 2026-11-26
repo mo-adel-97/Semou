@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using Dapper;
 using Semou.Api.Data;
 using Semou.Api.Infrastructure;
@@ -14,8 +15,9 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
 
     private const string ListSql = """
         SELECT U.Code, U.Guid, U.UserName, U.FullName, U.Staut_, S.ManFullName AS SellerName,
-               (SELECT COUNT(*) FROM dbo.User_Premision P WHERE P.UserGuid = U.Guid AND P.View_ = 1) AS Screens
-        FROM dbo.User_Info U LEFT JOIN dbo.SalesMan S ON S.Guid = U.SellerGuid
+               (SELECT COUNT(*) FROM dbo.User_Premision P WHERE P.UserGuid = U.Guid AND P.View_ = 1) AS Screens,
+               PR.JobTitle, PR.EmploymentType, PR.WorkMobile, PR.PersonalMobile
+        FROM dbo.User_Info U LEFT JOIN dbo.SalesMan S ON S.Guid = U.SellerGuid LEFT JOIN dbo.UserProfile PR ON PR.UserGuid = U.Guid
         """;
 
     public async Task<IEnumerable<UserListItem>> ListAsync(bool? isUse, CancellationToken ct)
@@ -35,7 +37,16 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var menus = await c.QueryAsync<MenuItem>(new CommandDefinition("SELECT Guid, MenuName, UnqName FROM dbo.MainMenu WHERE IsUse = 1 ORDER BY Code", cancellationToken: ct));
         var sellers = await c.QueryAsync<SellerItem>(new CommandDefinition("SELECT Guid, ManFullName AS Name, IsUse FROM dbo.SalesMan ORDER BY TRY_CONVERT(int, Code)", cancellationToken: ct));
         var users = await c.QueryAsync<UserListItem>(new CommandDefinition(ListSql + " ORDER BY U.Code", cancellationToken: ct));
-        return new UserCatalog(forms, menus, sellers, users);
+        async Task<IEnumerable<string>> distinct(string col) => await c.QueryAsync<string>(new CommandDefinition(
+            $"SELECT {col} FROM dbo.UserProfile WHERE NULLIF(LTRIM({col}), '') IS NOT NULL GROUP BY {col} ORDER BY COUNT(*) DESC, {col}", cancellationToken: ct));
+        var suggest = new ProfileSuggest(await distinct("JobTitle"), await distinct("EmploymentType"), await distinct("Specialization"), await distinct("BankName"),
+            await c.QueryAsync<BankCode>(new CommandDefinition("""
+                SELECT X.Code, X.Name FROM (
+                    SELECT SUBSTRING(Iban, 5, 2) AS Code, BankName AS Name, ROW_NUMBER() OVER (PARTITION BY SUBSTRING(Iban, 5, 2) ORDER BY UpdatedAt DESC) AS N
+                    FROM dbo.UserProfile WHERE Iban LIKE 'SA%' AND NULLIF(LTRIM(BankName), '') IS NOT NULL) X
+                WHERE X.N = 1
+                """, cancellationToken: ct)));
+        return new UserCatalog(forms, menus, sellers, users, suggest);
     }
 
     private sealed record InfoRow(int? Code, Guid Guid, string? UserName, string? FullName, bool? Staut_, bool? ChkBranch, Guid? BranchGuid,
@@ -54,6 +65,11 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var menus = await c.QueryAsync<MenuDb>(new CommandDefinition("SELECT MenuGuid, View_ FROM dbo.UserMenu WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var forms = await c.QueryAsync<PermDb>(new CommandDefinition("SELECT FormGuid, Add_, Edit, Del, Print_, Find_, View_ FROM dbo.User_Premision WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
         var branches = await c.QueryAsync<Guid>(new CommandDefinition("SELECT BranchGuid FROM dbo.UserBranch WHERE UserGuid = @guid ORDER BY ID", new { guid }, cancellationToken: ct));
+        var profile = await c.QueryFirstOrDefaultAsync(new CommandDefinition("""
+            SELECT NationalId, JobTitle, EmploymentType, Specialization, PersonalMobile, WorkMobile, Email, Iban, BankName,
+                   CONVERT(char(10), HireDate, 23) AS HireDate, CONVERT(char(10), BirthDate, 23) AS BirthDate, Notes
+            FROM dbo.UserProfile WHERE UserGuid = @guid
+            """, new { guid }, cancellationToken: ct));
         var web = await c.QueryAsync<(string FormKey, bool Add_, bool Edit, bool Del, bool Print_, bool Find_, bool View_)>(new CommandDefinition(
             "SELECT FormKey, Add_, Edit, Del, Print_, Find_, View_ FROM dbo.WebFormPermission WHERE UserGuid = @guid", new { guid }, cancellationToken: ct));
         var webPerms = web.Where(w => WebForms.IsWebForm(w.FormKey)).Select(w => new PermRow
@@ -78,6 +94,7 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
                     Print = f.Print_ == true, Find = f.Find_ == true, View = f.View_ == true,
                 }).Concat(webPerms),
                 Branches = branches.Distinct(),
+                Profile = profile,
             },
         };
     }
@@ -93,6 +110,101 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
         var exists = await c.ExecuteScalarAsync<int>(
             "SELECT COUNT(*) FROM dbo.User_Info WHERE UserName = @n AND (@self IS NULL OR Guid <> @self)", new { n = u.UserName.Trim(), self }, tx);
         if (exists > 0) throw new ApiException("اسم المستخدم الذي تم ادخاله مستخدم مسبقاً");
+
+        if (u.Profile is { } p)
+        {
+            NormalizeProfile(p);
+            if (p.NationalId is { } nid)
+            {
+                var other = await c.ExecuteScalarAsync<string?>("""
+                    SELECT TOP 1 ISNULL(U.FullName, U.UserName) FROM dbo.UserProfile P JOIN dbo.User_Info U ON U.Guid = P.UserGuid
+                    WHERE P.NationalId = @nid AND (@self IS NULL OR P.UserGuid <> @self)
+                    """, new { nid, self }, tx);
+                if (other != null) throw new ApiException($"رقم الهوية مسجل مسبقاً للمستخدم: {other}");
+            }
+        }
+    }
+
+    private static readonly Regex Digits = new(@"\D", RegexOptions.Compiled);
+    private static readonly Regex EmailRx = new(@"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$", RegexOptions.Compiled);
+
+    /// <summary>Trims every field, turns blanks into NULL and checks the format of what was typed.</summary>
+    private static void NormalizeProfile(UserProfileInput p)
+    {
+        static string? clean(string? v, int max, string tooLong)
+        {
+            v = string.Join(" ", (v ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+            if (v.Length == 0) return null;
+            if (v.Length > max) throw new ApiException(tooLong);
+            return v;
+        }
+        static string? mobile(string? v, string label)
+        {
+            var d = Digits.Replace(v ?? "", "");
+            if (d.Length == 0) return null;
+            if (d.StartsWith("966")) d = d[3..];
+            if (d.Length == 9 && d[0] == '5') d = "0" + d;
+            if (d.Length != 10 || !d.StartsWith("05")) throw new ApiException($"يرجى إدخال {label} صحيح (05xxxxxxxx)");
+            return d;
+        }
+
+        p.JobTitle = clean(p.JobTitle, 100, "الوظيفة طويلة جداً");
+        p.EmploymentType = clean(p.EmploymentType, 50, "الحالة الوظيفية طويلة جداً");
+        p.Specialization = clean(p.Specialization, 150, "التخصص طويل جداً");
+        p.BankName = clean(p.BankName, 100, "اسم البنك طويل جداً");
+        p.Notes = string.IsNullOrWhiteSpace(p.Notes) ? null : p.Notes.Trim();
+        if (p.Notes?.Length > 500) throw new ApiException("الملاحظات طويلة جداً (الحد الأقصى 500 حرف)");
+
+        var nid = Digits.Replace(p.NationalId ?? "", "");
+        if (nid.Length == 0) p.NationalId = null;
+        else if (nid.Length != 10 || nid[0] is not ('1' or '2')) throw new ApiException("يرجى إدخال رقم هوية صحيح (10 أرقام تبدأ بـ 1 أو 2)");
+        else p.NationalId = nid;
+
+        p.PersonalMobile = mobile(p.PersonalMobile, "رقم الجوال الشخصي");
+        p.WorkMobile = mobile(p.WorkMobile, "رقم جوال العمل");
+
+        p.Email = clean(p.Email, 150, "البريد الإلكتروني طويل جداً");
+        if (p.Email != null && !EmailRx.IsMatch(p.Email)) throw new ApiException("يرجى إدخال بريد إلكتروني صحيح");
+
+        var iban = new string((p.Iban ?? "").Where(ch => !char.IsWhiteSpace(ch) && ch != '-').ToArray()).ToUpperInvariant();
+        if (iban.Length == 0) p.Iban = null;
+        else
+        {
+            if (!IbanOk(iban)) throw new ApiException("رقم الآيبان غير صحيح، يرجى مراجعته");
+            p.Iban = iban;
+        }
+
+        var today = Clock.Now.Date;
+        if (p.BirthDate is { } bd && (bd.Date > today.AddYears(-15) || bd.Date < today.AddYears(-80))) throw new ApiException("يرجى إدخال تاريخ ميلاد صحيح");
+        if (p.HireDate is { } hd && (hd.Date > today.AddYears(1) || hd.Date < today.AddYears(-50))) throw new ApiException("يرجى إدخال تاريخ مباشرة صحيح");
+        p.BirthDate = p.BirthDate?.Date; p.HireDate = p.HireDate?.Date;
+    }
+
+    /// <summary>ISO 13616: letters/digits, Saudi IBANs are SA + 22 digits, and the mod-97 check must give 1.</summary>
+    public static bool IbanOk(string iban)
+    {
+        if (iban.Length < 15 || iban.Length > 34 || !iban.All(char.IsAsciiLetterOrDigit) || !char.IsAsciiLetter(iban[0]) || !char.IsAsciiLetter(iban[1])) return false;
+        if (iban.StartsWith("SA") && (iban.Length != 24 || !iban[2..].All(char.IsAsciiDigit))) return false;
+        var rem = 0;
+        foreach (var ch in iban[4..] + iban[..4])
+        {
+            var v = char.IsAsciiDigit(ch) ? ch - '0' : ch - 'A' + 10;
+            rem = v >= 10 ? (rem * 100 + v) % 97 : (rem * 10 + v) % 97;
+        }
+        return rem == 1;
+    }
+
+    private static async Task SaveProfileAsync(DbConnection c, DbTransaction tx, Guid userGuid, UserProfileInput? p)
+    {
+        if (p is null) return; // older clients: leave the employee data as it is
+        await c.ExecuteAsync("""
+            MERGE dbo.UserProfile AS T USING (SELECT @userGuid AS UserGuid) AS S ON T.UserGuid = S.UserGuid
+            WHEN MATCHED THEN UPDATE SET NationalId = @NationalId, JobTitle = @JobTitle, EmploymentType = @EmploymentType, Specialization = @Specialization,
+                 PersonalMobile = @PersonalMobile, WorkMobile = @WorkMobile, Email = @Email, Iban = @Iban, BankName = @BankName,
+                 HireDate = @HireDate, BirthDate = @BirthDate, Notes = @Notes, UpdatedAt = GETDATE()
+            WHEN NOT MATCHED THEN INSERT (UserGuid, NationalId, JobTitle, EmploymentType, Specialization, PersonalMobile, WorkMobile, Email, Iban, BankName, HireDate, BirthDate, Notes)
+                 VALUES (@userGuid, @NationalId, @JobTitle, @EmploymentType, @Specialization, @PersonalMobile, @WorkMobile, @Email, @Iban, @BankName, @HireDate, @BirthDate, @Notes);
+            """, new { userGuid, p.NationalId, p.JobTitle, p.EmploymentType, p.Specialization, p.PersonalMobile, p.WorkMobile, p.Email, p.Iban, p.BankName, p.HireDate, p.BirthDate, p.Notes }, tx);
     }
 
     private static object InfoParams(UserInput u, string password) => new
@@ -161,6 +273,7 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
             var guid = await c.ExecuteScalarAsync<Guid>("SELECT Guid FROM dbo.User_Info WHERE Code = @id", new { id }, tx);
 
             await SaveAccessAsync(c, tx, guid, u, isNew: true);
+            await SaveProfileAsync(c, tx, guid, u.Profile);
             await audit.WriteAsync(c, tx, Form, guid, UserActionLog.New, id.ToString());
             return new UserSaved("تم حفظ بيانات المستخدم بنجاح", id.ToString(), guid);
         }, IsolationLevel.Serializable, ct);
@@ -185,6 +298,7 @@ public sealed class UsersService(Db db, UserActionLog audit, PermissionService p
             await c.ExecuteAsync("dbo.UpdateUser", p, tx, commandType: CommandType.StoredProcedure);
 
             await SaveAccessAsync(c, tx, guid, u, isNew: false);
+            await SaveProfileAsync(c, tx, guid, u.Profile);
             await audit.WriteAsync(c, tx, Form, guid, UserActionLog.Update, current.Code.ToString(), req.Reason.Trim());
             return new UserSaved("تم تعديل بيانات المستخدم بنجاح", current.Code.ToString()!, guid);
         }, ct: ct);

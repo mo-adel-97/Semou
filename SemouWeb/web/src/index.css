@@ -1,12 +1,19 @@
 /* =====================================================================
    Semou design system: themeable
    html[data-mode="light|dark"] + html[data-accent="..."] (set by ThemeProvider)
-   Default brand from alsmow.com: green #4A7F5F, cream #FAF7F2, Cairo.
+   Default brand from alsmow.com: green #4A7F5F, cream #FAF7F2, Thmanyah Sans.
    Each accent defines ONLY --brand; all shades are derived with color-mix,
    so they work in light and dark mode.
    ===================================================================== */
 
 /* ---------- Accents ---------- */
+/* خط ثمانية (Thmanyah Sans) — served from /fonts/thmanyah */
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Light.woff2) format('woff2');font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Regular.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Medium.woff2) format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Bold.woff2) format('woff2');font-weight:600 800;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url(/fonts/thmanyah/thmanyahsans-Black.woff2) format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
 :root, [data-accent="semou"] { --brand: #4a7f5f; --brand-glow: #9ee2b8; }
 [data-accent="ocean"]   { --brand: #2563eb; --brand-glow: #93c5fd; }
 [data-accent="royal"]   { --brand: #7c3aed; --brand-glow: #c4b5fd; }
@@ -85,7 +92,7 @@
   --side-w: 272px;
   --side-w-collapsed: 76px;
   --top-h: 64px;
-  font-family: 'Cairo', system-ui, sans-serif;
+  font-family: 'Thmanyah Sans', system-ui, sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 1.6;
@@ -265,7 +272,7 @@ table.dt { width: 100%; border-collapse: separate; border-spacing: 0; }
 .cmdk-foot { border-top: 1px solid var(--line); padding: 10px 18px; display: flex; gap: 16px; color: var(--muted); font-size: 12px; }
 
 /* ---------------- SweetAlert2 theme ---------------- */
-.swal2-container { font-family: 'Cairo', system-ui, sans-serif; z-index: 2000 !important; }
+.swal2-container { font-family: 'Thmanyah Sans', system-ui, sans-serif; z-index: 2000 !important; }
 .swal2-container.swal2-backdrop-show { background: var(--overlay) !important; backdrop-filter: blur(3px); }
 .swal2-popup.sm-popup { background: var(--surface); color: var(--ink); border-radius: var(--r-xl); padding: 28px 24px 24px; box-shadow: var(--sh-3); border: 1px solid var(--line-2); width: min(440px, 92vw); direction: rtl; }
 .sm-title { color: var(--ink) !important; font-size: 21px !important; font-weight: 800 !important; padding: 6px 12px 0 !important; }
@@ -1608,3 +1615,7 @@ div.tx-text { margin: 4px 0; }
 .rg-card-dl dd .rq-ref .badge { flex: none; }
 .rg-card-dl dd { overflow: hidden; }
 .rg-card-dl dd :not(.badge):not(.code-chip):not(svg) { white-space: normal; max-width: 100%; }
+
+/* users list: job + employment type */
+.emp-job { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.iban-input { font-family: Consolas, ui-monospace, monospace; letter-spacing: .5px; }

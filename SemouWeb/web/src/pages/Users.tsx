@@ -4,7 +4,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { AnimatePresence } from 'motion/react'
-import { Copy, Eraser, Eye, EyeOff, KeyRound, LayoutGrid, Plus, Save, Search, ShieldCheck, UserCheck, UserCog, Users as UsersIcon, UserX } from 'lucide-react'
+import { BadgeCheck, Briefcase, Copy, Eraser, Eye, EyeOff, KeyRound, Landmark, LayoutGrid, Mail, Phone, Plus, Save, Search, ShieldCheck, UserCheck, UserCog, Users as UsersIcon, UserX } from 'lucide-react'
 import { api, qs } from '../api'
 import { useAuth } from '../auth'
 import { alerts, notify } from '../lib/alerts'
@@ -17,10 +17,18 @@ import { Check, Drawer, Field, Segmented, Spinner, Stat, StatusBadge, Switch, Ta
 /* Port of the desktop "بطاقة مستخدم" (EncodingUser). Permission key: adduser. */
 const FORM = 'adduser'
 
-interface UserRow { code: number; guid: string; userName: string; fullName: string; staut_: boolean; sellerName: string | null; screens: number }
+interface UserRow {
+  code: number; guid: string; userName: string; fullName: string; staut_: boolean; sellerName: string | null; screens: number
+  jobTitle: string | null; employmentType: string | null; workMobile: string | null; personalMobile: string | null
+}
+interface Suggest { jobs: string[]; types: string[]; specs: string[]; banks: string[]; bankCodes: { code: string; name: string }[] }
+interface Profile {
+  nationalId: string | null; jobTitle: string | null; employmentType: string | null; specialization: string | null; personalMobile: string | null; workMobile: string | null
+  email: string | null; iban: string | null; bankName: string | null; hireDate: string | null; birthDate: string | null; notes: string | null
+}
 interface FormItem { guid: string; name: string; unqName: string; code: number }
 interface MenuItemDb { guid: string; menuName: string; unqName: string }
-interface Catalog { forms: FormItem[]; menus: MenuItemDb[]; sellers: { guid: string; name: string; isUse: boolean | null }[]; users: UserRow[] }
+interface Catalog { forms: FormItem[]; menus: MenuItemDb[]; sellers: { guid: string; name: string; isUse: boolean | null }[]; users: UserRow[]; suggest: Suggest }
 type PermKey = 'add' | 'edit' | 'delete' | 'print' | 'find' | 'view'
 type PermRow = Record<PermKey, boolean>
 type Perms = Record<string, PermRow>
@@ -28,7 +36,7 @@ interface Details {
   code: string; guid: string
   user: {
     fullName: string; userName: string; staut_: boolean; chkBranch: boolean; branchGuid: string | null; chkAmount: boolean; chkOtherFess: boolean; sellerGuid: string | null
-    menus: { menuGuid: string; view: boolean }[]; perms: ({ formGuid: string } & PermRow)[]; branches: string[]
+    menus: { menuGuid: string; view: boolean }[]; perms: ({ formGuid: string } & PermRow)[]; branches: string[]; profile: Profile | null
   }
 }
 
@@ -57,6 +65,11 @@ function groupForms(forms: FormItem[]) {
 const columns: GridColumn<UserRow>[] = [
   { accessorKey: 'code', header: 'الكود', meta: { width: 80 }, cell: c => <span className="code-chip">{c.getValue() as number}</span> },
   { accessorKey: 'fullName', header: 'اسم الموظف', cell: c => <b>{c.getValue() as string}</b> },
+  { accessorKey: 'jobTitle', header: 'الوظيفة', cell: c => {
+    const r = c.row.original
+    return r.jobTitle ? <span className="emp-job">{r.jobTitle}{r.employmentType && <span className="badge muted">{r.employmentType}</span>}</span> : '—'
+  } },
+  { accessorKey: 'workMobile', header: 'الجوال', cell: c => { const v = (c.getValue() as string) ?? c.row.original.personalMobile; return v ? <span dir="ltr">{v}</span> : '—' } },
   { accessorKey: 'userName', header: 'اسم المستخدم', cell: c => <span dir="auto">{c.getValue() as string}</span> },
   { accessorKey: 'sellerName', header: 'مندوب البيع', cell: c => (c.getValue() as string) ?? '—' },
   { accessorKey: 'screens', header: 'الشاشات المتاحة', cell: c => <span className="badge muted">{c.getValue() as number} شاشة</span> },
@@ -121,10 +134,43 @@ const baseSchema = z.object({
   chkAmount: z.boolean(),
   chkOtherFess: z.boolean(),
   sellerGuid: z.string().min(1, 'يرجى اختيار مندوب البيع'),
+  /* بيانات الموظف (all optional; checked only when typed) */
+  nationalId: z.string().refine(v => !v || /^[12]\d{9}$/.test(v), 'رقم الهوية 10 أرقام ويبدأ بـ 1 أو 2'),
+  jobTitle: z.string().max(100, 'الوظيفة طويلة جداً'),
+  employmentType: z.string().max(50, 'الحالة الوظيفية طويلة جداً'),
+  specialization: z.string().max(150, 'التخصص طويل جداً'),
+  personalMobile: z.string().refine(v => !v || /^05\d{8}$/.test(v), 'رقم الجوال 10 أرقام ويبدأ بـ 05'),
+  workMobile: z.string().refine(v => !v || /^05\d{8}$/.test(v), 'رقم الجوال 10 أرقام ويبدأ بـ 05'),
+  email: z.string().trim().max(150, 'البريد الإلكتروني طويل جداً').refine(v => !v || /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v), 'البريد الإلكتروني غير صحيح'),
+  iban: z.string().refine(v => !v || ibanOk(v), 'رقم الآيبان غير صحيح'),
+  bankName: z.string().max(100, 'اسم البنك طويل جداً'),
+  hireDate: z.string(),
+  birthDate: z.string(),
+  notes: z.string().max(500, 'الملاحظات طويلة جداً'),
 })
+
+/** ISO 13616 mod-97 check (Saudi IBAN = SA + 22 digits). */
+function ibanOk(raw: string) {
+  const v = raw.replace(/\s/g, '').toUpperCase()
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(v)) return false
+  if (v.startsWith('SA') && !/^SA\d{22}$/.test(v)) return false
+  let rem = 0
+  for (const ch of v.slice(4) + v.slice(0, 4)) {
+    const n = parseInt(ch, 36)
+    rem = n >= 10 ? (rem * 100 + n) % 97 : (rem * 10 + n) % 97
+  }
+  return rem === 1
+}
+const ibanGroups = (v: string) => v.replace(/(.{4})/g, '$1 ').trim()
+const digitsOnly = (v: string, max: number) => v.replace(/\D/g, '').slice(0, max)
+const PROFILE_KEYS = ['nationalId', 'jobTitle', 'employmentType', 'specialization', 'personalMobile', 'workMobile', 'email', 'iban', 'bankName', 'hireDate', 'birthDate', 'notes'] as const
+const INFO_KEYS = ['fullName', 'userName', 'password', 'sellerGuid', 'branchGuid']
 type Info = z.infer<typeof baseSchema>
-const EMPTY: Info = { fullName: '', userName: '', password: '', staut_: true, chkBranch: false, branchGuid: '', chkAmount: false, chkOtherFess: false, sellerGuid: '' }
-type Tab = 'info' | 'perms' | 'menus' | 'branches'
+const EMPTY: Info = {
+  fullName: '', userName: '', password: '', staut_: true, chkBranch: false, branchGuid: '', chkAmount: false, chkOtherFess: false, sellerGuid: '',
+  nationalId: '', jobTitle: '', employmentType: '', specialization: '', personalMobile: '', workMobile: '', email: '', iban: '', bankName: '', hireDate: '', birthDate: '', notes: '',
+}
+type Tab = 'info' | 'profile' | 'perms' | 'menus' | 'branches'
 
 function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose: () => void }) {
   const { can, me } = useAuth()
@@ -144,8 +190,13 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
 
   const schema = useMemo(() => (isNew ? baseSchema.refine(v => v.password.length > 0, { path: ['password'], message: 'يرجى إدخال كلمة المرور' }) : baseSchema)
     .refine(v => !v.chkBranch || v.branchGuid, { path: ['branchGuid'], message: 'يرجى اختيار الفرع الافتراضي' }), [isNew])
-  const { register, handleSubmit, control, reset, formState: { errors, isDirty } } = useForm<Info>({ resolver: zodResolver(schema), defaultValues: EMPTY })
+  const { register, handleSubmit, control, reset, setValue, getValues, formState: { errors, isDirty } } = useForm<Info>({ resolver: zodResolver(schema), defaultValues: EMPTY })
   const chkBranch = useWatch({ control, name: 'chkBranch' })
+  const iban = useWatch({ control, name: 'iban' })
+  const ibanValid = !!iban && ibanOk(iban)
+  // A Saudi IBAN carries the bank code (characters 5-6): reuse the bank name already typed for that code.
+  const knownBank = iban?.startsWith('SA') && iban.length >= 6 ? catalog.data?.suggest.bankCodes.find(b => b.code === iban.slice(4, 6))?.name : undefined
+  useEffect(() => { if (knownBank && !getValues('bankName')) setValue('bankName', knownBank, { shouldDirty: true }) }, [knownBank, getValues, setValue])
 
   // Access state (grids) lives outside RHF.
   const [perms, setPerms] = useState<Perms>({})
@@ -165,7 +216,8 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
       return
     }
     const u = details.data.user
-    reset({ ...EMPTY, ...u, password: '', branchGuid: u.branchGuid ?? '', sellerGuid: u.sellerGuid ?? '' })
+    const pr = Object.fromEntries(PROFILE_KEYS.map(k => [k, u.profile?.[k] ?? '']))
+    reset({ ...EMPTY, ...u, ...pr, password: '', branchGuid: u.branchGuid ?? '', sellerGuid: u.sellerGuid ?? '' })
     const p: Perms = Object.fromEntries(u.perms.map(({ formGuid, ...r }) => [formGuid, r]))
     const m = Object.fromEntries((catalog.data?.menus ?? []).map(x => [x.guid, u.menus.find(y => y.menuGuid === x.guid)?.view ?? false]))
     setPerms(p); setMenus(m); setUserBranches(u.branches)
@@ -178,8 +230,10 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
 
   const save = useMutation({
     mutationFn: async (v: Info) => {
+      const profile = Object.fromEntries(PROFILE_KEYS.map(k => [k, v[k].trim() || null]))
+      const info = Object.fromEntries(Object.entries(v).filter(([k]) => !(PROFILE_KEYS as readonly string[]).includes(k)))
       const user = {
-        ...v, branchGuid: v.chkBranch ? v.branchGuid || null : null, sellerGuid: v.sellerGuid || null, password: v.password || null,
+        ...info, profile, branchGuid: v.chkBranch ? v.branchGuid || null : null, sellerGuid: v.sellerGuid || null, password: v.password || null,
         menus: Object.entries(menus).map(([menuGuid, view]) => ({ menuGuid, view })),
         perms: Object.entries(perms).filter(([, r]) => anyOn(r)).map(([formGuid, r]) => ({ formGuid, ...r })),
         branches: userBranches,
@@ -202,7 +256,8 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
   })
 
   const submit = handleSubmit(v => save.mutate(v), errs => {
-    setTab('info')
+    const first = Object.keys(errs)[0]
+    setTab(INFO_KEYS.includes(first) ? 'info' : 'profile')
     alerts.error(String(Object.values(errs)[0]?.message ?? 'يرجى مراجعة البيانات المدخلة'))
   })
 
@@ -261,6 +316,7 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
       subtitle={isNew ? 'بيانات الدخول والصلاحيات' : `كود المستخدم ${code ?? ''}`}
       tabs={<Tabs value={tab} onChange={setTab} items={[
         { value: 'info', label: 'البيانات الأساسية' },
+        { value: 'profile', label: 'بيانات الموظف' },
         { value: 'perms', label: 'صلاحيات الشاشات', badge: permCount },
         { value: 'menus', label: 'القوائم الرئيسية', badge: menuCount },
         { value: 'branches', label: 'فروع التقارير', badge: userBranches.length },
@@ -313,6 +369,66 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
               </Field>
             )}
           </form>
+
+          {/* -------- Employee data (dbo.UserProfile) -------- */}
+          <div className="grid cols-2" hidden={tab !== 'profile'}>
+            <datalist id="u-jobs">{catalog.data?.suggest.jobs.map(x => <option key={x} value={x} />)}</datalist>
+            <datalist id="u-types">{catalog.data?.suggest.types.map(x => <option key={x} value={x} />)}</datalist>
+            <datalist id="u-specs">{catalog.data?.suggest.specs.map(x => <option key={x} value={x} />)}</datalist>
+            <datalist id="u-banks">{catalog.data?.suggest.banks.map(x => <option key={x} value={x} />)}</datalist>
+
+            <div className="section-label span-all"><Briefcase size={15} /> البيانات الوظيفية</div>
+            <Field label="الوظيفة" error={errors.jobTitle?.message}>
+              <input className="input" list="u-jobs" readOnly={ro} placeholder="مثال: مدربة، إداري، تسويق" {...register('jobTitle')} />
+            </Field>
+            <Field label="الحالة الوظيفية" error={errors.employmentType?.message}>
+              <input className="input" list="u-types" readOnly={ro} placeholder="مثال: أساسي، متعاون، جزئي" {...register('employmentType')} />
+            </Field>
+            <Field label="التخصص / المؤهل" error={errors.specialization?.message} className="span-2">
+              <input className="input" list="u-specs" readOnly={ro} {...register('specialization')} />
+            </Field>
+            <Field label="تاريخ المباشرة"><input className="input" type="date" readOnly={ro} {...register('hireDate')} /></Field>
+            <Field label="تاريخ الميلاد"><input className="input" type="date" readOnly={ro} {...register('birthDate')} /></Field>
+
+            <div className="section-label span-all"><BadgeCheck size={15} /> الهوية والتواصل</div>
+            <Field label="رقم الهوية / الإقامة" error={errors.nationalId?.message} className="span-2">
+              <Controller control={control} name="nationalId" render={({ field }) => (
+                <input className={`input ${errors.nationalId ? 'invalid' : ''}`} dir="ltr" inputMode="numeric" maxLength={10} readOnly={ro} value={field.value} onBlur={field.onBlur}
+                  onChange={e => field.onChange(digitsOnly(e.target.value, 10))} />)} />
+            </Field>
+            <Field label="الجوال الشخصي" error={errors.personalMobile?.message}>
+              <Controller control={control} name="personalMobile" render={({ field }) => (
+                <div className="input-wrap"><Phone size={16} />
+                  <input className={`input ${errors.personalMobile ? 'invalid' : ''}`} dir="ltr" inputMode="tel" maxLength={10} placeholder="05xxxxxxxx" readOnly={ro} value={field.value} onBlur={field.onBlur}
+                    onChange={e => field.onChange(digitsOnly(e.target.value, 10))} /></div>)} />
+            </Field>
+            <Field label="جوال العمل" error={errors.workMobile?.message}>
+              <Controller control={control} name="workMobile" render={({ field }) => (
+                <div className="input-wrap"><Phone size={16} />
+                  <input className={`input ${errors.workMobile ? 'invalid' : ''}`} dir="ltr" inputMode="tel" maxLength={10} placeholder="05xxxxxxxx" readOnly={ro} value={field.value} onBlur={field.onBlur}
+                    onChange={e => field.onChange(digitsOnly(e.target.value, 10))} /></div>)} />
+            </Field>
+            <Field label="البريد الإلكتروني" error={errors.email?.message} className="span-2">
+              <div className="input-wrap"><Mail size={16} />
+                <input className={`input ${errors.email ? 'invalid' : ''}`} dir="ltr" type="email" autoComplete="off" readOnly={ro} {...register('email')} /></div>
+            </Field>
+
+            <div className="section-label span-all"><Landmark size={15} /> البيانات البنكية</div>
+            <Field label="رقم الآيبان (IBAN)" error={errors.iban?.message} className="span-2"
+              hint={iban ? (ibanValid ? '✓ رقم الآيبان صحيح' : 'SA + 22 رقم') : 'يبدأ بـ SA ويتكون من 24 خانة'}>
+              <Controller control={control} name="iban" render={({ field }) => (
+                <input className={`input iban-input ${errors.iban || (iban.length >= 24 && !ibanValid) ? 'invalid' : ''}`} dir="ltr" autoComplete="off" spellCheck={false}
+                  placeholder="SA00 0000 0000 0000 0000 0000" readOnly={ro} value={ibanGroups(field.value)} onBlur={field.onBlur}
+                  onChange={e => field.onChange(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 34))} />)} />
+            </Field>
+            <Field label="اسم البنك" error={errors.bankName?.message} className="span-2">
+              <input className="input" list="u-banks" readOnly={ro} {...register('bankName')} />
+            </Field>
+
+            <Field label="ملاحظات" error={errors.notes?.message} className="span-2">
+              <textarea className="input" readOnly={ro} maxLength={500} {...register('notes')} />
+            </Field>
+          </div>
 
           {/* -------- Screen permissions -------- */}
           {tab === 'perms' && catalog.data && (

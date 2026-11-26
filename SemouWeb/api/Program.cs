@@ -156,6 +156,7 @@ app.UseStaticFiles(new StaticFileOptions
         var h = ctx.Context.Response.Headers;
         if (ctx.File.Name.EndsWith(".html", StringComparison.OrdinalIgnoreCase)) h.CacheControl = "no-cache, no-store, must-revalidate";
         else if (ctx.Context.Request.Path.StartsWithSegments("/assets")) h.CacheControl = "public, max-age=31536000, immutable";
+        else if (ctx.Context.Request.Path.StartsWithSegments("/fonts")) h.CacheControl = "public, max-age=2592000";
     },
 });
 app.MapControllers();

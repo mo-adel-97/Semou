@@ -16,8 +16,12 @@ interface Seal { code: string; path: string; issuer: string; cancelled: boolean;
 /** Where the QR points: the public site address once deployed (VITE_PUBLIC_URL), else this server. */
 const publicBase = () => (import.meta.env.VITE_PUBLIC_URL as string | undefined)?.replace(/\/$/, '') || location.origin
 
+/** The ERP font for print windows (absolute URLs: the popup has no base of its own). */
+const FONT_FACE_CSS = [["Light",300],["Regular",400],["Medium",500],["Bold","600 800"],["Black",900]].map(([n, w]) => `@font-face{font-family:'Thmanyah Sans';src:url(${location.origin}/fonts/thmanyah/thmanyahsans-${n}.woff2) format('woff2');font-weight:${w};font-display:block}`).join('')
+
 /** Shared print CSS: keeps colors when printing + the seal block. */
 export const PRINT_BASE_CSS = `
+  ${FONT_FACE_CSS}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .seal{display:flex;align-items:center;gap:16px;padding:12px 16px;border:1px solid #e3dcc2;border-radius:16px;background:linear-gradient(135deg,#fffdf6,#fbf7ea);page-break-inside:avoid}
   .seal .vq{width:88px;height:88px;flex:none;border-radius:8px;background:#fff;padding:4px;border:1px solid #eee5c8}
@@ -31,9 +35,9 @@ export const PRINT_BASE_CSS = `
 const stampSvg = (color: string, cancelled: boolean) => `<svg class="stamp" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs><path id="sc" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
   <circle cx="60" cy="60" r="56" fill="none" stroke="${color}" stroke-width="3"/><circle cx="60" cy="60" r="34" fill="none" stroke="${color}" stroke-width="1.5"/>
-  <text font-family="Cairo" font-size="10.5" font-weight="800" fill="${color}"><textPath href="#sc" startOffset="2%">معهد السمو المتخصص العالي للتدريب • مستند رسمي •</textPath></text>
-  <text x="60" y="56" text-anchor="middle" font-family="Cairo" font-size="13" font-weight="800" fill="${color}">${cancelled ? 'ملغي' : 'موثّق'}</text>
-  <text x="60" y="72" text-anchor="middle" font-family="Cairo" font-size="8.5" fill="${color}">إلكترونياً</text></svg>`
+  <text font-family="Thmanyah Sans" font-size="10.5" font-weight="800" fill="${color}"><textPath href="#sc" startOffset="2%">معهد السمو المتخصص العالي للتدريب • مستند رسمي •</textPath></text>
+  <text x="60" y="56" text-anchor="middle" font-family="Thmanyah Sans" font-size="13" font-weight="800" fill="${color}">${cancelled ? 'ملغي' : 'موثّق'}</text>
+  <text x="60" y="72" text-anchor="middle" font-family="Thmanyah Sans" font-size="8.5" fill="${color}">إلكترونياً</text></svg>`
 
 /** Fetches the server seal and returns the HTML block (QR to the public verify page + code + stamp). */
 export async function sealHtml(type: SealType, guid: string) {
@@ -57,7 +61,7 @@ export async function sealHtml(type: SealType, guid: string) {
 const DOC_CSS = `
   @page{size:A4;margin:12mm}
   *{box-sizing:border-box} html,body{margin:0}
-  body{font-family:Cairo,sans-serif;color:#1c2321;font-size:12.5px;background:#fff}
+  body{font-family:'Thmanyah Sans',sans-serif;color:#1c2321;font-size:12.5px;background:#fff}
   .page{position:relative;z-index:1;min-height:calc(297mm - 24mm);display:flex;flex-direction:column;gap:16px}
   @media screen{body{background:#eef1ef;padding:24px} .page{width:210mm;margin:auto;background:#fff;padding:12mm;min-height:297mm;box-shadow:0 10px 40px rgba(0,0,0,.12);border-radius:6px}}
   .lh{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid #e4ebe7;position:relative}
@@ -98,7 +102,6 @@ function openPrint(title: string, page: string) {
   const w = window.open('', '_blank', 'width=960,height=1000')
   if (!w) { alerts.error('المتصفح منع فتح نافذة الطباعة، اسمح بالنوافذ المنبثقة'); return }
   w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${esc(title)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>${PRINT_BASE_CSS}${DOC_CSS}</style></head><body><div class="page">${page}</div>
   <script>document.fonts.ready.then(()=>setTimeout(()=>window.print(),250))<\/script></body></html>`)
   w.document.close()

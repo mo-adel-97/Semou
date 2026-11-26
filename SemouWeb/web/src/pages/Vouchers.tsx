@@ -352,9 +352,8 @@ async function printVoucher(kind: VoucherKind, guid: string, v: { code: string; 
   const w = window.open('', '_blank', 'width=900,height=700')
   if (!w) { alerts.error('المتصفح منع فتح نافذة الطباعة، اسمح بالنوافذ المنبثقة'); return }
   w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${title} ${esc(v.code)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
   <style>${PRINT_BASE_CSS}
-    *{box-sizing:border-box} body{font-family:Cairo,sans-serif;margin:0;padding:28px;color:#111}
+    *{box-sizing:border-box} body{font-family:'Thmanyah Sans',sans-serif;margin:0;padding:28px;color:#111}
     .top{display:flex;align-items:center;gap:16px;border-bottom:3px solid ${brand};padding-bottom:14px}
     .top img{height:70px} .top h1{margin:0;font-size:20px} .top small{color:#666}
     .title{margin-inline-start:auto;text-align:center;border:2px solid ${brand};border-radius:12px;padding:6px 18px}
