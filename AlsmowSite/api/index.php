@@ -11,6 +11,7 @@ require __DIR__ . '/lib/content.php';
 require __DIR__ . '/lib/resources.php';
 require __DIR__ . '/lib/settings.php';
 require __DIR__ . '/lib/search.php';
+require __DIR__ . '/lib/indexnow.php';
 
 date_default_timezone_set('Asia/Riyadh');
 mb_internal_encoding('UTF-8');
@@ -568,7 +569,9 @@ $r->post('/admin/content/{res}', function ($p) {
     $data = validate_record($res, body(), null);
     $id = DB::insert($res['table'], $data);
     log_activity($u, 'create', $res['name'], $id, (string) ($data[$res['title']] ?? ''));
-    return shape_row($res, DB::one("SELECT * FROM `{$res['table']}` WHERE id = ?", [$id]));
+    $row = DB::one("SELECT * FROM `{$res['table']}` WHERE id = ?", [$id]);
+    if (!empty($row['is_published'])) indexnow_ping($res['name'], [indexnow_url($res['name'], $row)]);
+    return shape_row($res, $row);
 });
 
 $r->put('/admin/content/{res}/{id}', function ($p) {
@@ -580,7 +583,10 @@ $r->put('/admin/content/{res}/{id}', function ($p) {
     $data = validate_record($res, body(), $existing);
     DB::update($res['table'], $id, $data);
     log_activity($u, 'update', $res['name'], $id, (string) ($data[$res['title']] ?? $existing[$res['title']]));
-    return shape_row($res, DB::one("SELECT * FROM `{$res['table']}` WHERE id = ?", [$id]));
+    $row = DB::one("SELECT * FROM `{$res['table']}` WHERE id = ?", [$id]);
+    // the new address, and the old one when the slug changed or the page was unpublished (so it drops out sooner)
+    if (!empty($row['is_published']) || !empty($existing['is_published'])) indexnow_ping($res['name'], [indexnow_url($res['name'], $row), indexnow_url($res['name'], $existing)]);
+    return shape_row($res, $row);
 });
 
 $r->delete('/admin/content/{res}/{id}', function ($p) {
@@ -591,6 +597,7 @@ $r->delete('/admin/content/{res}/{id}', function ($p) {
     if (!$existing) throw new HttpError(404, 'العنصر غير موجود');
     DB::run("DELETE FROM `{$res['table']}` WHERE id = ?", [$id]);
     log_activity($u, 'delete', $res['name'], $id, (string) $existing[$res['title']]);
+    if (!empty($existing['is_published'])) indexnow_ping($res['name'], [indexnow_url($res['name'], $existing)]);
     return ['ok' => true];
 });
 
