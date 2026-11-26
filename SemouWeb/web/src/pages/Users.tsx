@@ -138,7 +138,8 @@ function UserCard({ guid: initialGuid, onClose }: { guid: string | null; onClose
   const canSave = isNew ? can(FORM, 'add') : can(FORM, 'edit')
   const ro = !canSave
 
-  const catalog = useQuery({ queryKey: ['users', 'catalog'], queryFn: () => api<Catalog>('/users/catalog'), staleTime: 60_000 })
+  // fresh every time the card opens: a salesman or screen added a moment ago must be in the lists
+  const catalog = useQuery({ queryKey: ['users', 'catalog'], queryFn: () => api<Catalog>('/users/catalog'), staleTime: 0, refetchOnMount: 'always' })
   const details = useQuery({ queryKey: ['users', 'one', initialGuid], queryFn: () => api<Details>(`/users/${initialGuid}`), enabled: !!initialGuid, staleTime: 0 })
 
   const schema = useMemo(() => (isNew ? baseSchema.refine(v => v.password.length > 0, { path: ['password'], message: 'يرجى إدخال كلمة المرور' }) : baseSchema)
