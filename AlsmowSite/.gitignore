@@ -5,3 +5,5 @@ api/config.php
 *.log
 uploads/
 api/vendor/
+_gbp/
+seo_report3.md

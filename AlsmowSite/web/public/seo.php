@@ -125,6 +125,8 @@ try {
             $list = array_values(array_filter($programs, fn($p) => $p['type'] === $k));
             if ($list) $body .= '<h2><a href="/programs/type/' . $k . '">' . $e($t[1]) . '</a></h2>' . $links($list);
         }
+        $guides = DB::all('SELECT title, slug FROM posts WHERE is_published = 1 ORDER BY published_at DESC, sort ASC, id DESC LIMIT 12');
+        if ($guides) $body .= '<h2><a href="/blog">أدلة ونصائح</a></h2><ul>' . implode('', array_map(fn($x) => '<li><a href="/blog/' . $e(rawurlencode($x['slug'])) . '">' . $e($x['title']) . '</a></li>', $guides)) . '</ul>';
         $ld[] = ['@type' => 'ItemList', 'name' => 'برامج ' . $name, 'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'item' => $course($p)], $programs, array_keys($programs))];
     } elseif ($seg[0] === 'about' && count($seg) === 1) {
         $a = $S['about'] ?? [];
