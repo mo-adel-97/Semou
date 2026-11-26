@@ -100,7 +100,7 @@ export default function ProgramDetail() {
                   rel="noopener noreferrer"
                   className="btn w-full bg-[#25D366] text-white hover:brightness-95"
                 >
-                  <WhatsAppIcon className="h-5 w-5" /> استفسري عبر واتساب
+                  <WhatsAppIcon className="h-5 w-5" /> استفسر عبر واتساب
                 </a>
               )}
               {c?.phone && (

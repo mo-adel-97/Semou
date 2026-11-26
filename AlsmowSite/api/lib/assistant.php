@@ -245,7 +245,7 @@ function as_docs(?array $kbOverride = null): array
         $docs[] = [
             'id' => 'post' . $po['slug'], 'kind' => 'post', 'title' => $po['title'], 'boost' => 0.7,
             'fields' => [[$po['title'], 2.5], [(string) $po['excerpt'], 1.0]],
-            'answer' => "**{$po['title']}**\n" . as_plain((string) $po['excerpt'], 400) . "\nاقرئي المقال: $site/blog/" . rawurlencode($po['slug']),
+            'answer' => "**{$po['title']}**\n" . as_plain((string) $po['excerpt'], 400) . "\nاقرأ المقال: $site/blog/" . rawurlencode($po['slug']),
         ];
     }
     return $docs;

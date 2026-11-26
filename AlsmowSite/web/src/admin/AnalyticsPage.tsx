@@ -54,7 +54,7 @@ const daysAgo = (k: number) => { const d = new Date(); d.setDate(d.getDate() - k
 const SOURCE: Record<string, string> = { direct: 'زيارات مباشرة', search: 'محركات البحث', social: 'التواصل الاجتماعي', referral: 'مواقع أخرى', campaign: 'حملات (UTM)' }
 const DEVICE: Record<string, string> = { mobile: 'الجوال', desktop: 'الكمبيوتر', tablet: 'التابلت' }
 const EVENT: Record<string, string> = {
-  chat_open: 'فتح المساعد الذكي', chat_message: 'أسئلة للمساعد', register_click: 'نقرات «سجلي الآن»', register_submit: 'طلبات تسجيل مُرسلة',
+  chat_open: 'فتح المساعد الذكي', chat_message: 'أسئلة للمساعد', register_click: 'نقرات «سجّل الآن»', register_submit: 'طلبات تسجيل مُرسلة',
   contact_submit: 'رسائل تواصل', whatsapp_click: 'نقرات واتساب', phone_click: 'نقرات الاتصال', email_click: 'نقرات البريد', portal_click: 'دخول البوابة',
   program_view: 'مشاهدة صفحة برنامج', theme_change: 'تغيير ألوان الموقع', share: 'مشاركة',
 }
