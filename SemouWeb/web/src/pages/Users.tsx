@@ -4,7 +4,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { AnimatePresence } from 'motion/react'
-import { BadgeCheck, Briefcase, Copy, Eraser, Eye, EyeOff, KeyRound, Landmark, LayoutGrid, Mail, Phone, Plus, Save, Search, ShieldCheck, UserCheck, UserCog, Users as UsersIcon, UserX } from 'lucide-react'
+import { BadgeCheck, Briefcase, Copy, Pencil, Eraser, Eye, EyeOff, KeyRound, Landmark, LayoutGrid, Mail, Phone, Plus, Save, Search, ShieldCheck, UserCheck, UserCog, Users as UsersIcon, UserX } from 'lucide-react'
 import { api, qs } from '../api'
 import { useAuth } from '../auth'
 import { alerts, notify } from '../lib/alerts'
@@ -509,6 +509,28 @@ function HrSelect({ items, value, onChange, disabled, screen, form, noun, onAdde
       notify.success(`تمت إضافة ${noun}`)
     } catch (e) { alerts.error((e as Error).message) } finally { setBusy(false) }
   }
+  /** Rename the chosen item (same rules as its screen: edit permission + reason; every user linked to it shows the new name). */
+  const rename = async () => {
+    const cur = (items ?? []).find(i => i.guid === value)
+    if (!cur) return
+    const { default: Swal } = await import('sweetalert2')
+    const r = await Swal.fire({
+      title: `تعديل ${noun}`, input: 'text', inputValue: cur.name, showCancelButton: true, confirmButtonText: 'متابعة', cancelButtonText: 'إلغاء', buttonsStyling: false,
+      customClass: { popup: 'sm-popup', title: 'sm-title', confirmButton: 'btn', cancelButton: 'btn ghost', actions: 'sm-actions', input: 'input' },
+      inputValidator: v => (!v.trim() ? 'يرجى إدخال الاسم' : v.trim().length > 150 ? 'الاسم طويل جداً'
+        : (items ?? []).some(i => i.guid !== cur.guid && i.name === v.trim()) ? 'الاسم موجود مسبقاً في القائمة' : undefined),
+    })
+    if (!r.isConfirmed || !r.value || String(r.value).trim() === cur.name) return
+    const reason = await alerts.reason()
+    if (reason === null) return
+    setBusy(true)
+    try {
+      const row = await api<{ values: Record<string, unknown> }>(`/screens/${screen}/${cur.guid}`)
+      await api(`/screens/${screen}/${cur.guid}`, { method: 'PUT', json: { values: { ...row.values, Name: String(r.value).trim() }, reason } })
+      await onAdded()
+      notify.success('تم تعديل الاسم')
+    } catch (e) { alerts.error((e as Error).message) } finally { setBusy(false) }
+  }
   return (
     <div className="hr-select">
       <select className="input" disabled={disabled} value={value} onChange={e => onChange(e.target.value)}>
@@ -517,6 +539,9 @@ function HrSelect({ items, value, onChange, disabled, screen, form, noun, onAdde
       </select>
       {!disabled && can(form, 'add') && (
         <button type="button" className="btn secondary icon" onClick={add} disabled={busy} title={`إضافة ${noun} جديد`} aria-label={`إضافة ${noun}`}>{busy ? <Spinner /> : <Plus size={17} />}</button>
+      )}
+      {!disabled && value && can(form, 'edit') && (
+        <button type="button" className="btn ghost icon" onClick={rename} disabled={busy} title={`تعديل اسم ${noun}`} aria-label={`تعديل ${noun}`}><Pencil size={16} /></button>
       )}
     </div>
   )
