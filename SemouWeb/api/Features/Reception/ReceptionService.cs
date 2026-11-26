@@ -14,6 +14,10 @@ namespace Semou.Api.Features.Reception;
 public sealed class StudentInput
 {
     public string StudentName { get; set; } = "";
+    /// <summary>الاسم بالإنجليزي (dbo.Student.StudentNameEn).</summary>
+    public string? StudentNameEn { get; set; }
+    /// <summary>تاريخ الميلاد (dbo.Student.BirthDate).</summary>
+    public DateTime? BirthDate { get; set; }
     public string StudentTel { get; set; } = "";
     public string NationalId { get; set; } = "";
     public string? Email { get; set; }
@@ -190,7 +194,7 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
     {
         await using var c = await db.OpenAsync(ct);
         return await c.QueryFirstOrDefaultAsync(new CommandDefinition("""
-            SELECT S.Code, S.Guid, S.AcadmyId, S.StudentName, S.StudentTel, S.NationalId, S.Email, S.BarnchGuid AS BranchGuid, S.RegCaseGuid,
+            SELECT S.Code, S.Guid, S.AcadmyId, S.StudentName, S.StudentNameEn, CONVERT(char(10), S.BirthDate, 23) AS BirthDate, S.StudentTel, S.NationalId, S.Email, S.BarnchGuid AS BranchGuid, S.RegCaseGuid,
                    S.StudentType, S.StudentNational, CAST(ISNULL(S.IsUse,0) AS bit) AS IsUse, CAST(ISNULL(S.NoData,0) AS bit) AS NoData, S.Notes,
                    S.AccountGuid, CAST(A.Code AS nvarchar(50)) AS AccountCode, CAST(ISNULL(S.LockProfile,0) AS bit) AS Locked
             FROM dbo.Student S LEFT JOIN dbo.Account A ON A.Guid = S.AccountGuid WHERE S.Guid = @guid
@@ -200,6 +204,18 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
     /// <summary>VALIDATE_DATA + StudentExists + StudentMobileExists.</summary>
     private static async Task ValidateAsync(DbConnection c, DbTransaction tx, StudentInput i, Guid? self)
     {
+        var isNew = self is null;
+        i.StudentNameEn = string.Join(" ", (i.StudentNameEn ?? "").Split(" ", StringSplitOptions.RemoveEmptyEntries));
+        if (i.StudentNameEn.Length == 0) { if (isNew) throw new ApiException("يرجى إدخال اسم الطالب بالإنجليزي"); i.StudentNameEn = null; }
+        else if (i.StudentNameEn.Length > 150) throw new ApiException("الاسم بالإنجليزي طويل جداً");
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(i.StudentNameEn, "^[A-Za-z][A-Za-z .'-]*$")) throw new ApiException("الاسم بالإنجليزي يُكتب بحروف إنجليزية فقط");
+        if (i.BirthDate is null) { if (isNew) throw new ApiException("يرجى إدخال تاريخ ميلاد الطالب"); }
+        else
+        {
+            i.BirthDate = i.BirthDate.Value.Date;
+            var today = Clock.Now.Date;
+            if (i.BirthDate > today.AddYears(-10) || i.BirthDate < today.AddYears(-100)) throw new ApiException("يرجى إدخال تاريخ ميلاد صحيح");
+        }
         i.StudentName = i.StudentName.Trim(); i.StudentTel = i.StudentTel.Trim(); i.NationalId = i.NationalId.Trim();
         if (i.StudentName.Length == 0) throw new ApiException("يرجى إدخال اسم الطالب");
         if (i.StudentName.Length > 150) throw new ApiException("اسم الطالب طويل جداً");
@@ -227,6 +243,10 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
         i.StudentName, i.StudentTel, i.NationalId, i.RegCaseGuid, BarnchGuid = i.BranchGuid, i.IsUse, Notes = i.Notes?.Trim() ?? "",
         i.NoData, Email = i.Email!.Trim(), i.StudentType, i.StudentNational,
     };
+
+    /// <summary>Web-only columns, kept out of the shared AddStudent / UpdateStudent procs.</summary>
+    private static Task SaveExtraAsync(DbConnection c, DbTransaction tx, Guid guid, StudentInput i) =>
+        c.ExecuteAsync("UPDATE dbo.Student SET StudentNameEn = @en, BirthDate = @bd WHERE Guid = @guid", new { en = i.StudentNameEn, bd = i.BirthDate, guid }, tx);
 
     public async Task<StudentSaved> CreateAsync(StudentInput i, CancellationToken ct)
     {
@@ -270,6 +290,7 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
             p.Add("ID", id); p.Add("Code", id.ToString()); p.Add("AcadmyId", "S" + RandomNumberGenerator.GetInt32(int.MaxValue)); p.Add("AccountGuid", accountGuid);
             await c.ExecuteAsync("dbo.AddStudent", p, tx, commandType: CommandType.StoredProcedure);
             var guid = await c.ExecuteScalarAsync<Guid>("SELECT Guid FROM dbo.Student WHERE ID = @id", new { id }, tx);
+            await SaveExtraAsync(c, tx, guid, i);
 
             if (i.Archive is { } arc)
             {
@@ -320,6 +341,7 @@ public sealed class ReceptionService(Db db, ArchiveDb archive, UserActionLog aud
             var p = new DynamicParameters(StudentParams(i));
             p.Add("Guid", guid);
             await c.ExecuteAsync("dbo.UpdateStudent", p, tx, commandType: CommandType.StoredProcedure);
+            await SaveExtraAsync(c, tx, guid, i);
             await c.ExecuteAsync("dbo.UpdateAccount", new { Guid = cur.AccountGuid, AccountName = i.StudentName, i.IsUse }, tx, commandType: CommandType.StoredProcedure);
             await audit.WriteAsync(c, tx, StudentForm, guid, UserActionLog.Update, cur.Code, i.Reason!.Trim());
             return new StudentSaved("تم تعديل بيانات الطالب بنجاح", cur.Code, guid, cur.AccountGuid);

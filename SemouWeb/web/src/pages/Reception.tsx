@@ -610,10 +610,10 @@ interface Lookups {
   levels: { Guid: string; Name: string }[]; courses: { Guid: string; Name: string; DiplomGuid: string }[]
 }
 interface StudentForm {
-  StudentName: string; StudentTel: string; NationalId: string; Email: string; BranchGuid: string; RegCaseGuid: string
+  StudentName: string; StudentNameEn: string; BirthDate: string; StudentTel: string; NationalId: string; Email: string; BranchGuid: string; RegCaseGuid: string
   StudentType: number; StudentNational: number; IsUse: boolean; NoData: boolean; Notes: string
 }
-const EMPTY: StudentForm = { StudentName: '', StudentTel: '', NationalId: '', Email: '', BranchGuid: '', RegCaseGuid: '', StudentType: 1, StudentNational: 0, IsUse: true, NoData: false, Notes: '' }
+const EMPTY: StudentForm = { StudentName: '', StudentNameEn: '', BirthDate: '', StudentTel: '', NationalId: '', Email: '', BranchGuid: '', RegCaseGuid: '', StudentType: 1, StudentNational: 0, IsUse: true, NoData: false, Notes: '' }
 
 function StudentCard({ guid: initialGuid, archive, prefill, lookups, onClose, onSaved }: {
   guid: string | null; archive?: ArchiveRow; prefill?: Partial<StudentForm>; lookups?: Lookups; onClose: () => void; onSaved: (nid: string) => void
@@ -641,7 +641,7 @@ function StudentCard({ guid: initialGuid, archive, prefill, lookups, onClose, on
     const d = details.data
     if (!d) return
     const v: StudentForm = {
-      StudentName: String(d.StudentName ?? ''), StudentTel: String(d.StudentTel ?? ''), NationalId: String(d.NationalId ?? ''), Email: String(d.Email ?? ''),
+      StudentName: String(d.StudentName ?? ''), StudentNameEn: String(d.StudentNameEn ?? ''), BirthDate: String(d.BirthDate ?? ''), StudentTel: String(d.StudentTel ?? ''), NationalId: String(d.NationalId ?? ''), Email: String(d.Email ?? ''),
       BranchGuid: String(d.BranchGuid ?? ''), RegCaseGuid: String(d.RegCaseGuid ?? ''), StudentType: Number(d.StudentType ?? 1), StudentNational: Number(d.StudentNational ?? 0),
       IsUse: !!d.IsUse, NoData: !!d.NoData, Notes: String(d.Notes ?? ''),
     }
@@ -649,8 +649,15 @@ function StudentCard({ guid: initialGuid, archive, prefill, lookups, onClose, on
   }, [details.data])
   const set = (p: Partial<StudentForm>) => setF(x => ({ ...x, ...p }))
 
+  const enOk = /^[A-Za-z][A-Za-z .'-]*$/.test(f.StudentNameEn.trim())
+  const bdRange = (() => { const t = new Date(), iso = (y: number) => `${t.getFullYear() - y}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; return { min: iso(100), max: iso(10) } })()
+  const bdOk = !!f.BirthDate && f.BirthDate >= bdRange.min && f.BirthDate <= bdRange.max
   const validate = (): string | null => {
     if (!f.StudentName.trim()) return 'يرجى إدخال اسم الطالب'
+    if (isNew && !f.StudentNameEn.trim()) return 'يرجى إدخال اسم الطالب بالإنجليزي'
+    if (f.StudentNameEn.trim() && !enOk) return 'الاسم بالإنجليزي يُكتب بحروف إنجليزية فقط'
+    if (isNew && !f.BirthDate) return 'يرجى إدخال تاريخ ميلاد الطالب'
+    if (f.BirthDate && !bdOk) return 'يرجى إدخال تاريخ ميلاد صحيح'
     if (!f.StudentTel.trim()) return 'يرجى إدخال رقم الجوال'
     if (!/^\d{10}$/.test(f.StudentTel)) return 'يرجى إدخال رقم جوال صحيح'
     if (!f.NationalId.trim()) return 'يرجى إدخال رقم الهوية'
@@ -671,7 +678,7 @@ function StudentCard({ guid: initialGuid, archive, prefill, lookups, onClose, on
   const save = useMutation({
     mutationFn: async () => {
       const body = {
-        ...f, branchGuid: f.BranchGuid || null, regCaseGuid: f.RegCaseGuid || null,
+        ...f, StudentNameEn: f.StudentNameEn.trim() || null, BirthDate: f.BirthDate || null, branchGuid: f.BranchGuid || null, regCaseGuid: f.RegCaseGuid || null,
         archive: archive ? {
           custNo: archive.custNo, oldBranchId: archive.oldBranchId, type: arc.type,
           diplomGuid: arc.type === 0 ? arc.diplom || null : lookups?.courses.find(c => c.Guid === arc.course)?.DiplomGuid ?? null,
@@ -732,6 +739,12 @@ function StudentCard({ guid: initialGuid, archive, prefill, lookups, onClose, on
           )}
           <div className="section-label span-all">البيانات الأساسية</div>
           <Field label="اسم الطالب" required className="span-2"><input className="input" autoFocus readOnly={ro} maxLength={150} value={f.StudentName} onChange={e => set({ StudentName: e.target.value })} /></Field>
+          <Field label="الاسم بالإنجليزي" required={isNew} error={f.StudentNameEn.trim() && !enOk ? 'حروف إنجليزية فقط' : undefined}>
+            <input className={`input ${f.StudentNameEn.trim() && !enOk ? 'invalid' : ''}`} dir="ltr" lang="en" autoComplete="off" placeholder="Full name in English" readOnly={ro} maxLength={150} value={f.StudentNameEn} onChange={e => set({ StudentNameEn: e.target.value })} />
+          </Field>
+          <Field label="تاريخ الميلاد" required={isNew} error={f.BirthDate && !bdOk ? 'تاريخ الميلاد غير صحيح' : undefined}>
+            <input className={`input ${f.BirthDate && !bdOk ? 'invalid' : ''}`} type="date" min={bdRange.min} max={bdRange.max} readOnly={ro} value={f.BirthDate} onChange={e => set({ BirthDate: e.target.value })} />
+          </Field>
           <Field label="رقم الهوية" required error={f.NationalId && !nidOk ? 'رقم الهوية غير صحيح' : undefined} hint={nidOk ? '✓ رقم الهوية صحيح' : 'عشرة أرقام ولا يبدأ بصفر'}>
             <input className={`input ${f.NationalId && !nidOk ? 'invalid' : ''}`} dir="ltr" inputMode="numeric" maxLength={10} readOnly={ro} value={f.NationalId} onChange={e => set({ NationalId: e.target.value.replace(/\D/g, '') })} />
           </Field>
