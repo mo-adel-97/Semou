@@ -639,8 +639,10 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     }
 
     // a short follow-up about the program of the previous turn: «وكم مدته؟» «بكام؟» «هل هو معتمد؟»
-    $attrs = ['#fees', '#duration', '#credit', '#mode', '#cert', '#howmuch'];
-    $onlyAttrs = $words === [] && $tags && !array_diff(array_keys($tags), $attrs);
+    $attrs = ['#fees', '#duration', '#credit', '#mode', '#cert', '#howmuch', '#jobs'];
+    // words that only point back at it: «وش الوظائف بعده؟» «وش مستقبله؟»
+    $refs = array_flip(array_map('as_stem', array_map('as_norm', ['بعد', 'بعده', 'بعدها', 'له', 'لها', 'فيه', 'فيها', 'منه', 'منها', 'هذا', 'هذي', 'ذا', 'التخرج', 'تخرج', 'اتخرج'])));
+    $onlyAttrs = !array_filter($words, fn($w) => !isset($refs[$w]) && !isset($refs[as_stem($w)])) && $tags && !array_diff(array_keys($tags), $attrs);
     $ctx = null;
     if (!$progs && $onlyAttrs) {
         $last = as_last_program($history);
