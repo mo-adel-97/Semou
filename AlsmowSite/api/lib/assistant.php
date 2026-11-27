@@ -74,7 +74,7 @@ function as_syn(): array
         '#attend' => 'حضور غياب غيابات اغيب أغيب غبت يغيب تغيب تاخير تأخير اتاخر أتأخر',
         '#complain' => 'شكوي شكاوي شكوى شكاوى مقترح مقترحات اقتراح',
         '#privacy' => 'خصوصيه بياناتي',
-        '#jobs' => 'توظيف وظيفه وظايف وظائف عمل خريجين خريجات سوق',
+        '#jobs' => 'توظيف وظيفه وظايف وظائف عمل خريجين خريجات سوق اشتغل اشتغلي مجالات المجالات مستقبل مستقبله',
         '#about' => 'المعهد معهد رؤيه رؤية رساله قيم نبذه عنكم',
         '#advice' => 'يناسبني يناسب يناسبنى تناسبني انسب الانسب انصحيني انصحني تنصحيني تنصحني رشحي رشحيلي رشحلي اقترحي محتاره محتار حايره حاير اختار',
         '#exam' => 'اختبار اختبارات امتحان امتحانات',
@@ -194,8 +194,9 @@ function as_docs(?array $kbOverride = null): array
         $link = trim((string) ($e['link'] ?? ''));
         $docs[] = [
             'id' => "kb$i", 'kind' => 'kb', 'title' => $q, 'boost' => 1.35,
-            'fields' => [[$q, 3.0], [$variants, 3.0], [$a, 0.8]],
-            'answer' => $a . ($link !== '' ? "\n" . (str_starts_with($link, '/') ? $site . $link : $link) : ''),
+            // matched by its question and the ways to ask it (its answer mentions many programmes and would match anything)
+            'fields' => [[$q, 3.0], [$variants, 3.0]],
+            'answer' => as_fill($a) . ($link !== '' ? "\n" . (str_starts_with($link, '/') ? $site . $link : $link) : ''),
         ];
     }
 
@@ -319,6 +320,14 @@ function as_program_answer(array $p, array $focus): string
         $any = true;
         $lines[] = $p['mode'] ? '- **طريقة الدراسة:** ' . (PROGRAM_MODES[$p['mode']] ?? $p['mode']) : '- **طريقة الدراسة:** غير محددة على الموقع، تواصل معنا للتأكد.';
     }
+    if ($want('#jobs') || $want('#advice')) {
+        $any = true;
+        $info = as_field_info((string) ($p['category'] ?? ''));
+        $jobs = trim((string) ($p['careers'] ?? '')) !== '' ? array_map('trim', preg_split('/[·،,]/u', (string) $p['careers']) ?: []) : array_slice($info, 0, -1);
+        if ($jobs) $lines[] = '**مجالات العمل بعده:** ' . implode('، ', array_filter($jobs)) . '.';
+        if ($info) $lines[] = '**يناسب:** ' . end($info) . '.';
+        if (!$jobs && !$info) $lines[] = 'مجالات العمل بعد هذا البرنامج يوضحها لك فريق القبول.';
+    }
     if ($want('#cert')) {
         $any = true;
         $lines[] = $p['accreditation'] ? "- **الاعتماد:** {$p['accreditation']}" : '- **الاعتماد:** غير مذكور على صفحة البرنامج.';
@@ -336,6 +345,8 @@ function as_program_answer(array $p, array $focus): string
     }
     $lines[] = "صفحة البرنامج: $link";
     if ($want('#register') || $want('#fees')) $lines[] = "للتسجيل: $site/register";
+    $wa = preg_replace('/\D+/', '', (string) (all_settings()['contact']['whatsapp'] ?? ''));
+    if ($wa !== '') $lines[] = "استفسر عنه عبر واتساب: https://wa.me/$wa?text=" . rawurlencode("السلام عليكم، أبغى أستفسر عن {$p['title']}");
     return implode("\n", $lines);
 }
 
@@ -357,11 +368,45 @@ function as_programs_list(?string $type): string
 
 /* ---------- understanding ---------- */
 
+/** «عن بعد» or «حضوري» said in the text: 'online' / 'onsite' / null. */
+function as_mode_said(string $text): ?string
+{
+    $n = ' ' . as_norm($text) . ' ';
+    $remote = (bool) preg_match('/(عن ?بعد|اون ?لاين|online|من البيت|من المنزل|من بيتي|عن طريق النت)/u', $n);
+    $onsite = (bool) preg_match('/(حضوري|حضوريا|انتظام|بالمعهد|في المعهد|في المقر)/u', $n);
+    return $remote === $onsite ? null : ($remote ? 'online' : 'onsite');
+}
+
+/** Is the program taught online (by its mode, or «عن بعد» in its title)? */
+function as_is_online(array $p): bool
+{
+    return ($p['mode'] ?? '') === 'online' || as_mode_said((string) $p['title']) === 'online';
+}
+
+/** Of several programs, keep those of the mode the text asks for (all of them when it says none or none match). */
+function as_by_mode(array $progs, ?string $mode): array
+{
+    if ($mode === null || count($progs) < 2) return $progs;
+    $keep = array_values(array_filter($progs, fn($p) => as_is_online($p) === ($mode === 'online')));
+    return $keep ?: $progs;
+}
+
 /** Which program does the text name? Uses each title's distinctive words (not "دبلوم / دورة / إدارة"). */
-function as_find_programs(array $tokens): array
+function as_find_programs(array $tokens, ?string $raw = null): array
 {
     $progs = as_programs();
     if (!$progs) return [];
+    // the program's full name, as written in a suggestion chip or on the site («ادارة الموارد البشرية ( عن بعد )»):
+    // the longest title contained in the text wins outright
+    if ($raw !== null) {
+        $nq = ' ' . as_norm($raw) . ' ';
+        $exact = null;
+        foreach ($progs as $p) {
+            $nt = as_norm((string) $p['title']);
+            if ($nt !== '' && str_contains($nq, ' ' . $nt . ' ') && (!$exact || mb_strlen($nt) > mb_strlen(as_norm((string) $exact['title'])))) $exact = $p;
+        }
+        if ($exact) return [$exact];
+    }
     $df = [];
     $titleTok = [];
     foreach ($progs as $p) {
@@ -407,8 +452,50 @@ function as_find_programs(array $tokens): array
     if (!$scored) return [];
     usort($scored, fn($a, $b) => $b[2] <=> $a[2]);
     $best = $scored[0][2];
-    // several almost equally good → ambiguous: return them all
-    return array_map(fn($x) => $x[1], array_values(array_filter($scored, fn($x) => $x[2] >= $best - 0.08)));
+    // several almost equally good → ambiguous: return them all, unless «حضوري / عن بعد» tells them apart
+    $tied = array_map(fn($x) => $x[1], array_values(array_filter($scored, fn($x) => $x[2] >= $best - 0.08)));
+    return $raw !== null ? as_by_mode($tied, as_mode_said($raw)) : $tied;
+}
+
+/**
+ * The visitor's reply to «أي برنامج تقصد؟»: the options listed in the last assistant message; the reply picks one
+ * by its name (the chip), its number («1»، «الأول»، «الثاني»), its mode («عن بعد»، «حضوري») or its own words.
+ * Returns [program, the question that led to the clarification] or null.
+ */
+function as_clarify_pick(string $question, array $history): ?array
+{
+    $last = null;
+    $before = '';
+    foreach (array_reverse($history) as $m) {
+        if ($last === null && ($m['role'] ?? '') === 'assistant') { $last = (string) ($m['content'] ?? ''); continue; }
+        if ($last !== null && ($m['role'] ?? '') === 'user') { $before = (string) ($m['content'] ?? ''); break; }
+    }
+    if ($last === null || !str_starts_with($last, 'أي برنامج تقصد')) return null;
+    $byTitle = [];
+    foreach (as_programs() as $p) $byTitle[as_norm((string) $p['title'])] = $p;
+    $opts = [];
+    foreach (explode("\n", $last) as $line) {
+        $line = trim($line);
+        if (!str_starts_with($line, '- ')) continue;
+        $name = as_norm(trim(explode('—', mb_substr($line, 2))[0], " *"));
+        if (isset($byTitle[$name])) $opts[] = $byTitle[$name];
+    }
+    if (count($opts) < 2) return null;
+    $n = as_norm($question);
+    foreach ($opts as $p) if ($n === as_norm((string) $p['title'])) return [$p, $before];
+    $ord = ['1' => 0, 'الاول' => 0, 'اول' => 0, 'الاولي' => 0, 'الاولى' => 0, '2' => 1, 'الثاني' => 1, 'التاني' => 1, 'ثاني' => 1, 'الثانيه' => 1, '3' => 2, 'الثالث' => 2, 'التالت' => 2];
+    foreach (explode(' ', $n) as $w) if (isset($ord[$w], $opts[$ord[$w]])) return [$opts[$ord[$w]], $before];
+    $byMode = as_by_mode($opts, as_mode_said($question));
+    if (count($byMode) === 1) return [$byMode[0], $before];
+    $ids = array_column($opts, 'id');
+    $found = array_values(array_filter(as_find_programs(as_tokens($question), $question), fn($p) => in_array($p['id'], $ids, true)));
+    if (count($found) === 1) return [$found[0], $before];
+    // «الدبلوم» when only one option is a diploma
+    if (str_contains($n, 'دبلوم')) {
+        $d = array_values(array_filter($opts, fn($p) => $p['type'] === 'diploma'));
+        if (count($d) === 1) return [$d[0], $before];
+    }
+    return null;
 }
 
 /** BM25 over all documents. */
@@ -516,16 +603,33 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
         return ['answer' => 'العفو، سعدت بمساعدتك 🌿 إن احتجت أي شيء آخر فأنا هنا.', 'suggestions' => $sug(), 'confident' => true];
     }
 
+    // the reply to «أي برنامج تقصد؟» («عن بعد»، «الأول»، or the chip with the full name), with what was asked before it
+    if ($pick = as_clarify_pick($question, $history)) {
+        [$p, $before] = $pick;
+        $focus = array_values(array_unique(array_merge($focus, array_filter(as_tokens($before), fn($t) => $t[0] === '#'))));
+        if (in_array('#howmuch', $focus, true) && !in_array('#duration', $focus, true) && !in_array('#credit', $focus, true)) $focus[] = '#fees';
+        return ['answer' => as_program_answer($p, $focus), 'suggestions' => as_program_next($p, $focus), 'confident' => true];
+    }
+
     // the dashboard's Q&A wins when it clearly matches
     $docs = as_docs($kbOverride);
     $ranked = as_rank($docs, $tok);
     $top = $ranked[0] ?? null;
-    if ($top && $top['doc']['kind'] === 'kb' && $top['coverage'] >= 0.6) {
+    $topicTags = count(array_unique(array_filter($tok, fn($t) => $t[0] === '#' && $t !== '#howmuch')));
+    // …but not «كم رسوم / مدة <programme>»: that is the programme's own card, unless the entry is about that very attribute
+    $attrQ = array_values(array_intersect(array_keys($tags), ['#fees', '#howmuch', '#duration', '#credit', '#register']));
+    // and not a bare programme name («دبلوم موارد بشرية»): that is the programme itself
+    $named = as_find_programs($tok, $question);
+    $titleWords = array_flip(array_merge(...array_map(fn($p) => as_tokens((string) $p['title']), $named ?: [['title' => '']])));
+    $bareName = $named && !array_filter($words, fn($w) => !isset($titleWords[$w]));
+    $kbFits = fn(array $r) => !$bareName && (!$attrQ || !$named
+        || !array_diff($attrQ, as_tokens(implode(' ', array_column($r['doc']['fields'], 0)))));
+    if ($top && $top['doc']['kind'] === 'kb' && $top['coverage'] >= 0.6 && ($top['words'] >= 1 || $topicTags >= 2) && $kbFits($top)) {
         return ['answer' => $top['doc']['answer'], 'suggestions' => as_related($ranked, $top), 'confident' => true];
     }
 
     // a program named in this message
-    $progs = as_find_programs($tok);
+    $progs = as_find_programs($tok, $question);
     // "كم / بكام" next to a program = its price
     if ($progs && $has('#howmuch') && !$has('#duration') && !$has('#credit')) { $tags['#fees'] = true; $focus[] = '#fees'; }
 
@@ -548,17 +652,18 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     if (!$progs && $has('#register')) $ctx = as_last_program($history)[0] ?? null;
 
     if (count($progs) > 1) {
+        // the same subject taught two ways: say how they differ, and how to answer
         $lines = ['أي برنامج تقصد؟'];
-        foreach ($progs as $p) $lines[] = "- {$p['title']}";
-        return ['answer' => implode("\n", $lines), 'suggestions' => array_slice(array_map(fn($p) => $p['title'], $progs), 0, 3), 'confident' => true];
+        foreach (array_slice($progs, 0, 5) as $p) {
+            $how = as_is_online($p) ? 'عن بُعد' : (($p['mode'] ?? '') === 'onsite' ? 'حضوري' : null);
+            $lines[] = '- ' . $p['title'] . ($how && as_mode_said((string) $p['title']) === null ? " — $how" : '');
+        }
+        $lines[] = 'اضغط على اسم البرنامج، أو اكتب «الأول» أو «الثاني»' . (count(array_unique(array_map('as_is_online', $progs))) > 1 ? ' أو «عن بُعد» أو «حضوري»' : '') . '.';
+        return ['answer' => implode("\n", $lines), 'suggestions' => array_slice(array_map(fn($p) => $p['title'], $progs), 0, 4), 'confident' => true];
     }
     if (count($progs) === 1) {
         $p = $progs[0];
-        $next = [];
-        if (!$has('#fees')) $next[] = "كم رسوم {$p['title']}؟";
-        if (!$has('#duration')) $next[] = 'كم مدته؟';
-        if (!$has('#register')) $next[] = 'كيف أسجل؟';
-        return ['answer' => as_program_answer($p, $focus), 'suggestions' => array_slice($next, 0, 3), 'confident' => true];
+        return ['answer' => as_program_answer($p, $focus), 'suggestions' => as_program_next($p, $focus), 'confident' => true];
     }
 
     // "which program suits me?"
@@ -578,7 +683,7 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     }
 
     // intents answered from live data
-    if ($has('#program') || (($has('#diploma') || $has('#course')) && count($words) <= 2 && !$has('#register'))) {
+    if (!$has('#cert') && ($has('#program') || (($has('#diploma') || $has('#course')) && count($words) <= 2 && !$has('#register')))) {
         $type = $has('#diploma') && !$has('#course') ? 'diploma' : null;
         $list = as_programs_list($type);
         if ($has('#course') && !$has('#diploma')) {
@@ -629,6 +734,18 @@ function as_answer_core(string $question, array $history = [], ?array $kbOverrid
     $a = $set['fallback'] . "\nيمكنك سؤال فريق القبول مباشرة:\n" . implode("\n", as_contact_lines(true));
     if ($related) $a = $set['fallback'] . "\nقد يفيدك أحد هذه المواضيع، أو تواصل مع فريق القبول:\n" . implode("\n", as_contact_lines(true));
     return ['answer' => $a, 'suggestions' => $related ? array_values(array_unique($related)) : $sug(), 'confident' => false];
+}
+
+/** Next questions after a program card: what was not asked yet. */
+function as_program_next(array $p, array $focus): array
+{
+    $has = fn(string $t) => in_array($t, $focus, true);
+    $next = [];
+    if (!$has('#fees')) $next[] = "كم رسوم {$p['title']}؟";
+    if (!$has('#duration')) $next[] = 'كم مدته؟';
+    if (!$has('#jobs') && !$has('#advice')) $next[] = "وش الوظائف بعد {$p['title']}؟";
+    if (!$has('#register')) $next[] = 'كيف أسجل؟';
+    return array_slice($next, 0, 3);
 }
 
 function as_related(array $ranked, array $top): array
