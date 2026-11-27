@@ -1124,3 +1124,13 @@ html.menu-open .dock * { animation-play-state: paused !important; }
    near-opaque surfaces look the same and cost nothing */
 .site-shell .glass, .site-shell [class*="backdrop-blur"] { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .site-shell .glass { background-color: color-mix(in oklab, var(--surface) 94%, transparent); }
+
+/* ---------- admin: sidebar scrollbar (thin, dark) · active item accent · swipeable segmented rows ---------- */
+.admin-scroll { scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .16) transparent; }
+.admin-scroll::-webkit-scrollbar { width: 6px; }
+.admin-scroll::-webkit-scrollbar-track { background: transparent; }
+.admin-scroll::-webkit-scrollbar-thumb { background: rgb(255 255 255 / .16); border-radius: 999px; }
+.admin-scroll::-webkit-scrollbar-thumb:hover { background: rgb(255 255 255 / .28); }
+.admin-nav-on::before { content: ""; position: absolute; inset-inline-start: -.75rem; top: .55rem; bottom: .55rem; width: 3px; border-radius: 999px; background: var(--color-gold-400); }
+.seg-scroll { scrollbar-width: none; }
+.seg-scroll::-webkit-scrollbar { display: none; }

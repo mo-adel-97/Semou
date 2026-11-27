@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
             <TrendChart data={r.series} hourly={r.range.hourly} />
           </Panel>
 
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             <Panel title="الصفحات الأكثر زيارة" icon={Eye} sub="المشاهدات · متوسط وقت القراءة">
               <Bars rows={r.pages.map((p) => ({ ...p, label: p.title || p.k, note: p.d ? dur(p.d) : undefined, sub: p.title ? p.k : undefined }))} />
             </Panel>

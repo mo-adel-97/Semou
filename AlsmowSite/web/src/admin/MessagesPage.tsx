@@ -75,9 +75,9 @@ export default function MessagesPage() {
         actions={<a href="/api/admin/messages-export" className="btn-ghost !px-4 !py-2.5 text-sm"><Download className="h-4 w-4" /> تصدير Excel</a>}
       />
       <div className="mb-4 flex flex-col gap-3 md:flex-row">
-        <div className="flex flex-wrap gap-1 rounded-xl border border-line bg-surface p-1">
+        <div className="seg-scroll flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1 md:flex-wrap">
           {tabs.map((t) => (
-            <button key={t.id} onClick={() => { setTab(t.id); setPage(1) }} className={cx('rounded-lg px-3 py-1.5 text-sm font-semibold transition', tab === t.id ? 'bg-primary text-white' : 'text-ink-2 hover:bg-sand')}>
+            <button key={t.id} onClick={() => { setTab(t.id); setPage(1) }} className={cx('shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition', tab === t.id ? 'bg-primary text-white' : 'text-ink-2 hover:bg-sand')}>
               {t.label}
             </button>
           ))}

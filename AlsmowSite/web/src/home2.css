@@ -328,12 +328,12 @@ a.chat-row:hover { background: var(--surface); }
 .about-where-dots i.on { width: 12px; border-radius: 3px; background: var(--brand); }
 
 /* =====================================================================
-   Hero layout v3: three areas (words · stage · accrediting bodies).
+   Hero layout v3: two areas (words · stage); the accrediting bodies have their own section.
    Phones: words → the stage right away → the logos on one compact row.
    Laptops/desktops: everything is sized from the screen HEIGHT too, so the whole hero always fits.
    ===================================================================== */
 .hero2 { padding: 8.4rem 0 3rem; }
-.hero2-layout { display: grid; gap: 2rem; grid-template-areas: "text" "stage" "accs"; }
+.hero2-layout { display: grid; gap: 2rem; grid-template-areas: "text" "stage"; }
 .hero2-text { grid-area: text; }
 .hero2-stage { grid-area: stage; }
 .hero2-accs { grid-area: accs; border-top: 1px solid var(--line); padding-top: 1.1rem; }
@@ -357,8 +357,8 @@ a.chat-row:hover { background: var(--surface); }
 }
 @media (min-width: 1024px) {
   .hero2 { --hh: calc(100svh - 10.5rem); display: flex; align-items: center; min-height: 100svh; padding: 8.25rem 0 2.25rem; }
-  .hero2-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); grid-template-areas: "text stage" "accs stage"; column-gap: 3rem; row-gap: 0; align-items: center; }
-  .hero2-text { align-self: end; }
+  .hero2-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); grid-template-areas: "text stage"; column-gap: 3rem; row-gap: 0; align-items: center; }
+  .hero2-text { align-self: center; }
   .hero2-accs { align-self: start; margin-top: clamp(1.2rem, 3.4svh, 2.6rem); padding-top: clamp(.9rem, 2.2svh, 1.4rem); }
   .hero2-title { margin-top: clamp(.8rem, 2.2svh, 1.4rem); font-size: min(clamp(2.4rem, 1.3rem + 3vw, 3.9rem), calc(var(--hh) * .088)); line-height: 1.14; }
   .hero2-sub { margin-top: clamp(.7rem, 2svh, 1.4rem); font-size: min(1.15rem, calc(var(--hh) * .026)); }
@@ -586,6 +586,10 @@ a.chat-row:hover { background: var(--surface); }
 }
 .pcard-emblem svg { width: 2rem; height: 2rem; }
 .pcard:hover .pcard-emblem { transform: rotate(0deg) scale(1.06); }
+/* an article card: its cover photo on the stage, darkened at the top so the category pill stays readable */
+.pcard-photo { background: color-mix(in oklab, var(--stage) 30%, var(--surface)); }
+.pcard-photo::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, rgb(0 0 0 / .38), transparent 45%); }
+.pcard-photo .pcard-type { background: rgb(0 0 0 / .32); }
 .pcard-body { display: flex; flex: 1; flex-direction: column; gap: .6rem; padding: 1.15rem 1.35rem 1.3rem; }
 .pcard-title { font-family: var(--font-display); font-size: 1.22rem; font-weight: 800; line-height: 1.45; color: var(--ink); text-wrap: balance; transition: color .3s; }
 .pcard:hover .pcard-title { color: color-mix(in oklab, var(--stage) 70%, var(--ink)); }

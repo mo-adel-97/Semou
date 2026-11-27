@@ -23,24 +23,34 @@ function readMinutes(html?: string | null) {
   return Math.max(1, Math.round(words / 180))
 }
 
-/** An article in a list: the same card as a programme (coloured stage + topic icon), so the blog reads as part of the site. */
+/**
+ * An article in a list: the programme card's shell (same radius, stage, title, footer and arrow), with the article's
+ * own cover photo on the stage so the articles are told apart at a glance; no cover → the coloured stage + topic icon.
+ */
 export function PostCard({ p, index = 0 }: { p: Post; index?: number }) {
   const palette = usePalette()
   const Icon = topicIcon(p)
   return (
     <Link to={`/blog/${p.slug}`} className="pcard group" style={{ ['--stage' as string]: at(palette, index) }}>
-      <div className="pcard-stage">
-        <div className="demo-stage-bg" aria-hidden />
-        <Icon className="pcard-water" strokeWidth={1} aria-hidden />
+      <div className={cx('pcard-stage', p.cover && 'pcard-photo')}>
+        {p.cover ? (
+          <Img src={p.cover} alt="" className="absolute inset-0 -z-10 h-full w-full transition duration-700 group-hover:scale-105" />
+        ) : (
+          <>
+            <div className="demo-stage-bg" aria-hidden />
+            <Icon className="pcard-water" strokeWidth={1} aria-hidden />
+            <span className="pcard-emblem" aria-hidden><Icon strokeWidth={1.6} /></span>
+          </>
+        )}
         <span className="pcard-type"><i />{p.category || 'مقال'}</span>
-        <span className="pcard-emblem" aria-hidden><Icon strokeWidth={1.6} /></span>
       </div>
       <div className="pcard-body">
         <h3 className="pcard-title">{p.title}</h3>
         {p.excerpt && <p className="line-clamp-2 text-[.92rem] leading-relaxed text-muted">{p.excerpt}</p>}
         <div className="pcard-foot">
           <div className="pcard-meta">
-            {p.published_at ? <span><CalendarDays />{fmtDate(p.published_at)}</span> : <span>اقرأ المقال</span>}
+            {p.published_at && <span><CalendarDays />{fmtDate(p.published_at)}</span>}
+            <span><BookOpen />اقرأ المقال</span>
           </div>
           <span className="pcard-go" aria-hidden><ArrowLeft className="h-[1.1rem] w-[1.1rem]" /></span>
         </div>

@@ -159,7 +159,7 @@ export default function IntroBirds() {
   const message = pick(it?.message, '', false) || g?.tagline || 'مستقبلك يبدأ من هنا'
   const kicker = pick(it?.kicker, 'أهلاً بك في', saved)
   const quote = pick(it?.quote, '﴿وَقُل رَّبِّ زِدْنِي عِلْمًا﴾', saved)
-  const skip = pick(it?.skip, 'تخطّي', false)
+  const skip = pick(it?.skip, 'تخطَّ المقدمة', false)
   const logo = g?.logo || '/logo.png'
 
   useEffect(() => {

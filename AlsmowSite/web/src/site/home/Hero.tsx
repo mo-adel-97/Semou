@@ -30,7 +30,6 @@ export default function Hero({ data }: { data: HomeData }) {
   const title = h.title || data.settings.general.site_name || ''
   const total = data.counts.diploma + data.counts.qualifying + data.counts.development
   const palette = usePalette()
-  const accs = data.accreditations.filter((a) => a.logo)
   return (
     <section className="hero2 relative isolate overflow-hidden">
       <div className="hero2-grid absolute inset-0 -z-10" aria-hidden />
@@ -67,14 +66,6 @@ export default function Hero({ data }: { data: HomeData }) {
         <motion.div initial={{ opacity: 0, y: 30, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, delay: 0.15, ease: EASE }} className="hero2-stage">
           <Stage data={data} total={total} />
         </motion.div>
-        {accs.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="hero2-accs">
-            <div className="hero2-accs-label">معتمدون من</div>
-            <div className="hero-accs">
-              {accs.map((a) => <img key={a.id} src={a.logo!} alt={a.name} title={a.name} loading="eager" decoding="async" />)}
-            </div>
-          </motion.div>
-        )}
 
       </div>
     </section>

@@ -84,12 +84,12 @@ function List({ spec }: { spec: ResourceSpec }) {
           <input className="input ps-10" placeholder="بحث..." value={q} onChange={(e) => setQ(e.target.value)} />
         </label>
         {typeFilter.map((f) => (
-          <div key={f.key} className="flex flex-wrap gap-1 rounded-xl border border-line bg-surface p-1">
+          <div key={f.key} className="seg-scroll flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1 md:flex-wrap">
             {[{ value: '', label: 'الكل' }, ...(f.options ?? [])].map((o) => (
               <button
                 key={o.value}
                 onClick={() => setFilters({ ...filters, [f.key]: o.value })}
-                className={cx('rounded-lg px-3 py-1.5 text-sm font-semibold transition', (filters[f.key] ?? '') === o.value ? 'bg-primary text-white' : 'text-ink-2 hover:bg-sand')}
+                className={cx('shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition', (filters[f.key] ?? '') === o.value ? 'bg-primary text-white' : 'text-ink-2 hover:bg-sand')}
               >
                 {o.label}
               </button>
@@ -130,7 +130,7 @@ function List({ spec }: { spec: ResourceSpec }) {
                   )
                 )}
                 <div className="min-w-0 flex-1">
-                  <Link to={`/admin/c/${spec.name}/${r.id}`} className="block truncate font-bold text-ink hover:text-brand-700">{String(r[spec.title] ?? '')}</Link>
+                  <Link to={`/admin/c/${spec.name}/${r.id}`} className="line-clamp-2 block font-bold text-ink hover:text-brand-700 md:truncate">{String(r[spec.title] ?? '')}</Link>
                   <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
                     {columns.map((c) => <Cell key={c.key} f={c} v={r[c.key]} />)}
                     {r.is_featured === true && <span className="text-gold-600">★ في الرئيسية</span>}

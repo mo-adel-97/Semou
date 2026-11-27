@@ -73,7 +73,7 @@ function settings_schema(): array
                 'title' => ['type' => 'string', 'label' => 'العنوان الكبير', 'max' => 80, 'placeholder' => 'اسم المعهد', 'help' => 'اتركه فارغًا لعرض اسم المعهد من «عام»'],
                 'message' => ['type' => 'string', 'label' => 'الرسالة', 'max' => 120, 'placeholder' => 'الشعار النصي', 'help' => 'اتركه فارغًا لعرض الشعار النصي من «عام»'],
                 'quote' => ['type' => 'string', 'label' => 'الحكمة أسفل اللافتة', 'max' => 120, 'placeholder' => '﴿وَقُل رَّبِّ زِدْنِي عِلْمًا﴾', 'help' => 'اتركها فارغة لإخفائها'],
-                'skip' => ['type' => 'string', 'label' => 'نص زر التخطي', 'max' => 20, 'placeholder' => 'تخطّي'],
+                'skip' => ['type' => 'string', 'label' => 'نص زر التخطي', 'max' => 20, 'placeholder' => 'تخطَّ المقدمة'],
             ],
         ],
         // The butterflies (web/src/components/Butterflies.tsx): decoration, the one carrying a banner, the two that talk.

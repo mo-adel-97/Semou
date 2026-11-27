@@ -1,15 +1,15 @@
-import { ArrowLeft, MapPin } from 'lucide-react'
+import { ArrowLeft, Award, BadgeCheck, BookOpenCheck, Gem, Handshake, HeartHandshake, Lightbulb, MapPin, Rocket, ShieldCheck, Sparkles, Target, TrendingUp, Users, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Img, Reveal, useParallax } from '../../components/ui'
 import { cx } from '../../lib/format'
 import type { HomeData } from '../../lib/types'
-import { Headline, IsoCube, REDUCED, at, useOnScreen, usePalette } from './kit'
+import { Headline, REDUCED, at, useOnScreen, usePalette } from './kit'
 
 /* =====================================================================
    «من نحن» as a bento: the place (photo + the body that supervises it), the story (summary),
-   the vision and mission taking turns on a coloured card, and the values as a ruled row of cubes.
+   the vision and mission taking turns on a coloured card, and the values as a ruled row, each with its icon in the site's icon tile.
    Every word and image comes from the dashboard (settings › عن المعهد).
    ===================================================================== */
 
@@ -72,7 +72,7 @@ export default function About({ data }: { data: HomeData }) {
             <div className="pgrid grid grid-cols-2 lg:col-span-12" style={{ ['--cols' as string]: Math.min(a.values.length, 4) }}>
               {a.values.map((v, i) => (
                 <Reveal key={v} delay={i * 0.06} className="pgrid-cell !h-auto !justify-start gap-4 !p-5 md:!p-6">
-                  <IsoCube color={at(palette, i + 1)} className="w-11 shrink-0 md:w-12" />
+                  <ValueIcon value={v} color={at(palette, i + 1)} />
                   <span>
                     <span className="block font-display text-xs font-bold text-muted tabular-nums">0{i + 1}</span>
                     <b className="font-display text-lg font-extrabold text-ink md:text-xl">{v}</b>
@@ -137,6 +137,26 @@ function Where({ items }: { items: string[] }) {
         </motion.span>
       </AnimatePresence>
       {items.length > 1 && <span className="about-where-dots" aria-hidden>{items.map((_, d) => <i key={d} className={d === i ? 'on' : ''} />)}</span>}
+    </span>
+  )
+}
+
+/* a value's icon (the values are written in the dashboard, so the icon follows the word; anything else gets a gem) */
+const VALUE_ICONS: [RegExp, LucideIcon][] = [
+  [/جود|اتقان|إتقان|تميز|تميّز/, Award], [/تمكين|قدر|مهار/, Rocket], [/التزام|انضباط|مسؤول/, ShieldCheck],
+  [/تطوير|تطور|تحسين|نمو/, TrendingUp], [/ابتكار|إبداع|ابداع/, Lightbulb], [/شراك|تعاون/, Handshake],
+  [/نزاه|شفاف|أمان|امان|مصداق/, BadgeCheck], [/احترام|إنسان|انسان|رعاي/, HeartHandshake], [/فريق|عمل جماعي/, Users],
+  [/تعلم|تعليم|معرف/, BookOpenCheck], [/هدف|رؤي|طموح/, Target], [/ريادة|رياد/, Sparkles],
+]
+function ValueIcon({ value, color }: { value: string; color: string }) {
+  const Icon = VALUE_ICONS.find(([re]) => re.test(value))?.[1] ?? Gem
+  return (
+    <span
+      className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl md:h-14 md:w-14"
+      style={{ background: `color-mix(in oklab, ${color} 14%, var(--surface))`, color: `color-mix(in oklab, ${color} 80%, var(--ink))` }}
+      aria-hidden
+    >
+      <Icon className="h-6 w-6" />
     </span>
   )
 }

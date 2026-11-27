@@ -101,8 +101,8 @@ function Shell({ children }: { children: ReactNode }) {
       end={end}
       className={({ isActive }) =>
         cx(
-          'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition',
-          isActive ? 'bg-white/12 text-white shadow-inner' : 'text-white/65 hover:bg-white/6 hover:text-white',
+          'relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition',
+          isActive ? 'admin-nav-on bg-white/10 text-white' : 'text-white/65 hover:bg-white/6 hover:text-white',
         )
       }
     >
@@ -114,14 +114,14 @@ function Shell({ children }: { children: ReactNode }) {
 
   const sidebar = (
     <div className="flex h-full flex-col bg-deep-950 text-white">
-      <div className="flex items-center gap-3 px-5 py-5">
+      <div className="flex items-center gap-3 border-b border-white/8 px-5 py-5">
         <BrandLogo className="h-12 w-12" animate={false} />
         <div className="leading-tight">
           <div className="font-display font-extrabold">معهد السمو</div>
           <div className="text-xs text-white/50">لوحة التحكم</div>
         </div>
       </div>
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 pb-6">
+      <nav className="admin-scroll flex-1 space-y-6 overflow-y-auto px-3 py-5">
         <div className="space-y-1">
           {item('/admin', 'الرئيسية', LayoutDashboard, undefined, true)}
           {item('/admin/analytics', 'التحليلات', LineChart)}
@@ -180,21 +180,21 @@ function Shell({ children }: { children: ReactNode }) {
           </>
         )}
       </AnimatePresence>
-      <div className="lg:pr-64">
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-bg/85 px-4 py-3 backdrop-blur md:px-8">
+      <div className="min-w-0 lg:pr-64">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-line bg-bg/85 px-3 py-3 backdrop-blur sm:gap-3 md:px-8">
           <button onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl bg-surface shadow-soft lg:hidden" aria-label="القائمة">
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex min-w-0 flex-1 justify-start"><AdminSearch /></div>
-          <ThemePicker />
-          <a href="/?edit" target="_blank" rel="noopener" className="hidden items-center gap-2 rounded-full bg-deep-950 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-deep-900 md:flex" title="افتح الموقع واضغط على أي نص لتعديله">
-            <PencilLine className="h-4 w-4 text-gold-300" /> تعديل الموقع مباشرة
+          <span className="hidden sm:block"><ThemePicker /></span>
+          <a href="/?edit" target="_blank" rel="noopener" className="hidden shrink-0 items-center gap-2 rounded-full bg-deep-950 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-deep-900 md:flex" title="افتح الموقع واضغط على أي نص لتعديله">
+            <PencilLine className="h-4 w-4 text-gold-300" /> <span className="hidden xl:inline">تعديل الموقع مباشرة</span><span className="xl:hidden">تعديل</span>
           </a>
-          <Link to="/" target="_blank" className="flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold text-brand-700 shadow-soft hover:bg-brand-50">
-            عرض الموقع <ExternalLink className="h-4 w-4" />
+          <Link to="/" target="_blank" className="flex shrink-0 items-center gap-2 rounded-full bg-surface p-2.5 text-sm font-semibold text-brand-700 shadow-soft hover:bg-brand-50 sm:px-4 sm:py-2" aria-label="عرض الموقع">
+            <span className="hidden sm:inline">عرض الموقع</span> <ExternalLink className="h-4 w-4" />
           </Link>
         </header>
-        <main className="px-4 py-6 md:px-8 md:py-8">
+        <main className="px-3 py-5 sm:px-4 md:px-8 md:py-8">
           <motion.div key={loc.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
             {children}
           </motion.div>

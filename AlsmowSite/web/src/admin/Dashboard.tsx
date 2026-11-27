@@ -61,16 +61,16 @@ export default function Dashboard() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
         {tiles.map((t) => (
-          <Link key={t.label} to={t.to} className="card group p-5 transition hover:shadow-lift">
+          <Link key={t.label} to={t.to} className="card group p-4 transition hover:shadow-lift md:p-5">
             <div className="flex items-start justify-between">
               <span className={cx('grid h-11 w-11 place-items-center rounded-xl', t.tone)}><t.icon className="h-5 w-5" /></span>
               <ArrowLeft className="h-4 w-4 text-muted opacity-0 transition group-hover:opacity-100" />
             </div>
-            <div className="mt-4 font-display text-3xl font-black text-ink tabular-nums">{fmtNum(t.value)}</div>
+            <div className="mt-3 font-display text-2xl font-black text-ink tabular-nums md:mt-4 md:text-3xl">{fmtNum(t.value)}</div>
             <div className="mt-1 font-semibold text-ink-2">{t.label}</div>
-            <div className="mt-0.5 text-sm text-muted">{t.sub}</div>
+            <div className="mt-0.5 truncate text-xs text-muted md:text-sm">{t.sub}</div>
           </Link>
         ))}
       </div>
