@@ -106,8 +106,26 @@ try {
             'provider' => ['@id' => $orgId],
             'educationalCredentialAwarded' => $types[$p['type']][0] ?? null,
             'timeRequired' => !empty($p['hours']) ? 'PT' . (int) $p['hours'] . 'H' : null,
-            'hasCourseInstance' => !empty($p['mode']) ? ['@type' => 'CourseInstance', 'courseMode' => $modes[$p['mode']] ?? null] : null,
+            'hasCourseInstance' => array_filter([
+                '@type' => 'CourseInstance',
+                'courseMode' => $modes[$p['mode'] ?? ''] ?? 'Onsite',
+                'location' => ($p['mode'] ?? '') === 'online' ? null : 'حفر الباطن',
+            ], fn($v) => $v !== null),
+            'offers' => ['@type' => 'Offer', 'category' => 'Paid', 'availability' => 'https://schema.org/InStock', 'url' => $site . '/register'],
         ], fn($v) => $v !== null && $v !== '');
+    };
+
+    // «أسئلة شائعة» written in an article or programme (an h2/h3 ending with «؟» followed by its answer paragraph) as FAQPage data:
+    // what Google and AI answers quote for «هل الدبلوم معتمد؟», «كم مدة الدبلوم؟»
+    $faq = function (?string $html) use ($clip): ?array {
+        if (!$html || !preg_match_all('#<h[23][^>]*>([^<]{4,200})</h[23]>\s*<p[^>]*>(.+?)</p>#su', $html, $m, PREG_SET_ORDER)) return null;
+        $qa = [];
+        foreach ($m as $x) {
+            $q = $clip($x[1], 200);
+            if (!preg_match('/[؟?]$/u', $q)) continue;
+            $qa[] = ['@type' => 'Question', 'name' => $q, 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $clip($x[2], 600)]];
+        }
+        return count($qa) >= 2 ? ['@type' => 'FAQPage', 'mainEntity' => $qa] : null;
     };
 
     // ---------- the page ----------
@@ -173,7 +191,10 @@ try {
     } elseif ($seg[0] === 'programs' && count($seg) === 2) {
         $p = DB::one('SELECT * FROM programs WHERE slug = ? AND is_published = 1', [$seg[1]]);
         if ($p) {
-            $title = $p['title']; $h1 = $p['title'];
+            $h1 = $p['title'];
+            // the title says where, as people search it: «دبلوم إدارة التمريض في حفر الباطن», «… عن بُعد»
+            $city = trim((string) ($c['city'] ?? '')) ?: 'حفر الباطن';
+            $title = $p['title'] . (preg_match('/عن\s*بُ?عد|' . preg_quote($city, '/') . '/u', $p['title']) ? '' : ($p['mode'] === 'online' ? ' عن بُعد' : ' في ' . $city));
             $desc = $clip($p['summary'] ?: ($p['body'] ?? '')) ?: $siteDesc;
             // a short summary gets what people search with: the kind of programme, the institute, where
             if (mb_strlen($desc) < 110) $desc = $clip(rtrim($desc, '.') . ' — ' . ($types[$p['type']][0] ?? 'برنامج') . ' معتمد في ' . $name . '، ' . $where . '.');
@@ -190,6 +211,7 @@ try {
             $rel = array_values(array_filter($programs, fn($x) => $x['type'] === $p['type'] && (int) $x['id'] !== (int) $p['id']));
             if ($rel) $body .= '<h2>برامج ذات صلة</h2>' . $links(array_slice($rel, 0, 6));
             $ld[] = $course($p);
+            if ($f = $faq($p['body'] ?? '')) $ld[] = $f;
             $crumbs[] = ['البرامج', $site . '/programs'];
             if (isset($types[$p['type']])) $crumbs[] = [$types[$p['type']][1], $site . '/programs/type/' . $p['type']];
             $crumbs[] = [$p['title'], $site . '/programs/' . rawurlencode($p['slug'])];
@@ -213,6 +235,7 @@ try {
                 'author' => ['@id' => $orgId], 'publisher' => ['@id' => $orgId], 'inLanguage' => 'ar',
                 'mainEntityOfPage' => $site . '/blog/' . rawurlencode($p['slug']),
             ]);
+            if ($f = $faq($p['body'] ?? '')) $ld[] = $f;
             $crumbs[] = ['المدونة', $site . '/blog'];
             $crumbs[] = [$p['title'], $site . '/blog/' . rawurlencode($p['slug'])];
         } else $status = 404;
@@ -220,6 +243,7 @@ try {
         $p = DB::one('SELECT title, slug, body FROM pages WHERE slug = ? AND is_published = 1', [$seg[1]]);
         if ($p) {
             $title = $p['title']; $h1 = $p['title']; $desc = $clip($p['body'] ?? '') ?: $siteDesc; $body = $p['body'] ?? '';
+            if ($f = $faq($p['body'] ?? '')) $ld[] = $f;
             $crumbs[] = [$p['title'], $site . '/p/' . rawurlencode($p['slug'])];
         } else $status = 404;
     } elseif ($seg[0] === 'contact' && count($seg) === 1) {
