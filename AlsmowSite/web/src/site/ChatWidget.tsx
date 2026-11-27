@@ -1,6 +1,7 @@
 import { ArrowUp, RotateCcw, Sparkles, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import ChatRich from './ChatRich'
 import { LITE } from '../components/ui'
 import { cx } from '../lib/format'
@@ -61,6 +62,15 @@ export default function ChatWidget() {
     return () => { clearInterval(t); clearTimeout(stop) }
   }, [msgs, typingAt, open])
   useEffect(() => () => abort.current?.abort(), [])
+  // a link in an answer opened another page: on phones and tablets the chat covers the screen, so it steps aside to show it
+  // (the conversation is kept; the bubble reopens it where it was)
+  const { pathname } = useLocation()
+  const lastPath = useRef(pathname)
+  useEffect(() => {
+    if (pathname === lastPath.current) return
+    lastPath.current = pathname
+    if (open && window.matchMedia('(max-width: 1023px)').matches) setOpen(false)
+  }, [pathname, open])
   useEffect(() => {
     if (!open) return
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }

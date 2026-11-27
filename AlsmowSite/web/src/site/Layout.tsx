@@ -217,7 +217,7 @@ function Header() {
             <div className="flex shrink-0 items-center gap-2">
               <div className="hidden sm:block"><ThemePicker /></div>
               {portalShow && (
-                <PortalBtn className="hidden h-11 items-center gap-2 whitespace-nowrap rounded-2xl border border-line bg-surface/70 px-3 text-sm font-bold text-ink-2 transition hover:border-brand-300 hover:text-brand-700 md:flex 2xl:px-4">
+                <PortalBtn aria-label={portalText} className="hidden h-11 items-center gap-2 whitespace-nowrap rounded-2xl border border-line bg-surface/70 px-3 text-sm font-bold text-ink-2 transition hover:border-brand-300 hover:text-brand-700 md:flex 2xl:px-4">
                   <UserRound className="h-4 w-4 shrink-0" /> <span className="md:inline lg:hidden 2xl:inline">{portalText}</span>
                 </PortalBtn>
               )}
@@ -456,7 +456,7 @@ export default function Layout() {
           <motion.main
             id="main"
             key={pathname}
-            className="flex-1"
+            className="min-h-[100svh] flex-1"
             // phones: a quick fade only; blurring the whole page every navigation is very heavy on mobile GPUs
             initial={LITE ? { opacity: 0 } : { opacity: 0, y: 24, filter: 'blur(8px)' }}
             animate={LITE ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}

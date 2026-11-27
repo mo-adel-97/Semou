@@ -201,12 +201,12 @@ export default function ProgramsShowcase({ data }: { data: HomeData }) {
 
             <div className="pshow-grid" onPointerEnter={(e) => e.pointerType === 'mouse' && setHover(true)} onPointerLeave={() => setHover(false)}>
               {/* the list (desktop) */}
-              <div className="pshow-list" role="tablist" aria-label={PROGRAM_TYPES[active].plural}>
+              <div className="pshow-list" role="group" aria-label={PROGRAM_TYPES[active].plural}>
                 {list.map((x, i) => {
                   const S = FIELDS[fieldOf(x)].icon
                   const on = i === cur
                   return (
-                    <button key={x.id} role="tab" aria-selected={on} onClick={() => choose(i)} className={cx('pshow-row', on && 'on')} style={{ ['--c' as string]: at(palette, i) }}>
+                    <button key={x.id} aria-pressed={on} onClick={() => choose(i)} className={cx('pshow-row', on && 'on')} style={{ ['--c' as string]: at(palette, i) }}>
                       {on && <motion.span layoutId="pshow-row" className="pshow-row-bg" transition={{ type: 'spring', stiffness: 380, damping: 34 }} />}
                       <span className="pshow-row-icon"><S /></span>
                       <span className="relative min-w-0 flex-1 text-start">
@@ -236,11 +236,11 @@ export default function ProgramsShowcase({ data }: { data: HomeData }) {
               </div>
 
               {/* the strip (phone) */}
-              <div ref={strip} className="pshow-strip" role="tablist" aria-label={PROGRAM_TYPES[active].plural}>
+              <div ref={strip} className="pshow-strip" role="group" aria-label={PROGRAM_TYPES[active].plural}>
                 {list.map((x, i) => {
                   const S = FIELDS[fieldOf(x)].icon
                   return (
-                    <button key={x.id} role="tab" aria-selected={i === cur} onClick={() => choose(i)} className={cx('pshow-chipbtn', i === cur && 'on')} style={{ ['--c' as string]: at(palette, i) }}>
+                    <button key={x.id} aria-pressed={i === cur} onClick={() => choose(i)} className={cx('pshow-chipbtn', i === cur && 'on')} style={{ ['--c' as string]: at(palette, i) }}>
                       <S /><span>{x.title}</span>
                     </button>
                   )

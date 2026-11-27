@@ -46,8 +46,8 @@ export default function Portal() {
     <>
       <Seo title="بوابة المتدربين" description="تابع برامجك وحسابك ومدفوعاتك في معهد السمو" />
       <meta name="robots" content="noindex" />
-      <section className="relative min-h-[85vh] overflow-hidden pt-32 pb-20 md:pt-40">
-        <Aurora />
+      <section className="relative min-h-[100svh] overflow-hidden pt-32 pb-20 md:pt-40">
+        <Aurora className="!bottom-auto h-[100svh]" />
         <div className="pattern absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
         <div className="container-x relative">
           {me.isLoading ? (

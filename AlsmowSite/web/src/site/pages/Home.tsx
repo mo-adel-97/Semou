@@ -131,7 +131,7 @@ function Paths({ data }: { data: HomeData }) {
                       <span className="path-arrow"><ArrowLeft className="h-4 w-4" /></span>
                     </div>
                     <p className="mt-2 leading-relaxed text-muted">{PROGRAM_TYPES[t].blurb}</p>
-                    <span className="mt-4 inline-flex items-center gap-2 font-display text-sm font-bold" style={{ color: `color-mix(in oklab, ${at(palette, i)} 80%, var(--ink))` }}>
+                    <span className="mt-4 inline-flex items-center gap-2 font-display text-sm font-bold" style={{ color: `color-mix(in oklab, ${at(palette, i)} 55%, var(--ink))` }}>
                       <i className="h-2 w-2 rounded-full" style={{ background: at(palette, i) }} /> {countLabel(data.counts[t])}
                     </span>
                   </div>

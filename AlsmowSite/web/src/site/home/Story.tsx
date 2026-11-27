@@ -60,7 +60,7 @@ function StoryPinned({ data, palette }: { data: HomeData; palette: string[] }) {
                       <span className="story-step-icon"><s.icon className="h-5 w-5" /></span>
                       <span className="min-w-0 flex-1 text-start">
                         <span className="flex items-baseline gap-3">
-                          <span className="font-display text-sm font-bold tabular-nums opacity-60">0{i + 1}</span>
+                          <span className="font-display text-sm font-bold tabular-nums opacity-80">0{i + 1}</span>
                           <b className="font-display text-lg font-extrabold xl:text-xl">{s.title}</b>
                         </span>
                         <AnimatePresence initial={false}>
