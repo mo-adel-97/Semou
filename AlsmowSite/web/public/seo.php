@@ -149,8 +149,25 @@ try {
         $crumbs[] = [$title, $site . '/programs'];
     } elseif ($seg[0] === 'programs' && ($seg[1] ?? '') === 'type' && isset($seg[2], $types[$seg[2]]) && count($seg) === 3) {
         [, $plural, $blurb] = $types[$seg[2]];
-        $title = $plural; $h1 = $plural; $desc = $blurb . ' في ' . $name . '، ' . $where . '.';
-        $body = '<p>' . $e($blurb) . '</p>' . $links(array_values(array_filter($programs, fn($p) => $p['type'] === $seg[2])));
+        $list = array_values(array_filter($programs, fn($p) => $p['type'] === $seg[2]));
+        // what people search: «دبلومات معتمدة»، «دورات معتمدة» — the count, the accreditation body and where, in title and description
+        $acc = 'معتمدة من المؤسسة العامة للتدريب التقني والمهني';
+        $base = trim(preg_replace('/\s*المعتمدة$/u', '', $plural) ?? $plural);              // «الدبلومات» / «الدورات التأهيلية»
+        $indef = trim(preg_replace('/(^| )ال/u', '$1', $base) ?? $base);                      // «دبلومات» / «دورات تأهيلية»
+        $title = $base . ' ال' . $acc;                                                          // «الدبلومات المعتمدة من المؤسسة …»
+        $h1 = $plural;
+        $names = implode('، ', array_map(fn($p) => $p['title'], array_slice($list, 0, 4)));
+        $desc = $clip(count($list) . ' ' . $indef . ' ' . $acc . ' في ' . $name . ': ' . $names . '. ' . $where . '.', 160);
+        // each programme with its duration and hours, so the page itself answers «كم مدة الدبلوم؟»
+        $rows = DB::all('SELECT title, slug, summary, duration, hours, mode FROM programs WHERE is_published = 1 AND type = ? ORDER BY sort ASC, id DESC', [$seg[2]]);
+        $body = '<p>' . $e($blurb) . '، ' . $e($acc) . '، ' . $e($where) . '، للرجال والنساء.</p><ul>'
+            . implode('', array_map(fn($p) => '<li><a href="/programs/' . $e(rawurlencode($p['slug'])) . '">' . $e($p['title']) . '</a>'
+                . implode('', array_map(fn($x) => ' — ' . $e($x), array_filter([
+                    $p['duration'] ? 'المدة: ' . $p['duration'] : null,
+                    $p['hours'] ? $p['hours'] . ' ساعة معتمدة' : null,
+                    $p['mode'] === 'online' ? 'عن بُعد' : ($p['mode'] === 'onsite' ? 'حضوري' : null),
+                ])))
+                . (!empty($p['summary']) ? '<br>' . $e($clip($p['summary'], 200)) : '') . '</li>', $rows)) . '</ul>';
         $crumbs[] = ['البرامج', $site . '/programs'];
         $crumbs[] = [$plural, $site . '/programs/type/' . $seg[2]];
     } elseif ($seg[0] === 'programs' && count($seg) === 2) {
