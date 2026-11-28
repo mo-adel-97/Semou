@@ -73,6 +73,7 @@ builder.Services.AddScoped<Semou.Api.Features.Students.StudentListsService>();
 builder.Services.AddScoped<Semou.Api.Features.Documents.DocumentSealService>();
 builder.Services.AddScoped<Semou.Api.Features.Registration.RegistrationService>();
 builder.Services.AddScoped<Semou.Api.Features.Pricing.PricingService>();
+builder.Services.AddScoped<Semou.Api.Features.External.ExternalStudentsService>();
 builder.Services.AddScoped<Semou.Api.Features.Registration.AttachmentService>();
 builder.Services.AddScoped<Semou.Api.Features.Sales.SalesPoster>();
 builder.Services.AddScoped<Semou.Api.Features.Sales.PayInvoiceService>();
@@ -115,6 +116,10 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy("login", ctx => RateLimitPartition.GetFixedWindowLimiter(
         ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
+    // outside systems: per API key (behind the tunnel every caller has the same address)
+    o.AddPolicy("external", ctx => RateLimitPartition.GetFixedWindowLimiter(
+        ctx.Request.Headers["X-Api-Key"].ToString() is { Length: > 0 } k ? Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(k))) : "none",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1) }));
     o.AddPolicy("verify", ctx => RateLimitPartition.GetFixedWindowLimiter(
         ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1) }));
