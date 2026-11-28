@@ -10,7 +10,7 @@ const money = (n: unknown) => (Number(n) || 0).toLocaleString('en-US', { minimum
 const BRAND = '#3f7556'
 
 /* ---------- توثيق المستند: verification QR + official stamp on every printed document ---------- */
-export type SealType = 'inv' | 'reg' | 'cash' | 'jv' | 'st' | 'fee' | 'rreg' | 'rbill' | 'disc'
+export type SealType = 'inv' | 'reg' | 'cash' | 'jv' | 'st' | 'fee' | 'rreg' | 'rbill' | 'disc' | 'ord'
 interface Seal { code: string; path: string; issuer: string; cancelled: boolean; printedBy: string }
 
 /** Where the QR points: the public site address once deployed (VITE_PUBLIC_URL), else this server. */
@@ -214,50 +214,36 @@ interface RegOrderPrint {
   student: { academyId: string | null } | null
 }
 
-/** طلب الالتحاق: the request as sent (programme, package, amounts, down payment) — printable while it waits for review. */
+/** طلب الالتحاق: short and to the point — who, which programme, the package, what is paid and what is left, the seal. */
 export async function printRegOrder(guid: string) {
   try {
-    const d = await api<RegOrderPrint>(`/requests/registration/${guid}/print`)
+    const [d, seal] = await Promise.all([api<RegOrderPrint>(`/requests/registration/${guid}/print`), sealHtml('ord', guid)])
     const o = d.order, s = d.snapshot, isCourse = o.regType === 1
     const day = (v: string | null) => (v ? new Date(v).toLocaleDateString('en-GB') : '')
     const program = s.items.filter(x => x.type === 0).map(x => x.name).join(' + ') || s.course || ''
-    const rows = s.items.map((l, i) => `<tr><td class="muted">${i + 1}</td><td><b>${esc(l.name)}</b></td><td class="muted">${l.type === 1 ? 'رسوم' : isCourse ? 'دورة' : 'دبلوم'}</td><td class="n">${money(l.cost)}</td><td class="n">${money(l.tax)}</td><td class="n"><b>${money(l.total)}</b></td></tr>`).join('')
     const p = d.plan
-    const planCard = p ? `<div class="card"><h3>باقة التسجيل</h3>
-        <div class="hero"><div class="big">${esc(p.name)}</div><div class="sub">${p.months > 0 ? `دفعة مقدمة ثم ${p.months} قسطاً شهرياً` : 'سداد كامل عند التسجيل'}</div></div>
-        <div class="kv"><span>سعر الباقة</span><b class="n">${money(p.price)} ر.س</b>${p.months > 0 ? `<span>الدفعة المقدمة</span><b class="n">${money(p.down)} ر.س</b><span>القسط الشهري</span><b class="n">${money(p.installment)} ر.س × ${p.months}</b>` : ''}</div></div>` : ''
     const paid = s.hasPayment ? s.paySub : 0
-    const waiting = o.status === 0 || o.status === 3
+    const chips = [isCourse ? s.course : s.batch ? `الدفعة: ${s.batch}` : null, !isCourse && s.level ? `المستوى: ${s.level}` : null, p ? `باقة ${p.name}` : null]
+      .filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')
     openPrint(`طلب التحاق ${o.code}`, `
       ${o.status === 2 ? '<div class="void">مرفوض</div>' : ''}
-      ${letterhead({ name: d.branch?.name ?? s.branchName ?? '', address: d.branch?.address, vat: d.branch?.vat, tel: d.branch?.tel, title: 'طلب التحاق', sub: d.statusName, no: String(o.code) })}
+      ${letterhead({ name: d.branch?.name ?? s.branchName ?? '', address: d.branch?.address, vat: d.branch?.vat, tel: d.branch?.tel, title: 'طلب التحاق', no: String(o.code) })}
       <div class="cards">
-        <div class="card"><h3>بيانات المتدرب</h3><div class="kv"><span>الاسم</span><b>${esc(o.studentName)}</b><span>رقم الهوية</span><b dir="ltr">${esc(o.nationalId)}</b><span>الجوال</span><b dir="ltr">${esc(o.studentTel)}</b>${d.student?.academyId ? `<span>الكود الأكاديمي</span><b dir="ltr">${esc(d.student.academyId)}</b>` : ''}</div></div>
+        <div class="card"><h3>بيانات المتدرب</h3><div class="kv"><span>الاسم</span><b>${esc(o.studentName)}</b><span>رقم الهوية</span><b dir="ltr">${esc(o.nationalId)}</b><span>الجوال</span><b dir="ltr">${esc(o.studentTel)}</b></div></div>
         <div class="card"><h3>${isCourse ? 'الدورة' : 'البرنامج التدريبي'}</h3>
           <div class="hero"><div class="big">${esc(program)}</div><div class="sub">تاريخ الطلب <span dir="ltr">${esc(day(o.orderDate))}</span></div></div>
-          <div class="chips">${isCourse ? (s.course ? `<span>${esc(s.course)}</span>` : '') : `${s.batch ? `<span>الدفعة: ${esc(s.batch)}</span>` : ''}${s.level ? `<span>المستوى: ${esc(s.level)}</span>` : ''}`}${s.seller ? `<span>مسؤول التسجيل: ${esc(s.seller)}</span>` : ''}</div>
+          <div class="chips">${chips}</div>
         </div>
-        ${planCard}
       </div>
-      <table><thead><tr><th style="width:34px">#</th><th>البيان</th><th>النوع</th><th>قبل الضريبة</th><th>الضريبة</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="row">
-        <div class="pay">
-          <div><span>قيمة الطلب</span><b class="n">${money(s.subTotal)}</b></div>
-          ${s.hasPayment ? `<div class="ok"><span>الدفعة المقدمة${d.payRef ? ` (مرجع ${esc(d.payRef)})` : ''}</span><b class="n">${money(paid)}</b></div>` : ''}
-          <div class="due"><span>المتبقي بعد الدفعة المقدمة</span><b class="n">${money(Math.max(0, s.subTotal - paid))}</b></div>
-        </div>
-        <div class="tot"><div><span>الإجمالي قبل الضريبة</span><b class="n">${money(s.total)}</b></div><div><span>الضريبة</span><b class="n">${money(s.tax)}</b></div>
-          <div class="g"><span>إجمالي الطلب</span><span class="n">${money(s.subTotal)} ر.س</span></div></div>
+      <div class="pay" style="flex:none">
+        <div><span>${p ? `سعر الباقة (${esc(p.name)})` : 'قيمة الطلب'}</span><b class="n">${money(s.subTotal)}</b></div>
+        <div class="ok"><span>الدفعة المقدمة</span><b class="n">${money(paid)}</b></div>
+        <div class="due"><span>المتبقي</span><b class="n">${money(Math.max(0, s.subTotal - paid))}</b></div>
       </div>
-      <ul class="terms">
-        ${waiting ? '<li>هذا طلب التحاق قيد المراجعة، وتصدر استمارة التسجيل الرسمية وفاتورة الدفعة المقدمة بعد اعتماده.</li>' : o.status === 1 && o.docCode ? `<li>تم اعتماد الطلب وصدرت استمارة التسجيل رقم ${esc(o.docCode)}.</li>` : ''}
-        ${isCourse ? '' : `<li>${d.contract ? 'وقّع المتدرب اتفاقية التدريب.' : 'لم يوقّع المتدرب اتفاقية التدريب بعد، ومهلة التوقيع 30 يوماً من تاريخ التسجيل.'}</li>`}
-        ${p && p.months > 0 ? `<li>تُسدَّد الأقساط شهرياً بقيمة ${money(p.installment)} ر.س ابتداءً من الشهر التالي للتسجيل.</li>` : ''}
-        <li>المبالغ المدفوعة رسوم دراسية غير مستردة، ويُستكمل سداد المتبقي حسب نظام المعهد.</li>
-        ${d.notes ? `<li>${esc(d.notes)}</li>` : ''}
-      </ul>
+      <ul class="terms"><li>المبالغ المدفوعة رسوم دراسية غير مستردة.</li></ul>
       <div class="foot">
-        <div class="sig" style="justify-content:space-between"><div>توقيع المتدرب</div><div>مسؤول التسجيل${o.createdBy ? `: ${esc(o.createdBy)}` : ''}</div></div>
+        <div class="sig" style="justify-content:space-between"><div>توقيع المتدرب</div><div>مسؤول التسجيل</div></div>
+        ${seal}
       </div>`)
   } catch (e) { alerts.error((e as Error).message) }
 }

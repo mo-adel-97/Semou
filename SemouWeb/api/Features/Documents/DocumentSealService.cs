@@ -35,6 +35,7 @@ public sealed class DocumentSealService(Db db, IConfiguration config)
         ["rreg"] = "مرتجع تسجيل",
         ["rbill"] = "مرتجع مبيعات",
         ["disc"] = "سند خصم",
+        ["ord"] = "طلب التحاق",
     };
 
     private byte[] Secret()
@@ -79,6 +80,12 @@ public sealed class DocumentSealService(Db db, IConfiguration config)
                 SELECT X.Code AS Number, X.ActionDate AS Date, CAST(ISNULL(X.Amount,0) AS decimal(18,2)) AS Amount, S.StudentName AS Party, S.NationalId AS PartyId,
                        BR.BrName AS Branch, CAST(CASE WHEN ISNULL(X.IsUse,1) = 0 THEN 1 ELSE 0 END AS bit) AS Cancelled, CAST(0 AS int) AS Sub
                 FROM dbo.StudentDiscount X LEFT JOIN dbo.Student S ON S.AccountGuid = X.AccountGuid LEFT JOIN dbo.Branch BR ON BR.Guid = X.BranchGuid WHERE X.Guid = @guid
+                """,
+            // طلب الالتحاق (WebRegOrder): a rejected request no longer stands.
+            "ord" => """
+                SELECT CAST(O.Code AS nvarchar(50)) AS Number, O.OrderDate AS Date, CAST(ISNULL(O.DocSubTotal,0) AS decimal(18,2)) AS Amount, S.StudentName AS Party, S.NationalId AS PartyId,
+                       BR.BrName AS Branch, CAST(CASE WHEN O.Status = 2 THEN 1 ELSE 0 END AS bit) AS Cancelled, CAST(0 AS int) AS Sub
+                FROM dbo.WebRegOrder O LEFT JOIN dbo.Student S ON S.AccountGuid = O.AccountGuid LEFT JOIN dbo.Branch BR ON BR.Guid = O.BranchGuid WHERE O.Guid = @guid
                 """,
             // Statement (guid = student AccountGuid): valid while the account has no new movement.
             "st" => """
