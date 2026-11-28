@@ -15,6 +15,8 @@ public sealed class RegSnapshot
     public string? Level { get; set; }
     public string? Course { get; set; }
     public string? Seller { get; set; }
+    /// <summary>باقة التسجيل: «24 شهر • دفعة مقدمة 2,000 • قسط 500 × 24».</summary>
+    public string? Plan { get; set; }
     public List<SnapItem> Items { get; set; } = [];
     public decimal Total { get; set; }
     public decimal Tax { get; set; }

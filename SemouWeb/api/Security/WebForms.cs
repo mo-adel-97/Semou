@@ -16,6 +16,7 @@ public static class WebForms
     public const string EmploymentTypes = "webemptype";
     public const string Specializations = "webspecial";
     public const string Banks = "webbank";
+    public const string PricePlans = "webpriceplan";
 
     public sealed record Def(string Key, string Name, string Group, IReadOnlyDictionary<string, string> Rights);
 
@@ -72,6 +73,12 @@ public static class WebForms
             ["find"] = "استعراض البنوك",
             ["add"] = "إضافة بنك جديد (من الشاشة أو من بطاقة المستخدم)",
             ["edit"] = "تعديل الاسم أو إيقاف العنصر",
+        }),
+        new(PricePlans, "ضبط الأسعار والدفعات المقدمة", "ملف", new Dictionary<string, string>
+        {
+            ["view"] = "فتح الشاشة والاطلاع على الباقات وأسعار الدبلومات",
+            ["add"] = "إضافة باقة جديدة",
+            ["edit"] = "تعديل الباقات وأسعار الدبلومات والدفعات المقدمة (بسبب تعديل)",
         }),
         new(Settings, "الإعدادات العامة", "ملف", new Dictionary<string, string>
         {

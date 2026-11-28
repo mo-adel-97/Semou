@@ -58,6 +58,28 @@ public sealed class StatementReg
     public string? Program { get; set; }
 }
 
+/// <summary>One line of a package's schedule: the down payment (No = 0) or a monthly instalment.</summary>
+public sealed record PlanLine(int No, DateTime Due, decimal Amount, decimal Paid, string Status);
+
+public sealed class StatementPlan
+{
+    public Guid RegDocGuid { get; set; }
+    public string RegCode { get; set; } = "";
+    public DateTime RegDate { get; set; }
+    public bool Returned { get; set; }
+    public string? Program { get; set; }
+    public string PlanName { get; set; } = "";
+    public int Months { get; set; }
+    public decimal Price { get; set; }
+    public decimal DownPayment { get; set; }
+    public decimal Installment { get; set; }
+    public DateTime? FirstDue { get; set; }
+    public decimal Paid { get; set; }
+    public decimal Remaining { get; set; }
+    public decimal Overdue { get; set; }
+    public List<PlanLine> Lines { get; set; } = [];
+}
+
 public sealed class StatementService(Db db)
 {
     public const string Form = "studentstatment";
@@ -109,9 +131,12 @@ public sealed class StatementService(Db db)
             WHERE R.AccountGuid = @a ORDER BY R.RegDate DESC
             """, new { a = accountGuid }, cancellationToken: ct));
 
+        var plans = await PlansAsync(c, accountGuid, ct);
+
         return new
         {
             student = new { st.Guid, accountGuid, st.Code, st.StudentName, st.NationalId, st.StudentTel, st.AcadmyId },
+            plans,
             rows,
             totals = new { maden = Math.Round(tm, 2), daen = Math.Round(td, 2), balance = Math.Round(tm - td, 2) },
             bills,
@@ -121,6 +146,60 @@ public sealed class StatementService(Db db)
             }),
             regs,
         };
+    }
+
+    /// <summary>
+    /// The packages the student registered with (WebRegPlan) and their schedule. What was paid for a package = the
+    /// student's tax invoices (every payment issues one) for that diploma since the registration, cancelled ones excluded;
+    /// it is spread over the down payment first, then the instalments in order. Payments of other courses or fees never
+    /// count. A returned registration keeps its package for reference, without a schedule.
+    /// </summary>
+    private static async Task<List<StatementPlan>> PlansAsync(System.Data.Common.DbConnection c, Guid accountGuid, CancellationToken ct)
+    {
+        if (await c.ExecuteScalarAsync<int>(new CommandDefinition("SELECT CASE WHEN OBJECT_ID('dbo.WebRegPlan') IS NULL THEN 0 ELSE 1 END", cancellationToken: ct)) == 0) return [];
+        var plans = (await c.QueryAsync<StatementPlan>(new CommandDefinition("""
+            SELECT P.RegDocGuid, CAST(R.Code AS nvarchar(50)) AS RegCode, R.RegDate, CAST(ISNULL(R.IsReReg,0) AS bit) AS Returned,
+                   (SELECT TOP 1 D.DiplomName FROM dbo.RegDocDiplom RD JOIN dbo.Diplom D ON D.Guid = RD.DiplomGuid
+                     WHERE RD.RegDocGuid = R.Guid AND RD.DiplomType = '0' AND RD.Type_ = '0' ORDER BY RD.ID) AS Program,
+                   P.PlanName, P.Months, P.Price, P.DownPayment, P.Installment, P.FirstDue,
+                   CAST(ISNULL((SELECT SUM(BD.SubTotal) FROM dbo.Bill B JOIN dbo.RegDocDiplom BD ON BD.RegDocGuid = B.Guid AND BD.Type_ = '1'
+                         WHERE B.AccountGuid = R.AccountGuid AND ISNULL(B.IsUse,1) = 1 AND CAST(B.BillDate AS date) >= CAST(R.RegDate AS date)
+                           AND BD.DiplomGuid = (SELECT TOP 1 RD.DiplomGuid FROM dbo.RegDocDiplom RD WHERE RD.RegDocGuid = R.Guid AND RD.DiplomType = '0' AND RD.Type_ = '0' ORDER BY RD.ID)), 0) AS decimal(18,2)) AS Paid
+            FROM dbo.WebRegPlan P JOIN dbo.RegDoc R ON R.Guid = P.RegDocGuid
+            WHERE R.AccountGuid = @accountGuid AND ISNULL(R.IstUse,1) = 1
+            ORDER BY R.RegDate, R.Code
+            """, new { accountGuid }, cancellationToken: ct))).ToList();
+        var today = Clock.Now.Date;
+        foreach (var p in plans)
+        {
+            if (p.Returned) continue;
+            var left = Math.Max(0, p.Paid);
+            var due = new List<(int No, DateTime Due, decimal Amount)>();
+            if (p.Months <= 0) due.Add((0, p.RegDate.Date, p.Price));
+            else
+            {
+                if (p.DownPayment > 0) due.Add((0, p.RegDate.Date, p.DownPayment));
+                var first = p.FirstDue ?? p.RegDate.Date.AddMonths(1);
+                var rest = p.Price - p.DownPayment;
+                for (var n = 1; n <= p.Months; n++)
+                {
+                    // the last instalment absorbs the rounding, so the schedule always adds up to the price
+                    var amt = n < p.Months ? p.Installment : rest - p.Installment * (p.Months - 1);
+                    due.Add((n, first.AddMonths(n - 1), Math.Max(0, amt)));
+                }
+            }
+            foreach (var (no, date, amount) in due)
+            {
+                var paid = Math.Min(left, amount);
+                left -= paid;
+                var status = paid >= amount ? "paid" : date < today ? "overdue" : paid > 0 ? "partial" : date <= today.AddDays(7) ? "soon" : "due";
+                p.Lines.Add(new PlanLine(no, date, amount, paid, status));
+            }
+            p.Paid = p.Lines.Sum(l => l.Paid);
+            p.Remaining = p.Price - p.Paid;
+            p.Overdue = p.Lines.Where(l => l.Status == "overdue").Sum(l => l.Amount - l.Paid);
+        }
+        return plans;
     }
 
     private static decimal Dec(object? v) => v is null or DBNull ? 0 : Math.Round(Convert.ToDecimal(v), 2);

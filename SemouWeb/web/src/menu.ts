@@ -63,6 +63,7 @@ export const MENU: MenuGroup[] = [
       { key: 'discount-types', title: 'أنواع الخصم', perm: 'distype', form: 'EncodingDiscountType', ported: true, engine: 'discount-types' },
       { key: 'services', title: 'الخدمات', perm: 'adddiplom', form: 'EncodingDiplom', ported: true, engine: 'services' },
       { key: 'price-list', title: 'قائمة الأسعار', perm: 'addpricelist', form: 'EncodingPriceList', ported: true },
+      { key: 'price-plans', title: 'ضبط الأسعار والدفعات المقدمة', perm: 'webpriceplan', form: '', ported: true, web: true },
       { key: 'offers', title: 'العروض', perm: 'pricesale', form: 'EncodingPriceSale' },
       { key: 'reg-settings', title: 'إعدادات التسجيل', perm: 'regsetting', form: 'EncodingRegSetting', ported: true },
       { key: 'reception', title: 'مكتب الاستقبال', perm: 'resdesk', form: 'MainFindStudent', ported: true },

@@ -1,7 +1,7 @@
 import { useDeferredValue, useState, type ReactNode } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { motion } from 'motion/react'
-import { ArrowDownLeft, ArrowUpRight, FileText, Printer, ReceiptText, Scale, Search, Undo2, Wallet, X } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, CalendarClock, FileText, Printer, ReceiptText, Scale, Search, Undo2, Wallet, X } from 'lucide-react'
 import { api } from '../api'
 import { Drawer, Spinner, Tabs } from '../components/ui'
 import { printDiscount, printFeeForm, printRegistration, printReturn, printStatement, printTaxInvoice, type StatementData } from '../lib/print'
@@ -12,8 +12,20 @@ interface Statement extends StatementData {
   bills: { guid: string; code: string; taxNo: string | null; billDate: string; notes: string | null; total: number; tax: number; subTotal: number; userName: string | null; cancelled: boolean }[]
   returns: { date: string; code: string; notes: string | null; total: number; userName: string | null }[]
   regs: { guid: string; code: string; regDate: string; regType: number; total: number; accepted: boolean; returned: boolean; program: string | null }[]
+  plans?: StPlan[]
 }
-type Tab = 'moves' | 'bills' | 'regs' | 'returns'
+/** The registration package (باقة التسجيل) and its schedule: the down payment (no 0) then the monthly instalments. */
+interface StPlan {
+  regDocGuid: string; regCode: string; regDate: string; returned: boolean; program: string | null
+  planName: string; months: number; price: number; downPayment: number; installment: number; firstDue: string | null
+  paid: number; remaining: number; overdue: number
+  lines: { no: number; due: string; amount: number; paid: number; status: 'paid' | 'partial' | 'overdue' | 'soon' | 'due' }[]
+}
+type Tab = 'moves' | 'plans' | 'bills' | 'regs' | 'returns'
+const STATUS: Record<StPlan['lines'][number]['status'], { text: string; cls: string }> = {
+  paid: { text: 'مسدد', cls: 'ok' }, partial: { text: 'مسدد جزئياً', cls: 'info' }, overdue: { text: 'متأخر', cls: 'off' },
+  soon: { text: 'يستحق قريباً', cls: 'warn' }, due: { text: 'قادم', cls: 'muted' },
+}
 
 const money = (n: number | null | undefined) => (Number(n) || 0).toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const day = (v: string) => new Date(v).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -37,6 +49,7 @@ export function StudentStatement({ account, name, onClose }: { account: string; 
   const bal = d?.totals.balance ?? 0
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'moves', label: 'الحركات', count: d?.rows.length },
+    ...(d?.plans?.length ? [{ key: 'plans' as Tab, label: 'الباقة والأقساط', count: d.plans.length }] : []),
     { key: 'bills', label: 'الفواتير', count: d?.bills.length },
     { key: 'regs', label: 'الاستمارات', count: d?.regs.length },
     { key: 'returns', label: 'المرتجعات', count: d?.returns.length },
@@ -92,6 +105,8 @@ export function StudentStatement({ account, name, onClose }: { account: string; 
             </>
           )}
 
+          {tab === 'plans' && <Plans plans={d.plans ?? []} />}
+
           {tab === 'bills' && (
             <DocList empty="لا توجد فواتير للطالب" items={d.bills.map(b => ({
               key: b.guid, icon: <ReceiptText size={18} />, title: `فاتورة ضريبية ${b.taxNo ?? ''}`.trim(), sub: `رقم ${b.code} • ${day(b.billDate)}${b.userName ? ` • ${b.userName}` : ''}`,
@@ -115,6 +130,55 @@ export function StudentStatement({ account, name, onClose }: { account: string; 
         </div>
       )}
     </Drawer>
+  )
+}
+
+function Plans({ plans }: { plans: StPlan[] }) {
+  if (!plans.length) return <div className="empty"><b>لا توجد باقة تسجيل للطالب</b></div>
+  return (
+    <div className="grid" style={{ gap: 18 }}>
+      {plans.map(p => {
+        const pct = p.price ? Math.min(100, (p.paid / p.price) * 100) : 0
+        return (
+          <div key={p.regDocGuid} className="card card-pad grid" style={{ gap: 14 }}>
+            <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <div><b style={{ fontSize: 17 }}><CalendarClock size={17} style={{ verticalAlign: -3, color: 'var(--brand)' }} /> باقة {p.planName}</b>
+                <div className="muted small">{p.program ?? ''} • استمارة #{p.regCode} • {day(p.regDate)}</div></div>
+              {p.returned ? <span className="badge off">استمارة مرتجعة</span> : p.remaining <= 0 ? <span className="badge ok">مسددة بالكامل</span>
+                : p.overdue > 0 ? <span className="badge off">متأخرات {money(p.overdue)} ر.س</span> : <span className="badge info">منتظمة</span>}
+            </div>
+            <div className="plan-sum">
+              <div><small>سعر الباقة</small><b>{money(p.price)}</b></div>
+              <div><small>الدفعة المقدمة</small><b>{money(p.months > 0 ? p.downPayment : p.price)}</b></div>
+              {p.months > 0 && <div><small>القسط الشهري</small><b>{money(p.installment)} × {p.months}</b></div>}
+              <div><small>المسدد</small><b>{money(p.paid)}</b></div>
+              <div className={p.remaining > 0 ? 'bad' : ''}><small>المتبقي</small><b>{money(Math.max(0, p.remaining))}</b></div>
+            </div>
+            {!p.returned && <div className="plan-progress" title={`${Math.round(pct)}%`}><i style={{ width: `${pct}%` }} /></div>}
+            {!p.returned && (
+              <div style={{ overflow: 'auto' }}>
+                <table className="dt ledger">
+                  <thead><tr><th>القسط</th><th>تاريخ الاستحقاق</th><th className="n">المبلغ</th><th className="n">المسدد</th><th className="n">المتبقي</th><th>الحالة</th></tr></thead>
+                  <tbody>
+                    {p.lines.map(l => (
+                      <tr key={l.no} className={`sched-row ${l.status}`}>
+                        <td><b>{l.no === 0 ? (p.months > 0 ? 'الدفعة المقدمة' : 'السداد الكامل') : `القسط ${l.no}`}</b></td>
+                        <td className="nowrap">{day(l.due)}</td>
+                        <td className="n">{money(l.amount)}</td>
+                        <td className="n ok">{l.paid ? money(l.paid) : ''}</td>
+                        <td className="n due">{l.amount - l.paid > 0 ? money(l.amount - l.paid) : ''}</td>
+                        <td><span className={`badge ${STATUS[l.status].cls}`}>{STATUS[l.status].text}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <small className="muted">المسدد = فواتير السداد الخاصة بهذا الدبلوم منذ التسجيل، موزّعة على الدفعة المقدمة أولاً ثم الأقساط بالترتيب.</small>
+          </div>
+        )
+      })}
+    </div>
   )
 }
 

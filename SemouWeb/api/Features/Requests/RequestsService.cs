@@ -125,6 +125,7 @@ public sealed class RequestsService(Db db, CurrentUser me, RegistrationService r
         {
             Book = p.Setting.DocName, BranchName = p.Setting.BranchName, Batch = p.BatchName, Level = level, Course = course,
             Seller = await NameAsync(c, tx, "SELECT ManFullName FROM dbo.SalesMan WHERE Guid = @g", i.SellerGuid),
+            Plan = p.Plan is { } pl ? pl.Name + (pl.Months > 0 ? $" • دفعة مقدمة {pl.DownPayment:#,0.##} • قسط {pl.Installment:#,0.##} × {pl.Months}" : " • سداد كامل") : null,
             Items = p.Diploms.Select(d => new SnapItem(d.Name, 0, d.Cost, d.Tax, d.Total)).Concat(p.Fees.Select(f => new SnapItem(f.Name, 1, f.Cost, f.Tax, f.Total))).ToList(),
             Total = p.FTotal, Tax = p.FTax, SubTotal = p.FSub,
             HasPayment = p.Pay != null, PayLines = p.PayLines.Select(l => new SnapPayLine(l.Item.Name, l.Cost, l.Tax, l.Total)).ToList(), PaySub = p.PaySub,

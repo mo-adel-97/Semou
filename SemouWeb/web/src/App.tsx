@@ -45,6 +45,7 @@ const NewStudents = lazy(() => import('./pages/Control').then(m => ({ default: m
 const DiscountDocs = lazy(() => import('./pages/Control').then(m => ({ default: m.DiscountDocs })))
 const DocBooks = lazy(() => import('./pages/DocBooks').then(m => ({ default: m.DocBooks })))
 const GeneralSettings = lazy(() => import('./pages/Settings').then(m => ({ default: m.GeneralSettings })))
+const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })))
 const CrudScreen = lazy(() => import('./pages/CrudScreen').then(m => ({ default: m.CrudScreen })))
 
 /**
@@ -114,6 +115,7 @@ function Screen() {
   if (key === 'batch-count') return <Suspense fallback={<PageLoader />}><BatchSeats group={g} /></Suspense>
   if (key === 'new-students') return <Suspense fallback={<PageLoader />}><NewStudents group={g} /></Suspense>
   if (key === 'discount-doc') return <Suspense fallback={<PageLoader />}><DiscountDocs group={g} /></Suspense>
+  if (key === 'price-plans') return <Suspense fallback={<PageLoader />}><Pricing group={g} /></Suspense>
   if (key === 'reg-settings') return <Suspense fallback={<PageLoader />}><DocBooks group={g} /></Suspense>
   if (key === 'general-settings') return <Suspense fallback={<PageLoader />}><GeneralSettings group={g} /></Suspense>
   if (key === 'reception') return <Suspense fallback={<PageLoader />}><Reception group={g} /></Suspense>

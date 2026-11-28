@@ -72,6 +72,7 @@ builder.Services.AddScoped<Semou.Api.Features.Settings.UiConfigService>();
 builder.Services.AddScoped<Semou.Api.Features.Students.StudentListsService>();
 builder.Services.AddScoped<Semou.Api.Features.Documents.DocumentSealService>();
 builder.Services.AddScoped<Semou.Api.Features.Registration.RegistrationService>();
+builder.Services.AddScoped<Semou.Api.Features.Pricing.PricingService>();
 builder.Services.AddScoped<Semou.Api.Features.Registration.AttachmentService>();
 builder.Services.AddScoped<Semou.Api.Features.Sales.SalesPoster>();
 builder.Services.AddScoped<Semou.Api.Features.Sales.PayInvoiceService>();

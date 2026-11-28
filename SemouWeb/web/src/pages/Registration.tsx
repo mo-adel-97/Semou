@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'motion/react'
-import { BookOpenCheck, Check, ChevronLeft, ChevronRight, ClipboardList, FileCheck2, FileUp, GraduationCap, Paperclip, Receipt, Search, Send, ShieldCheck, Upload, Wallet } from 'lucide-react'
+import { Banknote, BookOpenCheck, CalendarClock, Check, ChevronLeft, ChevronRight, ClipboardList, FileCheck2, FileUp, GraduationCap, Paperclip, Receipt, Search, Send, ShieldCheck, Upload, Wallet } from 'lucide-react'
 import { api, ApiError, tokenStore } from '../api'
 import { alerts } from '../lib/alerts'
 import { CostCenterPicker } from '../components/CostCenterPicker'
@@ -9,11 +9,15 @@ import { Drawer, Field, Spinner, Switch } from '../components/ui'
 
 /* استمارة التسجيل (WhatRegTypeNeed → RegisterForm → AttachForm) as a step-by-step wizard. */
 interface PriceRow { code: string; name: string; diplomGuid: string; diplomType: number; cost: number; tax: number; total: number; payTaxRate: number }
+/** A registration package of a diploma (ضبط الأسعار والدفعات المقدمة): its price replaces the list price. */
+interface Offer { planGuid: string; name: string; months: number; description: string | null; price: number; downPayment: number; installment: number }
 interface Prep {
   student: { Guid: string; StudentName: string; NationalId: string; foreign: boolean }
   setting: { guid: string; code: number; docName: string; branchName: string; chkOtherFees: boolean; chkStartPay: boolean; chkAmountPay: boolean; amountPay: number; docPayName: string | null; chkVat: boolean }
   zeroAmount: boolean
   diploms: PriceRow[]; fees: PriceRow[]
+  /** diplomGuid -> its packages (none = sold at the list price) */
+  plans: Record<string, Offer[]>
   batches: { Code: string; BatchName: string; TotalCapacity: number; RegisteredStudents: number; AvailableSeats: number; Guid: string }[]
   levels: { Guid: string; Name: string; IsDef: boolean }[]
   courses: { Guid: string; Code: string; Name: string; CourseCode: string | null; DiplomName: string; DateStart: string; DateEnd: string; Time: string; Capacity: number; Registered: number }[]
@@ -48,6 +52,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
   const [notes, setNotes] = useState('')
   const [picked, setPicked] = useState<Record<string, number | null>>({}) // diplomGuid -> overridden total (null = list price)
   const [pickedFees, setPickedFees] = useState<Record<string, number | null>>({})
+  const [plan, setPlan] = useState('')
   const [coursePrices, setCoursePrices] = useState<PriceRow[] | null>(null)
   const [pay, setPay] = useState({ cash: '', cost: '', costName: '', ref: '', date: today(), notes: '', lines: {} as Record<string, string>, split: false, amount1: '', amount2: '', cash2: '', cost2: '', costName2: '', ref2: '', date2: today() })
   const [pickCost, setPickCost] = useState<1 | 2 | null>(null)
@@ -93,7 +98,20 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
 
   const items = useMemo(() => (regType === 1 && coursePrices ? coursePrices : prep?.diploms ?? []), [regType, coursePrices, prep])
   const eff = (p: PriceRow, override: number | null | undefined) => (override != null && override !== p.total ? { ...p, cost: override, tax: 0, total: override } : p)
-  const selDips = items.filter(p => p.diplomGuid in picked).map(p => eff(p, picked[p.diplomGuid]))
+  // the package's price (VAT inside, split with the item's rate exactly like the server)
+  const offersOf = (g: string | undefined) => (regType === 0 && g ? prep?.plans?.[g] ?? [] : [])
+  const mainDip = regType === 0 ? items.find(p => p.diplomGuid in picked) : undefined
+  const offers = offersOf(mainDip?.diplomGuid)
+  const offer = offers.find(o => o.planGuid === plan)
+  useEffect(() => { setPlan(o => (offers.some(x => x.planGuid === o) ? o : '')) }, [mainDip?.diplomGuid]) // eslint-disable-line react-hooks/exhaustive-deps
+  const withPlan = (p: PriceRow) => {
+    if (!offer || p.diplomGuid !== mainDip?.diplomGuid) return eff(p, picked[p.diplomGuid])
+    const cost = p.payTaxRate ? Math.round(offer.price / (1 + p.payTaxRate / 100) * 1000) / 1000 : offer.price
+    return { ...p, cost, tax: r2(offer.price - cost), total: offer.price }
+  }
+  const selDips = items.filter(p => p.diplomGuid in picked).map(withPlan)
+  const minDown = offer ? offer.downPayment : prep?.setting.amountPay ?? 0
+  const fromPrice = useMemo(() => Object.fromEntries(Object.entries(prep?.plans ?? {}).map(([g, l]) => [g, Math.min(...l.map(o => o.price))])), [prep])
   const selFees = (prep?.fees ?? []).filter(p => p.diplomGuid in pickedFees).map(p => eff(p, pickedFees[p.diplomGuid]))
   const all = [...selDips, ...selFees]
   const totals = { cost: r2(all.reduce((s, x) => s + x.cost, 0)), tax: r2(all.reduce((s, x) => s + x.tax, 0)), total: r2(all.reduce((s, x) => s + x.total, 0)) }
@@ -138,6 +156,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
       if (!selDips.length) return 'لا يمكن التسجيل بدون اختيار الدبلوم - الدورة'
       if (regType === 0 && selDips.length !== 1) return 'استمارة تسجيل الدبلوم تكون لدبلوم واحد فقط'
       if (regType === 0 && seats && (seats[selDips[0].diplomGuid]?.available ?? 0) <= 0) return 'عذراً، التخصص الذي اخترته لا تتوفر فيه أي مقاعد للتسجيل'
+      if (offers.length && !offer) return 'يرجى اختيار باقة التسجيل'
       if (prep.setting.chkOtherFees && !selFees.length) return 'لا يمكن التسجيل بدون اختيار رسوم الاختبار - الشهادة'
     }
     if (s === 'pay' && prep.setting.chkStartPay) {
@@ -146,7 +165,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
       if (!pay.ref.trim()) return 'يرجى إدخال رقم المرجع الخاص بعملية السداد'
       if (!pay.date) return 'يرجى إدخال تاريخ الحوالة البنكية / السداد'
       for (const l of payLines) {
-        if (l.total && l.total < prep.setting.amountPay) return `لا يمكن إدخال قيمة أقل من القيمة المحددة للدفعة المقدمة (${money(prep.setting.amountPay)})`
+        if (l.total && l.total < minDown) return offer ? `لا يمكن إدخال قيمة أقل من الدفعة المقدمة لباقة ${offer.name} (${money(minDown)})` : `لا يمكن إدخال قيمة أقل من القيمة المحددة للدفعة المقدمة (${money(minDown)})`
         if (l.total > dSub) return 'لا يمكن إدخال قيمة أكبر من قيمة الدبلوم / الدورة دون الرسوم'
       }
       if (paySub === 0 && !prep.zeroAmount) return 'يرجى إدخال المبلغ الخاص بعملية السداد'
@@ -165,7 +184,10 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
   const next = () => {
     if (step === 'type') { start(); return }
     const e = check(step); if (e) { alerts.error(e); return }
-    setStep(visible[idx + 1].key)
+    const to = visible[idx + 1].key
+    // entering the down payment with a package: its down payment is suggested (cash = the whole price)
+    if (to === 'pay' && offer && mainDip && !pay.lines[mainDip.diplomGuid]) setPay(p => ({ ...p, lines: { ...p.lines, [mainDip.diplomGuid]: String(offer.months > 0 ? offer.downPayment : offer.price) } }))
+    setStep(to)
   }
   const back = () => idx > 0 && setStep(visible[idx - 1].key)
 
@@ -196,8 +218,8 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
       return api<{ message: string; code: number; guid: string }>('/requests/registration', {
         method: 'POST', json: {
           studentGuid: student.StudentGuid, regType, studyBranchGuid: branch, chkContract: contract, regDate, batchGuid: batch || null, levelGuid: level || null,
-          courseGuid: course || null, sellerGuid: seller || null, notes,
-          diploms: selDips.map(d => ({ diplomGuid: d.diplomGuid, total: picked[d.diplomGuid] ?? null })),
+          courseGuid: course || null, sellerGuid: seller || null, planGuid: offer?.planGuid ?? null, notes,
+          diploms: selDips.map(d => ({ diplomGuid: d.diplomGuid, total: offer && d.diplomGuid === mainDip?.diplomGuid ? null : picked[d.diplomGuid] ?? null })),
           fees: selFees.map(d => ({ diplomGuid: d.diplomGuid, total: pickedFees[d.diplomGuid] ?? null })),
           payment: prep?.setting.chkStartPay ? {
             cashAccountGuid: pay.cash || null, costCenterGuid: pay.cost || null, ref: pay.ref, payDate: pay.date, notes: pay.notes,
@@ -304,7 +326,26 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
           {step === 'items' && prep && (
             <div className="grid" style={{ gap: 18 }}>
               {prep.student.foreign && <div className="alert info">الطالب أجنبي: يتم احتساب ضريبة القيمة المضافة 15% على البنود.</div>}
-              <ItemList title={regType === 1 ? 'بنود الدورة' : 'الدبلومات'} rows={items} picked={picked} setPicked={setPicked} editable={prep.zeroAmount} single={regType === 0} seats={regType === 0 ? seats : null} locked={regType === 1} />
+              <ItemList title={regType === 1 ? 'بنود الدورة' : 'الدبلومات'} rows={items} picked={picked} setPicked={setPicked} editable={prep.zeroAmount && !offers.length} single={regType === 0} seats={regType === 0 ? seats : null} locked={regType === 1} fromPrice={regType === 0 ? fromPrice : undefined} />
+              {offers.length > 0 && (
+                <div>
+                  <div className="lines-head"><h4>باقة التسجيل <small className="muted" style={{ fontWeight: 500, marginInlineStart: 8 }}>السعر والدفعة المقدمة حسب الباقة</small></h4></div>
+                  <div className="plan-cards">
+                    {offers.map(o => (
+                      <button key={o.planGuid} type="button" className={`plan-card ${plan === o.planGuid ? 'on' : ''}`} onClick={() => { setPlan(o.planGuid); if (mainDip) setPay(p => ({ ...p, lines: { ...p.lines, [mainDip.diplomGuid]: '' } })) }}>
+                        {plan === o.planGuid && <span className="pc-check"><Check size={14} /></span>}
+                        <span className="pc-name">{o.months > 0 ? <CalendarClock size={17} /> : <Banknote size={17} />}{o.name}</span>
+                        <span className="pc-price">{money(o.price)} <em>ر.س</em></span>
+                        {o.months > 0 ? <>
+                          <small>دفعة مقدمة <b className="num-strong">{money(o.downPayment)}</b></small>
+                          <small className="pc-inst">قسط {money(o.installment)} × {o.months} شهر</small>
+                        </> : <small className="pc-inst">سداد كامل عند التسجيل</small>}
+                        {o.description && <small className="muted">{o.description}</small>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {prep.setting.chkOtherFees && <ItemList title="رسوم الاختبار والشهادة" rows={prep.fees} picked={pickedFees} setPicked={setPickedFees} editable={prep.zeroAmount} />}
               <div className="totals">
                 <div><small>الإجمالي قبل الضريبة</small><b>{money(totals.cost)}</b></div>
@@ -317,7 +358,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
           {/* ---------- 4. Down payment ---------- */}
           {step === 'pay' && prep && (
             <div className="grid cols-2">
-              <div className="span-all alert info"><Receipt size={16} /> سيتم إصدار فاتورة مبيعات ({prep.setting.docPayName}) وسند قبض بالمبلغ المدفوع{prep.setting.amountPay ? `، الحد الأدنى للدفعة ${money(prep.setting.amountPay)} ر.س` : ''}.</div>
+              <div className="span-all alert info"><Receipt size={16} /> سيتم إصدار فاتورة مبيعات ({prep.setting.docPayName}) وسند قبض بالمبلغ المدفوع{minDown ? `، الحد الأدنى للدفعة ${money(minDown)} ر.س${offer ? ` (باقة ${offer.name})` : ''}` : ''}.</div>
               <Field label="الخزينة / البنك" required>
                 <select className="input" value={pay.cash} onChange={e => { const c = prep.cashBoxes.find(x => x.Guid === e.target.value); setPay(p => ({ ...p, cash: e.target.value, cost: c?.CostCenterGuid ?? p.cost, costName: c?.CostName ?? p.costName })) }}>
                   <option value="">اختر...</option>{prep.cashBoxes.map(c => <option key={c.Guid} value={c.Guid}>{c.Name}</option>)}
@@ -334,7 +375,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
                   <div key={d.diplomGuid} className="mt-row">
                     <span>{d.name} <small className="muted">(ضريبة {d.payTaxRate}%)</small></span>
                     <span className="num-strong" dir="ltr">{money(d.total)}</span>
-                    <input className="input" dir="ltr" inputMode="decimal" placeholder={prep.setting.amountPay ? String(prep.setting.amountPay) : '0'} value={pay.lines[d.diplomGuid] ?? ''}
+                    <input className="input" dir="ltr" inputMode="decimal" placeholder={minDown ? String(minDown) : '0'} value={pay.lines[d.diplomGuid] ?? ''}
                       onChange={e => setPay(p => ({ ...p, lines: { ...p.lines, [d.diplomGuid]: e.target.value.replace(/[^\d.]/g, '') } }))} />
                   </div>
                 ))}
@@ -390,6 +431,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
                 <b>{regType === 0 ? prep.batches.find(b => b.Guid === batch)?.BatchName : prep.courses.find(c => c.Guid === course)?.Name}</b>
                 <span>{regType === 0 ? prep.levels.find(l => l.Guid === level)?.Name : ''}</span></div>
               <div className="rv"><small>مندوب البيع</small><b>{prep.sellers.find(s => s.Guid === seller)?.ManFullName}</b><span>{contract ? 'وقّع اتفاقية التدريب' : 'لم يوقّع الاتفاقية بعد (مهلة 30 يوماً)'}</span></div>
+              {offer && <div className="rv"><small>باقة التسجيل</small><b>{offer.name}</b><span>{offer.months > 0 ? `دفعة مقدمة ${money(offer.downPayment)} • قسط ${money(offer.installment)} × ${offer.months}` : 'سداد كامل عند التسجيل'}</span></div>}
               <div className="rv span"><small>البنود</small>{all.map(x => <div key={x.diplomGuid} className="row" style={{ justifyContent: 'space-between' }}><span>{x.name}</span><b className="num-strong">{money(x.total)}</b></div>)}</div>
               {prep.setting.chkStartPay && <div className="rv span"><small>الدفعة المقدمة</small><b className="num-strong">{money(paySub)} ر.س</b><span>{cash?.Name}{pay.split ? ` + ${cash2?.Name}` : ''} • مرجع {pay.ref}</span></div>}
               <div className="totals span"><div className="grand"><small>إجمالي الاستمارة</small><b>{money(totals.total)}</b></div></div>
@@ -406,9 +448,11 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
 
 type Seat = { capacity: number; registered: number; available: number }
 
-function ItemList({ title, rows, picked, setPicked, editable, single, seats, locked }: {
+function ItemList({ title, rows, picked, setPicked, editable, single, seats, locked, fromPrice }: {
   title: string; rows: PriceRow[]; picked: Record<string, number | null>; setPicked: (f: (p: Record<string, number | null>) => Record<string, number | null>) => void
   editable: boolean; single?: boolean; seats?: Record<string, Seat> | null; locked?: boolean
+  /** diplomas sold through packages: "from" their cheapest package instead of the list price */
+  fromPrice?: Record<string, number>
 }) {
   const [q, setQ] = useState('')
   // With seats: diplomas that have seats first, full / not offered in this batch last.
@@ -438,7 +482,8 @@ function ItemList({ title, rows, picked, setPicked, editable, single, seats, loc
               {on && editable ? (
                 <input className="input price" dir="ltr" inputMode="decimal" value={picked[r.diplomGuid] ?? r.total} onClick={e => e.stopPropagation()} title="تعديل القيمة (صلاحية المبالغ الصفرية)"
                   onChange={e => { const v = e.target.value.replace(/[^\d.]/g, ''); setPicked(p => ({ ...p, [r.diplomGuid]: v === '' ? 0 : Number(v) })) }} />
-              ) : <b className="num-strong price-tag">{money(r.total)}</b>}
+              ) : fromPrice?.[r.diplomGuid] != null ? <b className="num-strong price-tag"><small className="muted" style={{ fontWeight: 600 }}>يبدأ من </small>{money(fromPrice[r.diplomGuid])}</b>
+                : <b className="num-strong price-tag">{money(r.total)}</b>}
             </div>
           )
         })}

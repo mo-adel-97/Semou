@@ -293,7 +293,7 @@ function CheckBanner({ check, pending }: { check: Check; pending: boolean }) {
 
 interface RegDetail {
   order: Row; statusName: string; notes: string | null; contract: boolean
-  snapshot: { book: string | null; branchName: string | null; batch: string | null; level: string | null; course: string | null; seller: string | null
+  snapshot: { book: string | null; branchName: string | null; batch: string | null; level: string | null; course: string | null; seller: string | null; plan?: string | null
     items: { name: string; type: number; cost: number; tax: number; total: number }[]; total: number; tax: number; subTotal: number
     hasPayment: boolean; payLines: { name: string; cost: number; tax: number; total: number }[]; paySub: number; cash: string | null; cost: string | null; cash2: string | null; cost2: string | null }
   payRef: string | null; payDate: string | null; payNotes: string | null; split: boolean; ref2: string | null; payDate2: string | null; amount1: number | null; amount2: number | null
@@ -365,7 +365,7 @@ function RegReview({ guid, onClose }: { guid: string; onClose: () => void }) {
               <Section title="بيانات الطلب" icon={<FileText size={16} />}>
                 <KV items={[
                   ['نوع التسجيل', x.order.regType === 1 ? 'دورة' : 'دبلوم'], ['دفتر التسجيل', x.snapshot.book], ['فرع الدراسة', x.snapshot.branchName],
-                  ['الدفعة', x.snapshot.batch], ['المستوى', x.snapshot.level], ['الدورة', x.snapshot.course], ['المسوق', x.snapshot.seller],
+                  ['الدفعة', x.snapshot.batch], ['المستوى', x.snapshot.level], ['الدورة', x.snapshot.course], ['باقة التسجيل', x.snapshot.plan ?? null], ['المسوق', x.snapshot.seller],
                   ['اتفاقية التدريب', x.order.regType === 0 ? (x.contract ? 'وقّعها المتدرب' : 'لم يوقّعها بعد') : null],
                   ['أرسله', `${x.order.createdBy ?? ''} • ${dt(x.order.orderDate)}`], ['ملاحظات', x.notes],
                 ]} />

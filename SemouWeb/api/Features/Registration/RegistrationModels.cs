@@ -76,6 +76,8 @@ public sealed class RegistrationInput
     public Guid? LevelGuid { get; set; }
     public Guid? CourseGuid { get; set; }
     public Guid? SellerGuid { get; set; }
+    /// <summary>باقة التسجيل (WebPricePlan): required for a diploma that has packages; its price replaces the list price.</summary>
+    public Guid? PlanGuid { get; set; }
     public string? Notes { get; set; }
     public List<RegItem> Diploms { get; set; } = [];
     public List<RegItem> Fees { get; set; } = [];
@@ -105,6 +107,8 @@ public sealed class RegPlan
     public decimal PaySub { get; init; }
     public string? CashName { get; init; }
     public string? CashName2 { get; init; }
+    /// <summary>The package the diploma is sold with (null = price list, no package).</summary>
+    public Semou.Api.Features.Pricing.PlanOffer? Plan { get; init; }
 }
 
 /// <summary>A registration's down payment waiting to be posted (web: a طلب سداد of kind 0).</summary>

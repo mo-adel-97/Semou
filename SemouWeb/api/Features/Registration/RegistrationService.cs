@@ -142,6 +142,8 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
             setting = new { s.Guid, s.Code, s.DocName, s.BranchGuid, s.BranchName, s.ChkOtherFees, s.ChkStartPay, s.ChkAmountPay, s.AmountPay, s.DocPayName, s.ChkVat },
             zeroAmount = zero,
             diploms, fees,
+            // the packages of each diploma (diplomGuid -> packages); empty = sold at the list price
+            plans = regType == 0 ? await Semou.Api.Features.Pricing.PricingService.OffersAsync(c, null, diploms.Select(d => d.DiplomGuid)) : [],
             batches = regType == 0 ? await c.QueryAsync("dbo.ShowSeatsOnBatch", new { BranchGuid = s.BranchGuid }, commandType: CommandType.StoredProcedure) : [],
             levels = regType == 0 ? await c.QueryAsync("SELECT Guid, LevelName AS Name, CAST(ISNULL(IsDef,0) AS bit) AS IsDef FROM dbo.Levels WHERE IsUse = 1 ORDER BY TRY_CONVERT(int, Code)") : [],
             courses = regType == 1 ? await c.QueryAsync("""
@@ -255,6 +257,23 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
                 return p;
             }).ToList();
             var dips = pick(i.Diploms, catalog);
+
+            /* ---------- باقة التسجيل: the package's price replaces the list price (final amount, VAT inside) ---------- */
+            Semou.Api.Features.Pricing.PlanOffer? plan = null;
+            if (i.RegType == 0 && dips.Count == 1)
+            {
+                var offers = await Semou.Api.Features.Pricing.PricingService.OffersAsync(c, tx, [dips[0].DiplomGuid]);
+                if (offers.TryGetValue(dips[0].DiplomGuid, out var list) && list.Count > 0)
+                {
+                    if (i.PlanGuid is null) throw new ApiException("يرجى اختيار باقة التسجيل");
+                    plan = list.FirstOrDefault(o => o.PlanGuid == i.PlanGuid) ?? throw new ApiException("الباقة المختارة غير متاحة لهذا الدبلوم، يرجى اختيار باقة أخرى");
+                    var d0 = dips[0];
+                    var rate = d0.PayTaxRate;
+                    var cost = rate != 0 ? R3(plan.Price / (1 + rate / 100)) : plan.Price;
+                    dips[0] = d0 with { Cost = cost, Tax = plan.Price - cost, Total = plan.Price };
+                }
+                else if (i.PlanGuid is not null) throw new ApiException("لا توجد باقات لهذا الدبلوم، يرجى التسجيل بسعر قائمة الأسعار");
+            }
             var fees = s.ChkOtherFees ? pick(i.Fees, feeCatalog) : [];
             var all = dips.Concat(fees).ToList();
             decimal fTotal = Math.Round(all.Sum(x => x.Cost), 2), fTax = Math.Round(all.Sum(x => x.Tax), 2), fSub = Math.Round(all.Sum(x => x.Total), 2);
@@ -291,7 +310,10 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
                 {
                     var item = dips.FirstOrDefault(d => d.DiplomGuid == l.DiplomGuid) ?? throw new ApiException("بند السداد غير موجود في الاستمارة");
                     // PayGrid_CellEndEdit rules
-                    if (l.Total < s.AmountPay) throw new ApiException($"لا يمكن إدخال قيمة أقل من القيمة المحددة للدفعة المقدمة ({s.AmountPay:0.00})");
+                    var minDown = plan?.DownPayment ?? s.AmountPay;
+                    if (l.Total < minDown) throw new ApiException(plan != null
+                        ? $"لا يمكن إدخال قيمة أقل من الدفعة المقدمة لباقة {plan.Name} ({minDown:0.00})"
+                        : $"لا يمكن إدخال قيمة أقل من القيمة المحددة للدفعة المقدمة ({minDown:0.00})");
                     if (l.Total > dSub) throw new ApiException("لا يمكن إدخال قيمة أكبر من قيمة الدبلوم / الدورة دون الرسوم");
                     var rate = item.PayTaxRate;
                     var cost = rate != 0 ? R3(l.Total / (1 + rate / 100)) : l.Total;
@@ -322,7 +344,7 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
             {
                 Student = new RegPlanStudent(st.AccountGuid, st.StudentName, st.NationalId), Setting = s, BatchName = batchName, CourseDiplomName = courseDiplomName,
                 Diploms = dips, Fees = fees, FTotal = fTotal, FTax = fTax, FSub = fSub, MainDiplom = mainDiplom, Pay = pay,
-                PayLines = payLines.Select(l => new RegPlanPayLine(l.Item, l.Cost, l.Tax, l.Total)).ToList(), PaySub = paySub, CashName = cashName, CashName2 = cashName2,
+                PayLines = payLines.Select(l => new RegPlanPayLine(l.Item, l.Cost, l.Tax, l.Total)).ToList(), PaySub = paySub, CashName = cashName, CashName2 = cashName2, Plan = plan,
             };
     }
 
@@ -362,7 +384,7 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
             foreach (var f in fees)
                 await c.ExecuteAsync("dbo.AddRegDocDiplom", new { RegDocGuid = regGuid, f.DiplomGuid, Cost = (double)f.Cost, Tax = (double)f.Tax, SubTotal = (double)f.Total, DiplomType = 1, Type_ = 0 }, tx, commandType: CommandType.StoredProcedure);
 
-            var regNotes = $"تسجيل الطالب {st.StudentName}\r\n {s.DocName}\r\n {batchName}\r\n {noteDip}";
+            var regNotes = $"تسجيل الطالب {st.StudentName}\r\n {s.DocName}\r\n {batchName}\r\n {noteDip}" + (p.Plan is { } pl ? $"\r\n باقة {pl.Name}" : "");
             var regCost = s.CostCenterGuid ?? Guid.Empty;
             await SalesPoster.JournalAsync(c, tx, regTypeGuid, regGuid, regCode, s.BranchGuid, i.RegDate, regNotes,
             [
@@ -388,6 +410,13 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
                     down = null;
                 }
             }
+
+            if (p.Plan is { } plan)
+                await c.ExecuteAsync("""
+                    INSERT dbo.WebRegPlan (RegDocGuid, PlanGuid, PlanName, Months, Price, DownPayment, Installment, FirstDue)
+                    VALUES (@regGuid, @PlanGuid, @Name, @Months, @Price, @DownPayment, @Installment, @firstDue)
+                    """, new { regGuid, plan.PlanGuid, plan.Name, plan.Months, plan.Price, plan.DownPayment, plan.Installment,
+                               firstDue = plan.Months > 0 ? i.RegDate.Date.AddMonths(1) : (DateTime?)null }, tx);
 
             await audit.WriteAsync(c, tx, Form, regGuid, UserActionLog.New, regCode);
             return (new RegistrationSaved("تم التسجيل بنجاح", regCode, regGuid, billCode, billGuid, taxNo, receiptCode, receiptCode2), down);
