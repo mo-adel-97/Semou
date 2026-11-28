@@ -9,7 +9,7 @@ import { api, qs, tokenStore } from '../api'
 import { useAuth } from '../auth'
 import { alerts } from '../lib/alerts'
 import { useBranches } from '../lib/lookups'
-import { printRegistration, printTaxInvoice } from '../lib/print'
+import { printRegistration, printRegOrder, printTaxInvoice } from '../lib/print'
 import { PageHead } from '../components/Shell'
 import { ReportGrid, type RCol } from '../components/ReportGrid'
 import { Dates, F, money } from '../components/ReportKit'
@@ -172,6 +172,7 @@ export function MyRequests({ group }: { group: string }) {
     { key: 'programs', label: 'البرنامج / البند', width: 190 },
     { key: 'payAmount', label: 'المبلغ', width: 105, num: true, tone: 'ok', priority: 3, value: r => (r.type === 'reg' ? r.subTotal : r.payAmount) },
     { key: 'status', label: 'الحالة', width: 140, priority: 1, cardBadge: true, value: r => statusOf(r.type, r.status).label, render: r => <Status k={r.type} s={r.status} /> },
+    { key: 'print', label: 'طباعة', width: 70, priority: 1, noFilter: true, value: () => '', render: r => r.type === 'reg' ? <button className="btn ghost sm" title="طباعة طلب الالتحاق" onClick={e => { e.stopPropagation(); printRegOrder(r.guid) }}><Printer size={15} /></button> : null },
     { key: 'reviewedBy', label: 'راجعه', width: 120 },
     { key: 'reviewDate', label: 'تاريخ المراجعة', width: 120, value: r => dt(r.reviewDate) },
     { key: 'reviewNotes', label: 'ملاحظات المراجعة', width: 220 },
@@ -346,6 +347,7 @@ function RegReview({ guid, onClose }: { guid: string; onClose: () => void }) {
         footer={x && <>
           {pending && can('webregorder', 'add') && <button className="btn" onClick={approve} disabled={!x.check.ok} title={x.check.ok ? '' : x.check.message ?? ''}><CheckCircle2 size={17} /> قبول وإنشاء الاستمارة</button>}
           {pending && can('webregorder', 'delete') && <button className="btn danger" onClick={reject}><XCircle size={17} /> رفض الطلب</button>}
+          <button className="btn secondary" onClick={() => printRegOrder(x.order.guid)}><Printer size={16} /> طباعة الطلب</button>
           {x.order.status === 1 && x.order.docGuid && <button className="btn secondary" onClick={() => printRegistration(x.order.docGuid!)}><Printer size={16} /> طباعة الاستمارة</button>}
           {x.order.status === 1 && x.order.billGuid && <button className="btn secondary" onClick={() => printTaxInvoice(x.order.billGuid!)}><Receipt size={16} /> طباعة الفاتورة</button>}
           <button className="btn ghost" onClick={onClose}>إغلاق</button>

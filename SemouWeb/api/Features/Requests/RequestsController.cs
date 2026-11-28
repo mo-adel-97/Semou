@@ -36,6 +36,15 @@ public sealed class RequestsController(RequestsService requests, PermissionServi
     [HttpGet("registration/{guid:guid}")]
     public async Task<IActionResult> GetReg(Guid guid, CancellationToken ct) { await Need(WebForms.RegOrders, Perm.View); return Ok(await requests.GetRegAsync(guid, ct)); }
 
+    /// <summary>طباعة طلب الالتحاق: its author, the reviewers and the reception desk.</summary>
+    [HttpGet("registration/{guid:guid}/print")]
+    public async Task<IActionResult> PrintReg(Guid guid, CancellationToken ct)
+    {
+        if (await requests.RegAuthorAsync(guid, ct) != me.UserGuid && !await Has(WebForms.RegOrders, Perm.View) && !await Has("resdesk", Perm.View))
+            throw new ApiException(RequirePermissionAttribute.Message(Perm.Print), 403);
+        return Ok(await requests.PrintRegAsync(guid, ct));
+    }
+
     [HttpPost("registration/{guid:guid}/approve")]
     public async Task<IActionResult> ApproveReg(Guid guid, ReviewInput input, CancellationToken ct) { await Need(WebForms.RegOrders, Perm.Add); return Ok(await requests.ApproveRegAsync(guid, input.Notes, ct)); }
 

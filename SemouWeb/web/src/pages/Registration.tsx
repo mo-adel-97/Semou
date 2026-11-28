@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Banknote, BookOpenCheck, CalendarClock, Check, ChevronLeft, ChevronRight, ClipboardList, FileCheck2, FileUp, GraduationCap, Paperclip, Receipt, Search, Send, ShieldCheck, Upload, Wallet } from 'lucide-react'
 import { api, ApiError, tokenStore } from '../api'
 import { alerts } from '../lib/alerts'
+import { printRegOrder } from '../lib/print'
 import { CostCenterPicker } from '../components/CostCenterPicker'
 import { Drawer, Field, Spinner, Switch } from '../components/ui'
 
@@ -232,7 +233,7 @@ export function RegistrationWizard({ student, onClose }: { student: RegStudent; 
     onSuccess: async r => {
       if (!r) return
       qc.invalidateQueries({ queryKey: ['reception'] }); qc.invalidateQueries({ queryKey: ['requests'] })
-      await alerts.success(r.message, 'ستظهر حالة الطلب في بطاقة الطالب، وتُنشأ الاستمارة فور قبوله من المبيعات.')
+      if (await alerts.confirm({ title: r.message, text: 'ستظهر حالة الطلب في بطاقة الطالب، وتُنشأ الاستمارة فور قبوله من المبيعات.', confirmText: 'طباعة الطلب', cancelText: 'إغلاق', icon: 'success' })) await printRegOrder(r.guid)
       onClose()
     },
   })

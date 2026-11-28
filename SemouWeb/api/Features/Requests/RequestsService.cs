@@ -248,6 +248,42 @@ public sealed class RequestsService(Db db, CurrentUser me, RegistrationService r
         };
     }
 
+    /// <summary>Who sent a registration request (the author may always print it).</summary>
+    public async Task<Guid?> RegAuthorAsync(Guid guid, CancellationToken ct)
+    {
+        await using var c = await db.OpenAsync(ct);
+        return await c.ExecuteScalarAsync<Guid?>(new CommandDefinition("SELECT UserGuid FROM dbo.WebRegOrder WHERE Guid = @guid", new { guid }, cancellationToken: ct));
+    }
+
+    /// <summary>طباعة طلب الالتحاق: everything the printed request shows (sent to the student before the form exists).</summary>
+    public async Task<object> PrintRegAsync(Guid guid, CancellationToken ct)
+    {
+        await using var c = await db.OpenAsync(ct);
+        var row = await c.QueryFirstOrDefaultAsync<OrderListRow>(new CommandDefinition(RegListSql + " WHERE O.Guid = @guid", new { guid }, cancellationToken: ct))
+                  ?? throw ApiException.NotFound("الطلب غير موجود");
+        var o = await c.QueryFirstAsync<(string Payload, Guid? BranchGuid)>("SELECT Payload, BranchGuid FROM dbo.WebRegOrder WHERE Guid = @guid", new { guid });
+        var payload = JsonSerializer.Deserialize<RegPayload>(o.Payload, Json)!;
+        var branch = await c.QueryFirstOrDefaultAsync("SELECT BrName AS name, BrAddress AS address, BrVatId AS vat, BrTel AS tel FROM dbo.Branch WHERE Guid = @b", new { b = o.BranchGuid });
+        // the package, as sold (its name, months, price, down payment and instalment)
+        object? plan = null;
+        if (payload.Input.PlanGuid is { } pg && payload.Snapshot.Items.FirstOrDefault(x => x.Type == 0) is { } main)
+        {
+            var pl = await c.QueryFirstOrDefaultAsync<(string Name, int Months)>("SELECT Name, Months FROM dbo.WebPricePlan WHERE Guid = @pg", new { pg });
+            if (pl.Name is not null)
+            {
+                var down = payload.Snapshot.PaySub;
+                plan = new { name = pl.Name, months = pl.Months, price = main.Total, down,
+                             installment = Semou.Api.Features.Pricing.PricingService.InstallmentOf(main.Total, Math.Min(down, main.Total), pl.Months) };
+            }
+        }
+        return new
+        {
+            order = row, statusName = RegStatusName(row.Status), snapshot = payload.Snapshot, notes = payload.Input.Notes, contract = payload.Input.ChkContract,
+            payRef = payload.Input.Payment?.Ref, payDate = payload.Input.Payment?.PayDate, branch, plan,
+            student = await StudentOfAsync(c, row.AccountGuid),
+        };
+    }
+
     public async Task<object> ApproveRegAsync(Guid guid, string? notes, CancellationToken ct)
     {
         var result = await db.InTransactionAsync(async (c, tx) =>

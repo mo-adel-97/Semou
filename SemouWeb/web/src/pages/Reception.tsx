@@ -13,7 +13,7 @@ import { PageHead } from '../components/Shell'
 import { Drawer, Field, Segmented, Spinner, Switch } from '../components/ui'
 import { RegistrationWizard, type RegStudent } from './Registration'
 import { PayInvoice, type PayTarget } from './PayInvoice'
-import { printRegistration } from '../lib/print'
+import { printRegistration, printRegOrder } from '../lib/print'
 import { StudentStatement } from './Statement'
 import { FeeForm, type FeeTarget } from './FeeForm'
 import { ReturnWizard, type ReturnStart } from './ReturnForm'
@@ -513,6 +513,7 @@ function RequestList({ rows }: { rows: SentRequest[] }) {
           </div>
           <span className={`badge ${tone(r)}`}>{r.statusName}</span>
           <span className="rp-req-amt">{money(r.amount)}</span>
+          {r.kind === 'reg' && <button className="btn ghost sm icon" title="طباعة طلب الالتحاق" onClick={() => printRegOrder(r.guid)}><Printer size={15} /></button>}
         </div>
       ))}
       {rows.length > recent.length && <button className="sc-toggle" onClick={() => setAll(v => !v)}>{all ? 'عرض الطلبات الحديثة فقط' : `عرض كل الطلبات (${rows.length.toLocaleString('ar-EG')})`}</button>}
