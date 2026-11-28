@@ -1134,3 +1134,18 @@ html.menu-open .dock * { animation-play-state: paused !important; }
 .admin-nav-on::before { content: ""; position: absolute; inset-inline-start: -.75rem; top: .55rem; bottom: .55rem; width: 3px; border-radius: 999px; background: var(--color-gold-400); }
 .seg-scroll { scrollbar-width: none; }
 .seg-scroll::-webkit-scrollbar { display: none; }
+
+/* ---------------- نافذة الإعلان (PromoPopup) ---------------- */
+.promo-wrap { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in oklab, var(--color-deep-950, #0b1a33) 62%, transparent); backdrop-filter: blur(6px); }
+.promo-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: .9rem; width: min(100%, 64rem); }
+.promo-img { display: block; width: 100%; padding: 0; border: 0; cursor: pointer; border-radius: 1.6rem; overflow: hidden; background: var(--surface); box-shadow: 0 40px 90px -30px rgb(0 0 0 / .6); transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.promo-img:hover { transform: translateY(-3px); }
+.promo-img img { display: block; width: 100%; height: auto; max-height: calc(100dvh - 9rem); object-fit: contain; }
+.promo-close { position: absolute; top: -.9rem; inset-inline-end: -.9rem; z-index: 2; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lift); transition: transform .3s; }
+.promo-close:hover { transform: rotate(90deg); }
+.promo-cta { padding: .8rem 2.2rem; border-radius: 999px; font-weight: 800; }
+@media (max-width: 767px) {
+  .promo-card { width: min(100%, 26rem); }
+  .promo-img { border-radius: 1.25rem; }
+  .promo-close { top: -.7rem; inset-inline-end: -.4rem; }
+}

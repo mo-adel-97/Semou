@@ -14,6 +14,7 @@ import { PROGRAM_TYPES, type ProgramType } from '../lib/types'
 
 import IntroBirds from './IntroBirds'
 import GiftBox from './GiftBox'
+import PromoPopup from './PromoPopup'
 import SiteTexts from './SiteTexts'
 import { startTracking, trackView } from '../lib/track'
 import Fx from '../components/Fx'
@@ -469,6 +470,7 @@ export default function Layout() {
         <Footer />
         <Floating />
         <Suspense fallback={null}><ChatWidget /></Suspense>
+        <PromoPopup />
       </div>
       <IntroBirds />
       {(letters.length > 0 || talks.length > 0) && (

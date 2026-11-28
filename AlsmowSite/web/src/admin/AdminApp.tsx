@@ -1,7 +1,7 @@
 import {
   BadgeCheck, BarChart3, Bird, Bot, Building2, ExternalLink, FileSignature, FileText, GraduationCap, Handshake, Images, Inbox,
   LayoutDashboard, LineChart, Loader2, LogOut, Menu, MessageSquareQuote, Newspaper, PencilLine, Phone, Search, Settings, Share2, Sparkles,
-  Type, UserCog, Users, X, type LucideIcon, Gift } from 'lucide-react'
+  Type, UserCog, Users, X, type LucideIcon, Gift, Megaphone } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
@@ -44,6 +44,7 @@ export const ICONS: Record<string, LucideIcon> = {
   'layout-dashboard': LayoutDashboard,
   bot: Bot,
   gift: Gift,
+  megaphone: Megaphone,
 }
 
 export default function AdminApp() {

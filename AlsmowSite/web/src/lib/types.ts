@@ -55,6 +55,8 @@ export interface Settings {
   general: Partial<{ site_name: string; tagline: string; logo: string; announcement: string; announcement_link: string; announcement_cta: string; register_text: string; register_url: string; portal_hide: boolean; portal_text: string; portal_link: string; lms_url: string; theme_accent: string; theme_color: string | null; theme_mode: string; theme_main: { a: string; b: string }[]; theme_sub: { a: string; b: string }[]; theme_secondary: string | null }>
   hero: Partial<{ eyebrow: string; title: string; highlight: string; subtitle: string; cta_text: string; cta_link: string; secondary_text: string; secondary_link: string; image: string; highlights: string[] }>
   assistant?: Partial<{ disabled: boolean; name: string | null; title: string | null; welcome: string | null; suggestions: string[]; fallback: string | null; kb: KbEntry[] }>
+  /** نافذة الإعلان (Settings › نافذة الإعلان) */
+  popup?: Partial<{ enabled: boolean; image_desktop: string | null; image_mobile: string | null; link: string | null; cta: string | null; alt: string | null; mode: 'session' | 'first' | 'always' }>
   intro?: Partial<{ mode: 'off' | 'first' | 'session' | 'always'; kicker: string | null; title: string | null; message: string | null; quote: string | null; skip: string | null }>
   about: Partial<{ title: string; summary: string; body: string; image: string; vision: string; mission: string; values: string[] }>
   stats: Partial<{ items: StatItem[] }>

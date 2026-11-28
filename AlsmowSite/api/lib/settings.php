@@ -59,6 +59,23 @@ function settings_schema(): array
                 'highlights' => ['type' => 'list', 'label' => 'نقاط مميزة', 'max' => 80, 'maxItems' => 4],
             ],
         ],
+        // The campaign picture shown when the site opens (web/src/site/PromoPopup.tsx)
+        'popup' => [
+            'label' => 'نافذة الإعلان', 'icon' => 'megaphone',
+            'fields' => [
+                'enabled' => ['type' => 'bool', 'label' => 'إظهار نافذة الإعلان عند فتح الموقع', 'default' => false],
+                'image_desktop' => ['type' => 'image', 'label' => 'صورة الكمبيوتر (عريضة)', 'help' => 'المقاس المناسب 1920×1080'],
+                'image_mobile' => ['type' => 'image', 'label' => 'صورة الجوال (طولية)', 'help' => 'المقاس المناسب 1080×1350'],
+                'link' => ['type' => 'url', 'label' => 'الرابط عند الضغط', 'max' => 500, 'placeholder' => '/register', 'help' => 'اتركه فارغًا لفتح صفحة التسجيل'],
+                'cta' => ['type' => 'string', 'label' => 'نص الزر أسفل الصورة', 'max' => 40, 'placeholder' => 'سجّل الآن', 'help' => 'اتركه فارغًا لإخفاء الزر (الصورة نفسها تفتح الرابط)'],
+                'alt' => ['type' => 'string', 'label' => 'وصف الصورة (لقارئ الشاشة)', 'max' => 160],
+                'mode' => ['type' => 'enum', 'label' => 'متى تظهر', 'default' => 'session', 'options' => [
+                    'session' => 'مرة في كل زيارة',
+                    'first' => 'مرة واحدة لكل جهاز (وتظهر من جديد عند تغيير الصورة)',
+                    'always' => 'مع كل فتح للموقع',
+                ], 'help' => 'للمعاينة في أي وقت: افتح الموقع ومعه ‎?promo‎ في آخر الرابط'],
+            ],
+        ],
         // The opening scene: doves carrying the welcome banner (web/src/site/IntroBirds.tsx)
         'intro' => [
             'label' => 'الافتتاحية', 'icon' => 'bird',
