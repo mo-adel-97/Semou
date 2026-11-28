@@ -91,6 +91,27 @@ public sealed class RegistrationService(Db db, UserActionLog audit, CurrentUser 
             }
         }
 
+        // A diploma priced in ضبط الأسعار والدفعات المقدمة is sold through its packages even when the book's price list
+        // does not carry it: it joins the list at its cheapest package (the chosen package's price replaces it on save).
+        if (regType == 0)
+        {
+            var offers = await Semou.Api.Features.Pricing.PricingService.OffersAsync(c, tx,
+                await c.QueryAsync<Guid>("SELECT Guid FROM dbo.Diplom WHERE StudyType = 0 AND DiplomType = 0 AND IsUse = 1", transaction: tx));
+            var missing = offers.Keys.Where(g => diploms.All(d => d.DiplomGuid != g)).ToArray();
+            if (missing.Length > 0)
+            {
+                var rows = await c.QueryAsync<(Guid Guid, string Code, string Name, double? TaxValue)>(
+                    "SELECT Guid, Code, DiplomName, TaxValue FROM dbo.Diplom WHERE Guid IN @missing ORDER BY TRY_CONVERT(int, Code)", new { missing }, tx);
+                foreach (var r in rows)
+                {
+                    var rate = foreign ? ForeignVat : (decimal)(r.TaxValue ?? 0);
+                    var total = offers[r.Guid].Min(o => o.Price);
+                    var cost = rate != 0 ? R3(total / (1 + rate / 100)) : total;
+                    diploms.Add(new PriceRow(r.Code, r.Name, r.Guid, 0, cost, total - cost, total, rate));
+                }
+            }
+        }
+
         var fees = new List<PriceRow>();
         if (s.ChkOtherFees)
         {
