@@ -12,7 +12,6 @@ import { useSite } from '../lib/queries'
  */
 
 const KEY = 'alsmow.promo' // sessionStorage / localStorage: which picture was already shown (a new picture shows again)
-const DELAY = 900 // after the page (and the opening scene) settles
 
 function seen(id: string, mode: string) {
   try {
@@ -37,6 +36,7 @@ export default function PromoPopup() {
   const mode = p?.mode || 'session'
   const link = p?.link || '/register'
   const cta = p?.cta || ''
+  const delay = Math.min(30, Math.max(0, Number(p?.delay ?? 1))) * 1000 // after the page (and the opening scene) settles
 
   useEffect(() => {
     if (!p?.enabled || !desktop) return
@@ -47,13 +47,17 @@ export default function PromoPopup() {
     if (seen(id, mode)) return
     let t = 0
     const html = document.documentElement
-    const show = () => { window.clearTimeout(t); t = window.setTimeout(() => { if (!html.classList.contains('intro-on')) { markSeen(id); setOpen(true) } }, DELAY) }
+    const src = window.matchMedia('(max-width: 767px)').matches ? mobile : desktop
+    let ready = false
+    const img = new Image(); img.decoding = 'async'; img.src = src
+    const loaded = img.decode().then(() => { ready = true }).catch(() => { ready = true })
+    const show = () => { window.clearTimeout(t); t = window.setTimeout(() => { void loaded.then(() => { if (ready && !html.classList.contains('intro-on')) { markSeen(id); setOpen(true) } }) }, delay) }
     // wait for the opening scene to finish (it marks <html> while it plays)
     const mo = new MutationObserver(() => { if (!html.classList.contains('intro-on')) { mo.disconnect(); show() } })
     if (html.classList.contains('intro-on')) mo.observe(html, { attributes: true, attributeFilter: ['class'] })
     else show()
     return () => { mo.disconnect(); window.clearTimeout(t) }
-  }, [p?.enabled, desktop, id, mode])
+  }, [p?.enabled, desktop, mobile, id, mode, delay])
 
   // while open: no page scrolling, Esc closes
   useEffect(() => {
@@ -61,9 +65,10 @@ export default function PromoPopup() {
     lenis?.stop()
     const html = document.documentElement, prev = html.style.overflow
     html.style.overflow = 'hidden'
+    html.classList.add('promo-on')
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     window.addEventListener('keydown', key)
-    return () => { window.removeEventListener('keydown', key); html.style.overflow = prev; lenis?.start() }
+    return () => { window.removeEventListener('keydown', key); html.style.overflow = prev; html.classList.remove('promo-on'); lenis?.start() }
   }, [open, lenis])
 
   const go = () => {
@@ -76,16 +81,16 @@ export default function PromoPopup() {
     <AnimatePresence>
       {open && (
         <motion.div className="promo-wrap" role="dialog" aria-modal="true" aria-label={p?.alt || 'إعلان'}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
           onClick={() => setOpen(false)}>
           <motion.div className="promo-card" onClick={e => e.stopPropagation()}
-            initial={{ opacity: 0, y: 28, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 26 }}>
+            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
             <button type="button" className="promo-close" onClick={() => setOpen(false)} aria-label="إغلاق"><X className="h-5 w-5" /></button>
             <button type="button" className="promo-img" onClick={go} aria-label={p?.alt || cta || 'سجّل الآن'}>
               <picture>
                 <source media="(max-width: 767px)" srcSet={mobile} />
-                <img src={desktop} alt={p?.alt || ''} decoding="async" />
+                <img src={desktop} alt={p?.alt || ''} />
               </picture>
             </button>
             {cta && <button type="button" className="promo-cta btn-primary" onClick={go}>{cta}</button>}

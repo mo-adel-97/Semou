@@ -1136,16 +1136,22 @@ html.menu-open .dock * { animation-play-state: paused !important; }
 .seg-scroll::-webkit-scrollbar { display: none; }
 
 /* ---------------- نافذة الإعلان (PromoPopup) ---------------- */
-.promo-wrap { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in oklab, var(--color-deep-950, #0b1a33) 62%, transparent); backdrop-filter: blur(6px); }
-.promo-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: .9rem; width: min(100%, 64rem); }
-.promo-img { display: block; width: 100%; padding: 0; border: 0; cursor: pointer; border-radius: 1.6rem; overflow: hidden; background: var(--surface); box-shadow: 0 40px 90px -30px rgb(0 0 0 / .6); transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
-.promo-img:hover { transform: translateY(-3px); }
-.promo-img img { display: block; width: 100%; height: auto; max-height: calc(100dvh - 9rem); object-fit: contain; }
-.promo-close { position: absolute; top: -.9rem; inset-inline-end: -.9rem; z-index: 2; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lift); transition: transform .3s; }
+/* No blur behind (it repaints the whole moving page every frame); the card is sized from the picture's own shape,
+   so the picture always fills it edge to edge on any screen. While it is open the page's own animations pause. */
+.promo-wrap { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1.25rem;
+  background: radial-gradient(120% 90% at 50% 0%, #163a6b 0%, #0a1830 55%, #060e1e 100%); }
+.promo-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  width: min(100%, 68rem, calc((100dvh - 8.5rem) * 16 / 9)); will-change: transform, opacity; }
+.promo-img { display: block; width: 100%; aspect-ratio: 16 / 9; padding: 0; border: 0; cursor: pointer; border-radius: 1.5rem; overflow: hidden; background: none; box-shadow: 0 30px 80px -24px rgb(0 0 0 / .65); }
+.promo-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.promo-close { position: absolute; top: -.85rem; inset-inline-end: -.85rem; z-index: 2; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px; background: #fff; color: #0b1a33; box-shadow: 0 10px 24px -8px rgb(0 0 0 / .45); transition: transform .3s; }
 .promo-close:hover { transform: rotate(90deg); }
-.promo-cta { padding: .8rem 2.2rem; border-radius: 999px; font-weight: 800; }
+.promo-cta { padding: .85rem 2.6rem; border-radius: 999px; font-weight: 800; background-color: #fff !important; color: #0b1a33 !important; box-shadow: 0 14px 30px -12px rgb(0 0 0 / .6) !important; }
+/* the page behind is not painted at all while the picture is up (no lag on phones) */
+html.promo-on .site-shell > :not(.promo-wrap) { visibility: hidden; }
+html.promo-on .site-shell *, html.promo-on .site-shell *::before, html.promo-on .site-shell *::after { animation-play-state: paused !important; }
 @media (max-width: 767px) {
-  .promo-card { width: min(100%, 26rem); }
-  .promo-img { border-radius: 1.25rem; }
+  .promo-card { width: min(100%, 26rem, calc((100dvh - 8.5rem) * 4 / 5)); }
+  .promo-img { aspect-ratio: 4 / 5; border-radius: 1.25rem; }
   .promo-close { top: -.7rem; inset-inline-end: -.4rem; }
 }
